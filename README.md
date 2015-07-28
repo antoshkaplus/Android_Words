@@ -8,3 +8,25 @@ Goals:
 * green, red colors
 * add spelling in english
 * later on make some progress graphs
+
+
+
+* somehow I need to use google translate API
+
+* because translating by hand sucks
+
+native language
+foreign language
+
+
+translation
+    native_word_id
+    foreign_word_id
+
+word
+    word
+    id
+
+
+
+backend is not going to be implemented soon
