@@ -30,3 +30,8 @@ word
 
 
 backend is not going to be implemented soon
+
+
+in raw folder should have some initial data set
+
+word;translation

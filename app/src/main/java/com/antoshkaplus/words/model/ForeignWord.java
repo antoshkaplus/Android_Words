@@ -16,4 +16,14 @@ public class ForeignWord extends Word {
 
     @DatabaseField(columnName = FIELD_NAME_CREATION_DATE)
     public Date creationDate;
+
+
+    public ForeignWord() {}
+
+    public ForeignWord(String word, Date creationDate) {
+        super(word);
+        this.creationDate = creationDate;
+    }
+
+
 }

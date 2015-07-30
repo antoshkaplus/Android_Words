@@ -15,7 +15,7 @@ public class UserTranslation {
     public static final String FIELD_TRANSLATION = "translation";
 
     @DatabaseField(columnName = FIELD_USER)
-    public String user;
+    public User user;
     @DatabaseField(columnName = FIELD_TRANSLATION)
     public Translation translation;
 

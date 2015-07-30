@@ -9,5 +9,10 @@ import java.util.Date;
 public class NativeWord extends Word {
     public static final String TABLE_NAME = "native_word";
 
+    public NativeWord() {}
+
+    public NativeWord(String word) {
+        super(word);
+    }
 
 }

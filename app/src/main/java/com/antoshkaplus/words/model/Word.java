@@ -15,4 +15,15 @@ public abstract class Word {
 
     @DatabaseField(columnName = FIELD_NAME_WORD, unique = true)
     public String word;
+
+    // id field is long because we may wanna use backend where it's most certainly is going to be long
+    @DatabaseField(columnName = FIELD_NAME_ID, generatedId = true)
+    public long id;
+
+
+    public Word() {}
+
+    public Word(String word) {
+        this.word = word;
+    }
 }

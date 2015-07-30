@@ -1,5 +1,9 @@
 package com.antoshkaplus.words;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
+
+import com.antoshkaplus.words.model.NativeWord;
 import com.antoshkaplus.words.model.Translation;
 import com.antoshkaplus.words.model.UserTranslation;
 import com.j256.ormlite.dao.Dao;
@@ -19,9 +23,23 @@ public class TranslationRepository {
     // probably email address
     private String user;
 
+
+    public TranslationRepository(Context ctx, String user) {
+        helper = new DatabaseHelper(ctx);
+        this.user = user;
+    }
+
     public void AddTranslation(Translation translation) throws Exception {
-        helper.getDao(Translation.class).create(translation);
-        helper.getDao(UserTranslation.class).create(new UserTranslation(user, translation));
+        // seems I need to join actually
+
+        translation.nativeWord
+        List<Translation> ts = helper.getDao(Translation.class).queryForMatching(translation);
+        if (ts.isEmpty()) {
+            helper.getDao(Translation.class).create(translation);
+        }
+
+        //helper.getDao(Translation.class).create(translation);
+        //helper.getDao(UserTranslation.class).create(new UserTranslation(user, translation));
     }
 
     public List<Translation> getAllTranslations() throws Exception {

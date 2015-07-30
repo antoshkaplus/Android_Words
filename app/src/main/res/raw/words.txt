@@ -1,0 +1,5 @@
+hello;privet
+bye;poka
+anton;anton;
+star;zvezda
+cinema;kino

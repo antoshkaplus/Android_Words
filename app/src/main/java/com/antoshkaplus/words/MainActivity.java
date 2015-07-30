@@ -11,6 +11,8 @@ import android.widget.Button;
 
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.model.ForeignWord;
+import com.antoshkaplus.words.model.NativeWord;
+import com.antoshkaplus.words.model.Translation;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -22,7 +24,12 @@ import com.google.api.services.translate.TranslateRequestInitializer;
 import com.google.api.services.translate.model.TranslationsListResponse;
 import com.google.api.services.translate.model.TranslationsResource;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends Activity {
@@ -35,6 +42,13 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        translationRepository = new TranslationRepository(this, "antoshkaplus@gmail.com");
+        try {
+            PopulateWithInitialData();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         Button add =  (Button) findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -42,7 +56,6 @@ public class MainActivity extends Activity {
                 // pop dialog box that would let you add new translation for current user
             }
         });
-
 
         new Thread(new Runnable() {
             @Override
@@ -149,7 +162,21 @@ public class MainActivity extends Activity {
         dialog.show(ft, "dialog");
     }
 
+    void PopulateWithInitialData() throws Exception {
+        InputStream input = getResources().openRawResource(R.raw.words);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        String line;
+        // should check for empty string
+        while ((line = reader.readLine()) != null) {
+            String[] words = line.split(";");
 
+            translationRepository.AddTranslation(
+                    new Translation(
+                            new ForeignWord(words[0], new Date()),
+                            new NativeWord(words[1])
+                    ));
+        }
+    }
 
 
 }
