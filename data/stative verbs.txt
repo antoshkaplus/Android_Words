@@ -1,0 +1,64 @@
+﻿agree 
+appear
+believe
+belong
+concern - волноваться, беспокоиться
+consist
+contain
+depend
+deserve
+disagree
+dislike
+doubt
+feel(=have an opinion)
+fit
+hate
+hear
+imagine
+impress
+include
+involve
+know
+like
+love
+matter
+mean
+measure(=be long)
+mind
+need
+owe
+own
+prefer
+promise
+realise
+recognise
+remember
+seem
+sound
+suppose
+understand 
+want
+weight(=have weight)
+wish
+
+can be both stative and dynamic:
+be:
+  usually a stative verb, but whan it is used 
+  in continuous it means 'behaving' or 'acting'
+have:
+  stative = own
+  dynamic = part of an expression
+see:
+  stative = see with your eyes / understand
+  dynamic = meet / have a relationship with
+taste
+smell
+feel
+look:
+  stative = has a certain taste
+  dynamic = the action of tasting
+think:
+  stative = have an opinion
+  dynamic = consider, have in my mind
+  
+

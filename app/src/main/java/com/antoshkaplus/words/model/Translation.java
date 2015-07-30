@@ -13,6 +13,7 @@ public class Translation {
 
     public static final String FIELD_FOREIGN_WORD = "foreign_word";
     public static final String FIELD_NATIVE_WORD = "native_word";
+    public static final String FIELD_ID = "id";
 
     @DatabaseField(columnName = FIELD_FOREIGN_WORD,
                     foreign = true,
@@ -26,6 +27,11 @@ public class Translation {
                     foreignAutoRefresh = true,
                     uniqueCombo = true)
     public NativeWord nativeWord;
+
+    @DatabaseField(columnName = FIELD_ID, generatedId = true)
+    public long id;
+
+
 
     public Translation() {}
 

@@ -8,6 +8,8 @@ import android.util.Log;
 import com.antoshkaplus.words.model.ForeignWord;
 import com.antoshkaplus.words.model.NativeWord;
 import com.antoshkaplus.words.model.Translation;
+import com.antoshkaplus.words.model.User;
+import com.antoshkaplus.words.model.UserTranslation;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -39,6 +41,8 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, ForeignWord.class);
             TableUtils.createTable(connectionSource, NativeWord.class);
             TableUtils.createTable(connectionSource, Translation.class);
+            TableUtils.createTable(connectionSource, User.class);
+            TableUtils.createTable(connectionSource, UserTranslation.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);

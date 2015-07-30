@@ -1,0 +1,422 @@
+Martin the Warrior 
+disembarked -- выгруженный
+sleeve -- рукав
+sly -- хитрый
+hitherto -- до сих пор
+winking -- моргание
+detain -- задерживать
+tempest -- буря
+ought -- обязанность, долг
+berth -- причал
+bow -- поклониться
+adversity -- невзгоды
+exultation -- ликование
+indignant -- возмущенный
+screw -- винт, болт, шуруп
+accomplice -- сообщник
+caff -- дразнить
+purser -- казначей
+venture -- рисковать
+imprudent -- неосторожный
+confide -- доверять, поверять, полагаться
+twinlight -- сумрак
+mist -- туман
+gule -- шторм, буря
+surge -- большая волна
+chagrin -- огорчение, досада, разочарование
+obliged -- обязанный, принужденный
+repose -- передышка
+funnel -- воронка
+succour -- приходить на помощь
+errand -- поручение
+odourless -- без запаха
+embassy -- посольство
+enigmatical -- загадочный
+polished -- безупречный, элегантный
+resemble -- напоминать, походить на
+swarm -- рой, стая, толпа
+lavish -- щедрый, расточительный
+avaricious -- скупой
+taciturn -- молчаливый
+purse -- кошелек
+cosy -- уютный
+aptness -- меткость, способность
+tranquil -- спокойный, уравновешенный
+superfluous -- излишний, чрезмерный
+wardrobe -- гардероб, шкаф
+vain -- напрасный, тщетный
+impassible -- бесстрастный
+voyage -- рейс, путешествие
+cease -- прекращать
+deflection -- прогиб
+palatable -- вкусный, приятный, аппетитный
+booby -- олух, болван
+scarcely -- едва
+midst -- среди
+affair -- дело
+torture -- пытка
+rear -- задний
+fugitive -- беглец
+ere -- прежде чем 
+wig -- парик
+bail -- залог
+devotion -- преданность
+spouse -- супруг, супруга
+confer -- совещаться
+pity -- жалость
+domestic -- внутренний
+decamp -- удирать
+prophet -- пророк
+porch -- крыльцо
+clay -- глина
+adorn -- украшать
+polygamist -- многоженец
+peculiar -- специфический
+insist -- настаивать
+gratitude -- благодарность
+perceive -- воспринимать
+adversary -- противник
+colonel -- полковник
+ought -- должен
+budge -- шевелиться, передумывать
+descend -- спускаться
+prudent -- благоразумный
+ford -- брод
+capricious -- капризный
+pale -- бледный
+oblige -- обязать
+alacrity -- готовность
+groin -- пах
+haste -- поспешность
+sledge -- сани
+freight -- груз 
+pensive -- задумчивый
+blundering -- неумелый
+unpropitious -- неблагоприятный
+famish -- голодать
+exhibit -- проявлять
+sabre -- сабля
+frolic -- резвиться
+delight -- восторг, восхищение
+procure -- добывать, обеспечивать
+exultation -- ликование, торжество
+pugilistic -- кулачный
+blow -- удар
+treason -- измена, предательство
+plunder -- грабеж
+bruise -- синяк
+tailor -- портной
+retaliate -- мстить
+ribbon -- лента
+herd -- стадо
+enlarged -- увеличенный
+amusing -- забавный
+divert -- отвлекать
+cravat -- галстук
+clergyman -- священник
+affix -- прикрепить
+irritate -- раздражать
+contradict -- противоречить
+visage -- облик
+tar -- смола
+feather -- перо
+ambuscade -- засада
+disguise -- скрыть, маскировка
+preach -- проповедь
+perish -- погибнуть
+sombre -- мрачный
+folly -- глупость
+anxious -- тревожный
+maiden -- девушка
+fright -- испуг
+moss -- мох
+shimmer -- отблеск, мерцание
+haze -- дымка, туман
+noontide -- полдень
+shade -- тень
+hazelnut -- фундук, лесной орех
+cowl -- капюшон
+stern gaze -- суровый взгляд
+trip -- спотыкаться
+grasp -- понимание, схватывание
+dignity -- достоинство
+whisker -- бакенбарды, усы
+sedate pace -- степенный темп
+snail -- улитка
+courageous -- мужественный
+orphaned -- осиротевший
+forsake -- отказываться, оставлять
+hang up -- подвешивать, откладывать
+courtesy -- вежливость
+humble -- скромный, покорный
+torn -- порванный
+bilge -- трюмный
+sever -- канализация
+ferret -- хорек
+sconce -- подсвечник
+badger -- барсук
+friar -- монах
+waddle -- переваливаться, ходить вразвалку
+groom -- ухаживать
+whirl -- вихрь
+mole -- крот
+belfry -- колокольня
+vigorously -- энергично
+consternation -- ужас, испуг, оцепенение
+weariness -- усталость
+relish -- удовольствие, наслаждаться
+desolation -- разорение, разрушение
+vivid -- яркий
+shudder -- дрожь
+pipe up -- заговорить, заиграть, запеть
+astounding -- поразительный
+roving -- бродячий
+torment -- мучение
+dumbly -- безмолвно, молчаливо
+fret -- беспокоиться, раздражаться
+splendid -- великолепный
+humble -- скромный
+pinafore -- передник
+weep -- плакать
+indebted -- в долгу
+strain -- напряжение
+shiver -- дрожь
+meadow -- луг, поляна
+larder -- кладовая
+doze off -- задремать
+uncanny -- жуткий, сверхъестественный
+lizard -- ящерица
+ruthless -- безжалостный
+exhilaration -- возбуждение
+swollen -- набухший
+dormitory -- общежитие
+solicitous -- заботливый
+prevail -- преобладать
+toad -- жаба
+newt -- тритон
+merriment -- веселье
+curmudgeon -- скряга, грубиян
+avalanche -- лавина
+dandelion -- одуванчик
+loot -- добыча
+
+
+Programming
+foolproof -- надежный
+propagation -- распространение
+
+tableau —- 
+eggplant
+squash
+mackerel
+scomber
+tuna
+inflamation — воспаление
+enamel —- 
+needle
+prick —- укол, колоть
+proliferation —- распространение
+renegade —- изменник
+adversity —- несчастья, бедствия
+
+wry —- перекошенный
+cue —- намек
+dimness —- тусклость
+pigmy —- карликовый
+vindictive —- мстительный
+hobble —- хромать
+descend —- спускаться
+serpent —- змея
+wan —- бледный
+relieve —- 
+bow —- лук
+berth —- причал
+draff —- отбросы
+ledge —- выступ
+rim —- обод
+vigorous —- энергичный, сильный, ядреный
+shelter
+hiss —- шипение
+swell —- зыбь
+wee —- крошечный
+clangour —- бренчать
+prow —- нос, челн, корабль
+sneer —- насмешка
+devouring —- 
+suspend —- приостановить
+sliver —- щепка, расщеплять
+leek —- лук-порей
+naughty —- непослушный
+stern —- суровый
+doom —-
+gloom —- мрак
+daft —- глупый
+munch —- жевать
+splendid — великолепный
+rot —- гниль
+tore —- разорвал
+gob —- плевок
+screwed up —- пьяный
+trot —- быстрая походка
+mischief —- несчатье
+howl —- вой
+bunk —- койка
+varmint —- шалун
+clasp —- застежка
+clumsy —- неуклюжий
+vent —- вентиляционное отверстие
+spleen —- селезенка, злоба
+humid —- влажный
+baling —- вычерпывать воду
+oar —- весло
+abating —- ослабление
+swab —- тампон
+parley —- переговоры
+stirring —- перемешивание, возбуждение
+rough
+jumble —- беспорядок
+grunt —- хрюкать
+fur —- мех
+bobble —- промашка
+crevice —- расщелина
+numb —- оцепенелый
+immersion —- погружение
+perk —- воспрянуть духом
+shiver —- дрожь
+beggars can’t be choosers
+pebble —- галька, булыжник
+apron - фартук
+trident - трезубец
+tummy - животик
+aperture - отверстие
+vigilant - бдительный
+meek - кроткий, смиренный
+spry - живой, подвижный, проворный
+hasp - засов
+scoop - совок
+beaker - мерный стакан
+snugly - уютно
+defy - игнорировать
+sneak
+pail - ведро
+tidy - аккуратный
+latch - защелка
+trolley - тележка
+leap - прыжок
+boulder - валун
+what the future holds
+javelin - дротик
+inferior — младший по чину
+ditty - песенка
+vermin - паразиты, вредители, сброд
+dace - плотва
+courage - мужество
+shallow - мелководный
+divert - отвлекать, забавлять
+lame - хромой
+inlet - вход
+vessel - судно
+weasel - ласка
+beech - бук
+crumb - крошка
+pike - щука
+sore - больной
+beetle - жук
+tyke - дворняжка, хам, грубиян
+ford - брод
+rabble - сброд, толпа
+dragonfly
+perch - окунь
+
+desist — воздерживаться
+stoat — горностай
+mud - грязь
+coherent - когерентный
+oppressive - гнетущий
+barrage - заграждение
+sway - власть, колебаться, качаться
+rodent - грызун
+wield - владеть
+crisp - хрустящий
+glint - блеск
+devoid - лишенный
+hay - сено
+vengeance - месть
+grasp - хватка
+respite - передышка
+wrath - гнев
+wistfully - задумчиво
+sly - хитрый
+oaf - болван
+stifle - душить
+giggle - хихикать
+snuggle up - прильнуть
+friends in need are friends indeed
+hither and thither - туда-сюда
+wily - коварный
+oyster - устрица
+morsel - кусочек
+leveret - зайчонок
+nibble on - покусывать
+filthy - грязный
+snooze - вздремнуть
+shrew - землеройка
+murmur - ропот, журчание, шепот
+dissent - несогласие
+pandemonium - столпотворение, смятение
+meadow - луг
+cumbersome - громоздкий
+sulk - дуться, сердиться
+hornet - шершень
+sting - жало
+obsession - одержимость
+beaver - бобр
+swift - быстро, поспешно
+collar - воротник
+sparrow - воробей
+wander
+blueprint - проект
+haversack - рюкзак
+belfry - колокольня
+spill - пролить, разливаться, просыпат, рассыпать
+loft - чердак
+scowl - хмуриться
+demise - кончина, смерть
+apprehensive - опасающийся
+vixen - самка лисицы
+arduous - трудный, крутой
+doubtless - несомненный 
+savor - наслаждаться, смаковать
+slumber - сон
+resentment - негодование
+venomous - ядовитый 
+prod - толчок
+shook him by the hand
+grumbling - бурчание
+lives up to it 
+lenient - мягкий, снисходительный, терпимый
+battery ram
+riddle - загадка
+wink - подмигивание
+wand - палочка, жезл
+garrulous - болтливый
+surveillance - наблюдение
+pour - лить
+scorn - презрение
+hourglass - песочные часы
+oblige - обязать, принуждать, угождать
+turmoil - суматоха
+twilight - сумерки
+expenditure - расход, трата, потребление
+pinafore - передник
+weep - плакать
+
+culprit - преступник, обвиняемый
+connoisseur - знаток
+leverage - способ для достижения цели
+
+diner - человек, обедающий вне дома, вагон-ресторан, небольшой ресторанчик
+mallard - дикая утка
+fowl - птица
+bells and whistles - svistelki perdelki
+amplifier - усилитель

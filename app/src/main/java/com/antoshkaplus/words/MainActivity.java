@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.model.ForeignWord;
@@ -42,12 +43,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        translationRepository = new TranslationRepository(this, "antoshkaplus@gmail.com");
+        translationRepository = new TranslationRepository(this);
         try {
+            translationRepository.Init("antoshkaplus@gmail.com");
+
             PopulateWithInitialData();
+
+            ListView lv = (ListView)findViewById(R.id.translations);
+            lv.setAdapter(new TranslationAdapter(this, translationRepository.getAllTranslations()));
+
         } catch (Exception ex) {
+
             ex.printStackTrace();
         }
+
+
 
         Button add =  (Button) findViewById(R.id.add);
         add.setOnClickListener(new View.OnClickListener() {
@@ -56,34 +66,34 @@ public class MainActivity extends Activity {
                 // pop dialog box that would let you add new translation for current user
             }
         });
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //TranslateRequestInitializer i = new TranslateRequestInitializer("");
-                GoogleCredential credential = new GoogleCredential().setAccessToken(
-                        "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
-
-                Translate t = new Translate.Builder(
-                        AndroidHttp.newCompatibleTransport(),
-                        new JacksonFactory(),
-                        credential)
-                        //.setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyAIFPlEdDg6XEsRnZJels01EIdTmVBfRbM"))
-                        .setApplicationName("Words")
-                        .build();
-                List<String> ls = new ArrayList<>();
-                ls.add("add");
-                try {
-                    TranslationsListResponse response = t.translations().list(ls, "ru").execute();
-                    for (TranslationsResource rs : response.getTranslations()) {
-                        Log.d(TAG, rs.getTranslatedText());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }).start();
-
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                //TranslateRequestInitializer i = new TranslateRequestInitializer("");
+//                GoogleCredential credential = new GoogleCredential().setAccessToken(
+//                        "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
+//
+//                Translate t = new Translate.Builder(
+//                        AndroidHttp.newCompatibleTransport(),
+//                        new JacksonFactory(),
+//                        credential)
+//                        //.setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyAIFPlEdDg6XEsRnZJels01EIdTmVBfRbM"))
+//                        .setApplicationName("Words")
+//                        .build();
+//                List<String> ls = new ArrayList<>();
+//                ls.add("add");
+//                try {
+//                    TranslationsListResponse response = t.translations().list(ls, "ru").execute();
+//                    for (TranslationsResource rs : response.getTranslations()) {
+//                        Log.d(TAG, rs.getTranslatedText());
+//                    }
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
+//            }
+//        }).start();
+//
 
 
     }
