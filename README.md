@@ -35,3 +35,11 @@ backend is not going to be implemented soon
 in raw folder should have some initial data set
 
 word;translation
+
+
+to do::
+ability to add new translations, with usage or TranslationApi from google
+
+add backend... like we did in recursive lists. use google datastore api directly
+
+implement different options , add more games

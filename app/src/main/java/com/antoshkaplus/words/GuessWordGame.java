@@ -19,6 +19,7 @@ public class GuessWordGame {
 
     private List<Word> guesses;
     private Word word;
+    private int correctPosition;
 
     private int guessCount;
 
@@ -29,21 +30,22 @@ public class GuessWordGame {
 
     void NewGame() {
         guesses = new ArrayList<>(guessCount);
-        int k = rng.nextInt(guessCount);
+        correctPosition = rng.nextInt(guessCount);
         for (int i = 0; i < guessCount; i++) {
             // be sure to use Vector.remove() or you may get the same item twice
             Collections.swap(translationList, i, rng.nextInt(translationList.size()-i) + i);
             Translation t = translationList.get(i);
-            if (k == i) {
+            if (correctPosition == i) {
                 word = t.nativeWord;
             }
-            guesses.set(i, t.foreignWord);
+            guesses.add(t.foreignWord);
         }
     }
 
-    boolean IsCorrect(Word w) {
-        return w == word;
+    boolean IsCorrect(int position) {
+        return correctPosition == position;
     }
+
 
     List<Word> getGuesses() {
         return guesses;

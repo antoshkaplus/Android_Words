@@ -1,6 +1,7 @@
 package com.antoshkaplus.words;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,12 +33,15 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import android.os.Handler;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements GuessWordFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
 
     private TranslationRepository translationRepository;
+    private Handler handler = new Handler();
+    private GuessWordGame game;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +54,12 @@ public class MainActivity extends Activity {
             PopulateWithInitialData();
 
             ListView lv = (ListView)findViewById(R.id.translations);
-            lv.setAdapter(new TranslationAdapter(this, translationRepository.getAllTranslations()));
-
+            List<Translation> trs = translationRepository.getAllTranslations();
+            lv.setAdapter(new TranslationAdapter(this, trs));
+            GuessWordFragment fr = (GuessWordFragment)getFragmentManager().findFragmentById(R.id.fragment_guess_word);
+            game = new GuessWordGame(trs, 3);
+            game.NewGame();
+            fr.setGame(game);
         } catch (Exception ex) {
 
             ex.printStackTrace();
@@ -187,6 +195,29 @@ public class MainActivity extends Activity {
                     ));
         }
     }
+
+
+    public void OnCorrectGuess(final GuessWordFragment fragment) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                game.NewGame();
+                fragment.setGame(game);
+            }
+        }, 2000);
+
+    }
+
+    public void OnIncorrectGuess(final GuessWordFragment fragment) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                game.NewGame();
+                fragment.setGame(game);
+            }
+        }, 2000);
+    }
+
 
 
 }

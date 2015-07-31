@@ -285,138 +285,138 @@ perk —- воспрянуть духом
 shiver —- дрожь
 beggars can’t be choosers
 pebble —- галька, булыжник
-apron - фартук
-trident - трезубец
-tummy - животик
-aperture - отверстие
-vigilant - бдительный
-meek - кроткий, смиренный
-spry - живой, подвижный, проворный
-hasp - засов
-scoop - совок
-beaker - мерный стакан
-snugly - уютно
-defy - игнорировать
+apron -- фартук
+trident -- трезубец
+tummy -- животик
+aperture -- отверстие
+vigilant -- бдительный
+meek -- кроткий, смиренный
+spry -- живой, подвижный, проворный
+hasp -- засов
+scoop -- совок
+beaker -- мерный стакан
+snugly -- уютно
+defy -- игнорировать
 sneak
-pail - ведро
-tidy - аккуратный
-latch - защелка
-trolley - тележка
-leap - прыжок
-boulder - валун
+pail -- ведро
+tidy -- аккуратный
+latch -- защелка
+trolley -- тележка
+leap -- прыжок
+boulder -- валун
 what the future holds
-javelin - дротик
-inferior — младший по чину
-ditty - песенка
-vermin - паразиты, вредители, сброд
-dace - плотва
-courage - мужество
-shallow - мелководный
-divert - отвлекать, забавлять
-lame - хромой
-inlet - вход
-vessel - судно
-weasel - ласка
-beech - бук
-crumb - крошка
-pike - щука
-sore - больной
-beetle - жук
-tyke - дворняжка, хам, грубиян
-ford - брод
-rabble - сброд, толпа
+javelin -- дротик
+inferior —- младший по чину
+ditty -- песенка
+vermin -- паразиты, вредители, сброд
+dace -- плотва
+courage -- мужество
+shallow -- мелководный
+divert -- отвлекать, забавлять
+lame -- хромой
+inlet -- вход
+vessel -- судно
+weasel -- ласка
+beech -- бук
+crumb -- крошка
+pike -- щука
+sore -- больной
+beetle -- жук
+tyke -- дворняжка, хам, грубиян
+ford -- брод
+rabble -- сброд, толпа
 dragonfly
-perch - окунь
+perch -- окунь
 
-desist — воздерживаться
-stoat — горностай
-mud - грязь
-coherent - когерентный
-oppressive - гнетущий
-barrage - заграждение
-sway - власть, колебаться, качаться
-rodent - грызун
-wield - владеть
-crisp - хрустящий
-glint - блеск
-devoid - лишенный
-hay - сено
-vengeance - месть
-grasp - хватка
-respite - передышка
-wrath - гнев
-wistfully - задумчиво
-sly - хитрый
-oaf - болван
-stifle - душить
-giggle - хихикать
-snuggle up - прильнуть
+desist —- воздерживаться
+stoat —- горностай
+mud -- грязь
+coherent -- когерентный
+oppressive -- гнетущий
+barrage -- заграждение
+sway -- власть, колебаться, качаться
+rodent -- грызун
+wield -- владеть
+crisp -- хрустящий
+glint -- блеск
+devoid -- лишенный
+hay -- сено
+vengeance -- месть
+grasp -- хватка
+respite -- передышка
+wrath -- гнев
+wistfully -- задумчиво
+sly -- хитрый
+oaf -- болван
+stifle -- душить
+giggle -- хихикать
+snuggle up -- прильнуть
 friends in need are friends indeed
-hither and thither - туда-сюда
-wily - коварный
-oyster - устрица
-morsel - кусочек
-leveret - зайчонок
-nibble on - покусывать
-filthy - грязный
-snooze - вздремнуть
-shrew - землеройка
-murmur - ропот, журчание, шепот
-dissent - несогласие
-pandemonium - столпотворение, смятение
-meadow - луг
-cumbersome - громоздкий
-sulk - дуться, сердиться
-hornet - шершень
-sting - жало
-obsession - одержимость
-beaver - бобр
-swift - быстро, поспешно
-collar - воротник
-sparrow - воробей
+hither and thither -- туда-сюда
+wily -- коварный
+oyster -- устрица
+morsel -- кусочек
+leveret -- зайчонок
+nibble on -- покусывать
+filthy -- грязный
+snooze -- вздремнуть
+shrew -- землеройка
+murmur -- ропот, журчание, шепот
+dissent -- несогласие
+pandemonium -- столпотворение, смятение
+meadow -- луг
+cumbersome -- громоздкий
+sulk -- дуться, сердиться
+hornet -- шершень
+sting -- жало
+obsession -- одержимость
+beaver -- бобр
+swift -- быстро, поспешно
+collar -- воротник
+sparrow -- воробей
 wander
-blueprint - проект
-haversack - рюкзак
-belfry - колокольня
-spill - пролить, разливаться, просыпат, рассыпать
-loft - чердак
-scowl - хмуриться
-demise - кончина, смерть
-apprehensive - опасающийся
-vixen - самка лисицы
-arduous - трудный, крутой
-doubtless - несомненный 
-savor - наслаждаться, смаковать
-slumber - сон
-resentment - негодование
-venomous - ядовитый 
-prod - толчок
+blueprint -- проект
+haversack -- рюкзак
+belfry -- колокольня
+spill -- пролить, разливаться, просыпат, рассыпать
+loft -- чердак
+scowl -- хмуриться
+demise -- кончина, смерть
+apprehensive -- опасающийся
+vixen -- самка лисицы
+arduous -- трудный, крутой
+doubtless -- несомненный 
+savor -- наслаждаться, смаковать
+slumber -- сон
+resentment -- негодование
+venomous -- ядовитый 
+prod -- толчок
 shook him by the hand
-grumbling - бурчание
+grumbling -- бурчание
 lives up to it 
-lenient - мягкий, снисходительный, терпимый
+lenient -- мягкий, снисходительный, терпимый
 battery ram
-riddle - загадка
-wink - подмигивание
-wand - палочка, жезл
-garrulous - болтливый
-surveillance - наблюдение
-pour - лить
-scorn - презрение
-hourglass - песочные часы
-oblige - обязать, принуждать, угождать
-turmoil - суматоха
-twilight - сумерки
-expenditure - расход, трата, потребление
-pinafore - передник
-weep - плакать
+riddle -- загадка
+wink -- подмигивание
+wand -- палочка, жезл
+garrulous -- болтливый
+surveillance -- наблюдение
+pour -- лить
+scorn -- презрение
+hourglass -- песочные часы
+oblige -- обязать, принуждать, угождать
+turmoil -- суматоха
+twilight -- сумерки
+expenditure -- расход, трата, потребление
+pinafore -- передник
+weep -- плакать
 
-culprit - преступник, обвиняемый
-connoisseur - знаток
-leverage - способ для достижения цели
+culprit -- преступник, обвиняемый
+connoisseur -- знаток
+leverage -- способ для достижения цели
 
-diner - человек, обедающий вне дома, вагон-ресторан, небольшой ресторанчик
-mallard - дикая утка
-fowl - птица
+diner -- человек, обедающий вне дома, вагон-ресторан, небольшой ресторанчик
+mallard -- дикая утка
+fowl -- птица
 bells and whistles - svistelki perdelki
-amplifier - усилитель
+amplifier -- усилитель

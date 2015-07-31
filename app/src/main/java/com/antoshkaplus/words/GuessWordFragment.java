@@ -1,12 +1,22 @@
 package com.antoshkaplus.words;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.antoshkaplus.words.model.Word;
+
+import java.util.Locale;
 
 
 /**
@@ -17,7 +27,7 @@ import android.view.ViewGroup;
  * Use the {@link GuessWordFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GuessWordFragment extends Fragment {
+public class GuessWordFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,6 +38,12 @@ public class GuessWordFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private ListView guesses;
+    private TextView word;
+
+    private GuessWordGame game;
+    private TextToSpeech textToSpeech;
 
     /**
      * Use this factory method to create a new instance of
@@ -61,27 +77,43 @@ public class GuessWordFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_guess_word, container, false);
+        View v = inflater.inflate(R.layout.fragment_guess_word, container, false);
+        guesses = (ListView)v.findViewById(R.id.guesses);
+        guesses.setOnItemClickListener(this);
+        guesses.setOnItemLongClickListener(this);
+        word = (TextView)v.findViewById(R.id.word);
+        word.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(game.getWord().word);
+                return true;
+            }
+        });
+        return v;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        textToSpeech = new TextToSpeech(activity, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                textToSpeech.setLanguage(Locale.US);
+            }
+        });
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+//            throw new ClassCastException(activity.toString()
+//                    + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -91,19 +123,44 @@ public class GuessWordFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    void setGame(GuessWordGame game) {
+        this.game = game;
+
+        guesses.setAdapter(new ArrayAdapter<Word>(getActivity(), android.R.layout.simple_list_item_1, game.getGuesses()));
+        word.setText(game.getWord().word);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (game.IsCorrect(position)) {
+            // should myself color green or red depending on result
+            view.setBackgroundColor(Color.GREEN);
+            // send result to activity
+            mListener.OnCorrectGuess(this);
+
+        } else {
+            view.setBackgroundColor(Color.RED);
+            // send result to activity
+            mListener.OnIncorrectGuess(this);
+        }
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        speak(game.getGuesses().get(position).word);
+        return true;
+    }
+
+    private void speak(String word) {
+        textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, null);
+    }
+
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+
+        public void OnCorrectGuess(GuessWordFragment fragment);
+        public void OnIncorrectGuess(GuessWordFragment fragment);
+
     }
 
 }
