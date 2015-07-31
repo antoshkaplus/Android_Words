@@ -31,7 +31,7 @@ public class TranslationAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.view_translation, null);
+            convertView = inflater.inflate(android.R.layout.simple_list_item_2, null);
         }
         Translation item = (Translation)getItem(position);
         TextView foreignView = (TextView)convertView.findViewById(android.R.id.text1);

@@ -1,21 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.antoshkaplus.words.GuessWordFragment">
 
     <TextView
+        android:id="@+id/word"
         android:text="default word"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <!-- possible answers -->
     <ListView
+        android:id="@+id/guesses"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     </ListView>
-
 
 </LinearLayout>

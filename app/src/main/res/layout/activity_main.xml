@@ -12,16 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="add translation"
-        android:id="@+id/add"/>
+        android:id="@+id/add"
+        />
 
     <ListView
         android:id="@+id/translations"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/add"
-        >
-
-    </ListView>
-
+        />
 
 </RelativeLayout>

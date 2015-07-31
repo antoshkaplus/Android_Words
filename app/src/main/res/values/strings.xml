@@ -6,4 +6,8 @@
 
     <string name="dialog__foreign_word">Foreign word</string>
     <string name="dialog__native_word">Native word</string>
+    <string name="title_activity_guess_word">GuessWordActivity</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
