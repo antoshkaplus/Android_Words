@@ -120,6 +120,11 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
         } else if (id == R.id.action_add_translation) {
             showAddWordDialog();
             return true;
+        } else if (id == R.id.action_translation_list) {
+
+        } else if (id == R.id.action_guess_word) {
+
+
         }
 
         return super.onOptionsItemSelected(item);

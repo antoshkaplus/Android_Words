@@ -1,6 +1,7 @@
 package com.antoshkaplus.words;
 
 import android.app.Activity;
+import android.app.ListFragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -22,7 +23,7 @@ import java.util.List;
  * Use the {@link TranslationListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TranslationListFragment extends Fragment {
+public class TranslationListFragment extends ListFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -68,14 +69,6 @@ public class TranslationListFragment extends Fragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_translation_list, container, false);
-        translationListView = (GridView)v.findViewById(R.id.translation_list);
-    }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
@@ -103,7 +96,7 @@ public class TranslationListFragment extends Fragment {
     public void setTranslationList(List<Translation> translationList) {
         this.translationList = translationList;
         // now need also insert everything into the view
-        translationListView.set
+        setListAdapter(new TranslationAdapter(getActivity(), this.translationList));
     }
 
     /**

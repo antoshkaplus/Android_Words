@@ -4,6 +4,12 @@
     <item android:id="@+id/action_add_translation"
         android:title="@string/action_add_translation"/>
 
+    <item android:id="@+id/action_guess_word"
+        android:title="@string/action_guess_word"/>
+
+    <item android:id="@+id/action_translation_list"
+        android:title="@string/action_translation_list"/>
+
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
