@@ -2,10 +2,24 @@
     <string name="app_name">Words</string>
 
     <string name="hello_world">Hello world!</string>
+
+    <string name="action_add_translation">Add Translation</string>
     <string name="action_settings">Settings</string>
 
-    <string name="dialog__foreign_word">Foreign word</string>
-    <string name="dialog__native_word">Native word</string>
+    <string name="dialog__foreign_word__title">Foreign word</string>
+    <string name="dialog__native_word__title">Native word</string>
+
+    <string name="dialog__add_title">Add new:</string>
+    <string name="dialog__empty__title">Error</string>
+    <string name="dialog__empty__text">Item can\'t be an empty string</string>
+    <string name="dialog__exists__title">Error</string>
+    <string name="dialog__exists__text">Such item name already exists</string>
+    <string name="dialog__sync_success__title">Good news</string>
+    <string name="dialog__sync_success__text">Synchronization is successful</string>
+    <string name="dialog__sync_failure__title">Bad news</string>
+    <string name="dialog__sync_failure__text">Synchronization failed</string>
+
+
     <string name="title_activity_guess_word">GuessWordActivity</string>
 
 <!-- TODO: Remove or change this placeholder text -->

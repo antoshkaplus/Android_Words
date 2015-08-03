@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Created by antoshkaplus on 7/28/15.
@@ -42,7 +43,19 @@ public class TranslationRepository {
         }
     }
 
-    public void AddTranslation(Translation translation) throws Exception {
+    public void addTranslationList(final List<Translation> translationList) throws Exception {
+        helper.getDao(UserTranslation.class).callBatchTasks(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                for (Translation t : translationList) {
+                    addTranslation(t);
+                }
+                return null;
+            }
+        });
+    }
+
+    public boolean addTranslation(Translation translation) throws Exception {
         // seems I need to join actually
         if (translation.nativeWord.id == 0) {
             List<NativeWord> nw = helper.getDao(NativeWord.class).queryForEq(NativeWord.FIELD_NAME_WORD, translation.nativeWord.word);
@@ -79,6 +92,9 @@ public class TranslationRepository {
 
         if (helper.getDao(UserTranslation.class).queryForFieldValues(mu).isEmpty()) {
             helper.getDao(UserTranslation.class).create(new UserTranslation(user, translation));
+            return true;
+        } else {
+            return false;
         }
     }
 

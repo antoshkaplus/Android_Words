@@ -51,12 +51,12 @@ public class AddWordDialog extends DialogFragment {
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                     if (i == KeyEvent.KEYCODE_ENTER) {
-                        listener.onAddStringDialogSuccess(foreignWord.getText());
+                        listener.onAddWordDialogSuccess(foreignWord.getText().toString(), nativeWord.getText().toString());
                         dismiss();
                         return true;
                     }
                     if (i == KeyEvent.KEYCODE_BACK) {
-                        listener.onAddStringDialogCancel();
+                        listener.onAddWordDialogCancel();
                         dismiss();
                         return true;
                     }
@@ -73,15 +73,13 @@ public class AddWordDialog extends DialogFragment {
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.onAddStringDialogSuccess(foreignWord.getText());
-                        dismiss();
+
                     }
                 }))
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.onAddStringDialogCancel();
-                        dismiss();
+
                     }
                 })
                 .create();
@@ -90,19 +88,45 @@ public class AddWordDialog extends DialogFragment {
         return dialog;
     }
 
+    private void OnTranslate() {
+        listener.onAddWordDialogTranslate(foreignWord.getText().toString());
+        dismiss();
+    }
+
+    private void OnAdd() {
+        listener.onAddWordDialogSuccess(
+                foreignWord.getText().toString(),
+                nativeWord.getText().toString());
+        dismiss();
+    }
+
+    private void OnCancel() {
+        listener.onAddWordDialogCancel();
+        dismiss();
+    }
+
+
+    // called from somewhere to set translation of current word if wasn't changed
+    public void setTranslation(String from, String to) {
+
+    }
+
     public void setAddWordDialogListener(AddWordDialogListener listener) {
         this.listener = listener;
     }
 
     private class DefaultListener implements AddWordDialogListener {
         @Override
-        public void onAddStringDialogSuccess(CharSequence string) {}
+        public void onAddWordDialogSuccess(String from, String to) {}
         @Override
-        public void onAddStringDialogCancel() {}
+        public void onAddWordDialogTranslate(String from) {}
+        @Override
+        public void onAddWordDialogCancel() {}
     }
 
     public interface AddWordDialogListener {
-        void onAddStringDialogSuccess(CharSequence string);
-        void onAddStringDialogCancel();
+        void onAddWordDialogSuccess(String from, String to);
+        void onAddWordDialogTranslate(String from);
+        void onAddWordDialogCancel();
     }
 }

@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.antoshkaplus.words.dialog.AddWordDialog;
+import com.antoshkaplus.words.dialog.RetryDialog;
 import com.antoshkaplus.words.model.ForeignWord;
 import com.antoshkaplus.words.model.NativeWord;
 import com.antoshkaplus.words.model.Translation;
@@ -53,9 +54,9 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
 
             PopulateWithInitialData();
 
-            ListView lv = (ListView)findViewById(R.id.translations);
+//            ListView lv = (ListView)findViewById(R.id.translations);
             List<Translation> trs = translationRepository.getAllTranslations();
-            lv.setAdapter(new TranslationAdapter(this, trs));
+//            lv.setAdapter(new TranslationAdapter(this, trs));
             GuessWordFragment fr = (GuessWordFragment)getFragmentManager().findFragmentById(R.id.fragment_guess_word);
             game = new GuessWordGame(trs, 3);
             game.NewGame();
@@ -65,42 +66,35 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
             ex.printStackTrace();
         }
 
+        // i need to probably have some sort of callback
 
-
-        Button add =  (Button) findViewById(R.id.add);
-        add.setOnClickListener(new View.OnClickListener() {
+//
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                // pop dialog box that would let you add new translation for current user
+            public void run() {
+                //TranslateRequestInitializer i = new TranslateRequestInitializer("");
+                GoogleCredential credential = new GoogleCredential().setAccessToken(
+                        "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
+
+                Translate t = new Translate.Builder(
+                        AndroidHttp.newCompatibleTransport(),
+                        new JacksonFactory(),
+                        credential)
+                        //.setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyAIFPlEdDg6XEsRnZJels01EIdTmVBfRbM"))
+                        .setApplicationName("Words")
+                        .build();
+                List<String> ls = new ArrayList<>();
+                ls.add("add");
+                try {
+                    TranslationsListResponse response = t.translations().list(ls, "ru").execute();
+                    for (TranslationsResource rs : response.getTranslations()) {
+                        Log.d(TAG, rs.getTranslatedText());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
-        });
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                //TranslateRequestInitializer i = new TranslateRequestInitializer("");
-//                GoogleCredential credential = new GoogleCredential().setAccessToken(
-//                        "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
-//
-//                Translate t = new Translate.Builder(
-//                        AndroidHttp.newCompatibleTransport(),
-//                        new JacksonFactory(),
-//                        credential)
-//                        //.setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyAIFPlEdDg6XEsRnZJels01EIdTmVBfRbM"))
-//                        .setApplicationName("Words")
-//                        .build();
-//                List<String> ls = new ArrayList<>();
-//                ls.add("add");
-//                try {
-//                    TranslationsListResponse response = t.translations().list(ls, "ru").execute();
-//                    for (TranslationsResource rs : response.getTranslations()) {
-//                        Log.d(TAG, rs.getTranslatedText());
-//                    }
-//                } catch (Exception ex) {
-//                    ex.printStackTrace();
-//                }
-//            }
-//        }).start();
+        }).start();
 //
 
 
@@ -123,6 +117,9 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_add_translation) {
+            showAddWordDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -132,68 +129,79 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
         AddWordDialog dialog = new AddWordDialog();
         Bundle args = new Bundle();
-        args.putString(AddWordDialog.ARG_FOREIGN_WORD, getString(R.string.dialog__foreign_word));
+        args.putString(AddWordDialog.ARG_FOREIGN_WORD, getString(R.string.dialog__foreign_word__title));
         dialog.setArguments(args);
         dialog.setAddWordDialogListener(new AddWordDialog.AddWordDialogListener() {
             @Override
-            public void onAddStringDialogSuccess(CharSequence string) {
-//                RetryDialog.RetryDialogListener listener = new RetryDialog.RetryDialogListener() {
-//                    @Override
-//                    public void onDialogCancel() { }
-//                    @Override
-//                    public void onDialogRetry() {
-//                        showAddNewDialog();
-//                    }
-//                };
-//                // empty string
-//                if (string.toString().isEmpty()) {
-//                    // show dialog with on retry
-//                    showRetryDialog(
-//                            getString(R.string.dialog__empty__title),
-//                            getString(R.string.dialog__empty__text),
-//                            listener);
-//                    return;
-//                }
-//                // item already exists
-//                boolean exists = false;
-//                for (Item i : items) {
-//                    if (i.title.contentEquals(string)) {
-//                        exists = true;
-//                        break;
-//                    }
-//                }
-//                if (exists) {
-//                    showRetryDialog(
-//                            getString(R.string.dialog__exists__title),
-//                            getString(R.string.dialog__exists__text),
-//                            listener);
-//                    return;
-//                }
+            public void onAddWordDialogSuccess(String from, String to) {
+                RetryDialog.RetryDialogListener listener = new RetryDialog.RetryDialogListener() {
+                    @Override
+                    public void onDialogCancel() { }
+                    @Override
+                    public void onDialogRetry() {
+                        showAddWordDialog();
+                    }
+                };
+                // empty string
+                if (from.isEmpty() || to.isEmpty()) {
+                    // show dialog with on retry
+                    showRetryDialog(
+                            getString(R.string.dialog__empty__title),
+                            getString(R.string.dialog__empty__text),
+                            listener);
+                    return;
+                }
+                // this one could be made as separate function
+                Translation t = new Translation(new ForeignWord(from, null), new NativeWord(to));
+                // need to have my own exceptions
+                try {
+                    translationRepository.addTranslation(t);
 
+                } catch (Exception ex) {
+                    // should check for specific exception
+                    showRetryDialog(
+                            getString(R.string.dialog__exists__title),
+                            getString(R.string.dialog__exists__text),
+                            listener);
 
-//                addNewItem(string.toString(), pressedPosition);
-//                getListView().clearChoices();
+                }
             }
+
             @Override
-            public void onAddStringDialogCancel() {}
+            public void onAddWordDialogTranslate(String from) {
+                // here we have to use translate api
+            }
+
+            @Override
+            public void onAddWordDialogCancel() {}
         });
         dialog.show(ft, "dialog");
     }
+
+    private void showRetryDialog(String title, String text, RetryDialog.RetryDialogListener listener) {
+        RetryDialog dialog = (RetryDialog)getFragmentManager().findFragmentByTag("retry_dialog");
+        if (dialog == null) {
+            dialog = RetryDialog.newInstance(title, text);
+        }
+        dialog.setRetryDialogListener(listener);
+        dialog.show(getFragmentManager(), "retry_dialog");
+    }
+
 
     void PopulateWithInitialData() throws Exception {
         InputStream input = getResources().openRawResource(R.raw.words);
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         String line;
         // should check for empty string
+        List<Translation> ts = new ArrayList<>();
         while ((line = reader.readLine()) != null) {
             String[] words = line.split(";");
-
-            translationRepository.AddTranslation(
-                    new Translation(
-                            new ForeignWord(words[0], new Date()),
-                            new NativeWord(words[1])
-                    ));
+            ts.add(new Translation(
+                    new ForeignWord(words[0], new Date()),
+                    new NativeWord(words[1])
+            ));
         }
+        translationRepository.addTranslationList(ts);
     }
 
 
