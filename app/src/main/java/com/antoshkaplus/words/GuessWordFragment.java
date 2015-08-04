@@ -85,6 +85,9 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
         guesses.setOnItemClickListener(this);
         guesses.setOnItemLongClickListener(this);
         word = (TextView)v.findViewById(R.id.word);
+        if (game != null) {
+            fillViews();
+        }
         word.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -125,7 +128,12 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
 
     void setGame(GuessWordGame game) {
         this.game = game;
+        if (guesses != null) {
+            fillViews();
+        }
+    }
 
+    void fillViews() {
         guesses.setAdapter(new ArrayAdapter<Word>(getActivity(), android.R.layout.simple_list_item_1, game.getGuesses()));
         word.setText(game.getWord().word);
     }
@@ -154,6 +162,8 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
     private void speak(String word) {
         textToSpeech.speak(word, TextToSpeech.QUEUE_FLUSH, null, null);
     }
+
+    
 
 
     public interface OnFragmentInteractionListener {

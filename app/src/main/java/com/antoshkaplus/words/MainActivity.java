@@ -36,7 +36,7 @@ import java.util.Date;
 import java.util.List;
 import android.os.Handler;
 
-public class MainActivity extends Activity implements GuessWordFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements GuessWordFragment.OnFragmentInteractionListener, TranslationListFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
 
@@ -57,7 +57,16 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
 //            ListView lv = (ListView)findViewById(R.id.translations);
             List<Translation> trs = translationRepository.getAllTranslations();
 //            lv.setAdapter(new TranslationAdapter(this, trs));
+
             GuessWordFragment fr = (GuessWordFragment)getFragmentManager().findFragmentById(R.id.fragment_guess_word);
+            if (fr == null) {
+                fr = new GuessWordFragment();
+            }
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.container, fr);
+            ft.commit();
+
+
             game = new GuessWordGame(trs, 3);
             game.NewGame();
             fr.setGame(game);
@@ -109,26 +118,47 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        try {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == R.id.action_add_translation) {
-            showAddWordDialog();
-            return true;
-        } else if (id == R.id.action_translation_list) {
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_settings) {
+                return true;
+            } else if (id == R.id.action_add_translation) {
+                showAddWordDialog();
+                return true;
+            } else if (id == R.id.action_translation_list) {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                TranslationListFragment tf = (TranslationListFragment) getFragmentManager().findFragmentById(R.id.fragment_translation_list);
+                if (tf == null) {
+                    tf = new TranslationListFragment();
+                    // .. god damn initialize this shit please with data set
+                }
 
-        } else if (id == R.id.action_guess_word) {
-
-
+                ft.replace(R.id.container, tf);
+                ft.addToBackStack(null);
+                ft.commit();
+                return true;
+            } else if (id == R.id.action_guess_word) {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                GuessWordFragment gf = (GuessWordFragment) getFragmentManager().findFragmentById(R.id.fragment_guess_word);
+                ft.replace(R.id.container, gf);
+                ft.addToBackStack(null);
+                ft.commit();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw ex;
         }
-
-        return super.onOptionsItemSelected(item);
     }
+
+
+
 
     public void showAddWordDialog() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
