@@ -43,3 +43,14 @@ ability to add new translations, with usage or TranslationApi from google
 add backend... like we did in recursive lists. use google datastore api directly
 
 implement different options , add more games
+
+
+
+
+
+now it's time to write backend !!!!!
+
+
+
+
+

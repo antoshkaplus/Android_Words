@@ -93,11 +93,12 @@ public class TranslationListFragment extends ListFragment {
         mListener = null;
     }
 
-    public void setTranslationList(List<Translation> translationList) {
-        this.translationList = translationList;
-        // now need also insert everything into the view
-        setListAdapter(new TranslationAdapter(getActivity(), this.translationList));
-    }
+//    public void setTranslationList(List<Translation> translationList) {
+//        this.translationList = translationList;
+//        // now need also insert everything into the view
+//        Activity a = getActivity();
+//        setListAdapter(new TranslationAdapter(a, this.translationList));
+//    }
 
     /**
      * This interface must be implemented by activities that contain this

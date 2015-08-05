@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.antoshkaplus.words.R;
@@ -67,19 +68,27 @@ public class AddWordDialog extends DialogFragment {
         foreignWord.setSingleLine();
         foreignWord.setImeActionLabel("Add", 0);
         foreignWord.requestFocus();
+        Button button = (Button)view.findViewById(R.id.translate);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                OnTranslate();
+            }
+        });
+        nativeWord = (EditText)view.findViewById(R.id.native_word);
         Dialog dialog = (new AlertDialog.Builder(getActivity())
                 .setTitle(title)
                 .setView(view)
                 .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        OnAdd();
                     }
                 }))
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-
+                        OnCancel();
                     }
                 })
                 .create();
@@ -88,9 +97,12 @@ public class AddWordDialog extends DialogFragment {
         return dialog;
     }
 
+
+    // can use those methods directly in OnCreateDialog
     private void OnTranslate() {
         listener.onAddWordDialogTranslate(foreignWord.getText().toString());
-        dismiss();
+        // turn on progress bar
+
     }
 
     private void OnAdd() {
@@ -108,7 +120,7 @@ public class AddWordDialog extends DialogFragment {
 
     // called from somewhere to set translation of current word if wasn't changed
     public void setTranslation(String from, String to) {
-
+        nativeWord.setText(to);
     }
 
     public void setAddWordDialogListener(AddWordDialogListener listener) {

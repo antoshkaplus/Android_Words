@@ -2,6 +2,8 @@
     <string name="app_name">Words</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="translate">Translate</string>
+
 
     <string name="action_add_translation">Add Translation</string>
     <string name="action_settings">Settings</string>
@@ -20,6 +22,9 @@
     <string name="dialog__sync_success__text">Synchronization is successful</string>
     <string name="dialog__sync_failure__title">Bad news</string>
     <string name="dialog__sync_failure__text">Synchronization failed</string>
+
+
+
 
 
     <string name="title_activity_guess_word">GuessWordActivity</string>

@@ -10,18 +10,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <CheckBox
-        android:text="user defined translation"
+    <ProgressBar
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Large"
+        android:visibility="gone"
+         />
+
+    <Button
+        android:id="@+id/translate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/translate"
+        android:layout_gravity="right"
+        />
+
+
+    <!--<CheckBox-->
+        <!--android:text="user defined translation"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content" />-->
 
     <!-- going to show it if user would press on checkbox -->
     <EditText
-        android:id="@+id/translation"
+        android:id="@+id/native_word"
         android:inputType="text|textAutoCorrect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"/>
+        />
 
 
 </LinearLayout>

@@ -3,7 +3,10 @@ package com.antoshkaplus.words;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +39,9 @@ import java.util.Date;
 import java.util.List;
 import android.os.Handler;
 
-public class MainActivity extends Activity implements GuessWordFragment.OnFragmentInteractionListener, TranslationListFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements
+        GuessWordFragment.OnFragmentInteractionListener,
+        TranslationListFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
 
@@ -44,9 +49,20 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
     private Handler handler = new Handler();
     private GuessWordGame game;
 
+    private GuessWordFragment guessWordFragment;
+    private TranslationListFragment translationListFragment;
+    private AddWordDialog addWordDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            guessWordFragment = (GuessWordFragment) getFragmentManager().getFragment(savedInstanceState, "guess_word_fragment");
+            translationListFragment = (TranslationListFragment) getFragmentManager().getFragment(savedInstanceState, "translation_list_fragment");
+        } else {
+            guessWordFragment = new GuessWordFragment();
+            translationListFragment = new TranslationListFragment();
+        }
         setContentView(R.layout.activity_main);
         translationRepository = new TranslationRepository(this);
         try {
@@ -58,18 +74,15 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
             List<Translation> trs = translationRepository.getAllTranslations();
 //            lv.setAdapter(new TranslationAdapter(this, trs));
 
-            GuessWordFragment fr = (GuessWordFragment)getFragmentManager().findFragmentById(R.id.fragment_guess_word);
-            if (fr == null) {
-                fr = new GuessWordFragment();
-            }
             FragmentTransaction ft = getFragmentManager().beginTransaction();
-            ft.add(R.id.container, fr);
+            ft.add(R.id.container, guessWordFragment);
             ft.commit();
 
+            translationListFragment.setListAdapter(new TranslationAdapter(this, trs));
 
             game = new GuessWordGame(trs, 3);
             game.NewGame();
-            fr.setGame(game);
+            guessWordFragment.setGame(game);
         } catch (Exception ex) {
 
             ex.printStackTrace();
@@ -77,35 +90,18 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
 
         // i need to probably have some sort of callback
 
-//
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //TranslateRequestInitializer i = new TranslateRequestInitializer("");
-                GoogleCredential credential = new GoogleCredential().setAccessToken(
-                        "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
 
-                Translate t = new Translate.Builder(
-                        AndroidHttp.newCompatibleTransport(),
-                        new JacksonFactory(),
-                        credential)
-                        //.setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyAIFPlEdDg6XEsRnZJels01EIdTmVBfRbM"))
-                        .setApplicationName("Words")
-                        .build();
-                List<String> ls = new ArrayList<>();
-                ls.add("add");
-                try {
-                    TranslationsListResponse response = t.translations().list(ls, "ru").execute();
-                    for (TranslationsResource rs : response.getTranslations()) {
-                        Log.d(TAG, rs.getTranslatedText());
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }).start();
-//
 
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (translationListFragment == null || guessWordFragment == null) {
+            translationListFragment = new TranslationListFragment();
+            guessWordFragment = new GuessWordFragment();
+        }
 
     }
 
@@ -132,21 +128,12 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
                 return true;
             } else if (id == R.id.action_translation_list) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                TranslationListFragment tf = (TranslationListFragment) getFragmentManager().findFragmentById(R.id.fragment_translation_list);
-                if (tf == null) {
-                    tf = new TranslationListFragment();
-                    // .. god damn initialize this shit please with data set
-                }
-
-                ft.replace(R.id.container, tf);
-                ft.addToBackStack(null);
+                ft.replace(R.id.container, translationListFragment);
                 ft.commit();
                 return true;
             } else if (id == R.id.action_guess_word) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
-                GuessWordFragment gf = (GuessWordFragment) getFragmentManager().findFragmentById(R.id.fragment_guess_word);
-                ft.replace(R.id.container, gf);
-                ft.addToBackStack(null);
+                ft.replace(R.id.container, guessWordFragment);
                 ft.commit();
                 return true;
             }
@@ -157,21 +144,34 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        getFragmentManager().putFragment(outState, "guess_word_fragment", guessWordFragment);
+        getFragmentManager().putFragment(outState, "translation_list_fragment", translationListFragment);
+    }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
 
+    }
 
     public void showAddWordDialog() {
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
-        AddWordDialog dialog = new AddWordDialog();
+        // now we have one dialog for everything
+        addWordDialog = new AddWordDialog();
         Bundle args = new Bundle();
         args.putString(AddWordDialog.ARG_FOREIGN_WORD, getString(R.string.dialog__foreign_word__title));
-        dialog.setArguments(args);
-        dialog.setAddWordDialogListener(new AddWordDialog.AddWordDialogListener() {
+        addWordDialog.setArguments(args);
+        addWordDialog.setAddWordDialogListener(new AddWordDialog.AddWordDialogListener() {
             @Override
             public void onAddWordDialogSuccess(String from, String to) {
                 RetryDialog.RetryDialogListener listener = new RetryDialog.RetryDialogListener() {
                     @Override
-                    public void onDialogCancel() { }
+                    public void onDialogCancel() {
+                    }
+
                     @Override
                     public void onDialogRetry() {
                         showAddWordDialog();
@@ -204,13 +204,16 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
 
             @Override
             public void onAddWordDialogTranslate(String from) {
+                new TranslateTask().execute(from);
+
                 // here we have to use translate api
             }
 
             @Override
-            public void onAddWordDialogCancel() {}
+            public void onAddWordDialogCancel() {
+            }
         });
-        dialog.show(ft, "dialog");
+        addWordDialog.show(ft, "dialog");
     }
 
     private void showRetryDialog(String title, String text, RetryDialog.RetryDialogListener listener) {
@@ -261,6 +264,38 @@ public class MainActivity extends Activity implements GuessWordFragment.OnFragme
         }, 2000);
     }
 
+    class TranslateTask extends AsyncTask<String, Void, String> {
+        String foreignWord;
 
+        @Override
+        protected String doInBackground(String... strings) {
+            foreignWord = strings[0];
+//            GoogleCredential credential = new GoogleCredential().setAccessToken(
+//                    "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
+
+            Translate t = new Translate.Builder(
+                    AndroidHttp.newCompatibleTransport(),
+                    new JacksonFactory(),
+                    null)
+                    .setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyCpNJPGA_zTpriCby8-z4XyAwEllC9wRlM"))
+                    .setApplicationName("Words")
+                    .build();
+            List<String> ls = new ArrayList<>();
+            ls.add(foreignWord);
+            try {
+                TranslationsListResponse response = t.translations().list(ls, "ru").execute();
+                String nativeWord = response.getTranslations().get(0).getTranslatedText();
+                return nativeWord;
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            addWordDialog.setTranslation(foreignWord, s);
+        }
+    }
 
 }
