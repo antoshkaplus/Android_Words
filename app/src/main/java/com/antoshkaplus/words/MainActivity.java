@@ -136,6 +136,10 @@ public class MainActivity extends Activity implements
                 ft.replace(R.id.container, guessWordFragment);
                 ft.commit();
                 return true;
+            } else if (id == R.id.action_sync) {
+                // need to put everything in special data structures and send.
+
+
             }
             return super.onOptionsItemSelected(item);
         } catch (Exception ex) {
