@@ -7,6 +7,14 @@ public class Translation {
     private String foreignWord;
     private String nativeWord;
 
+    public Translation() {}
+
+    public Translation(String foreignWord, String nativeWord) {
+        this.foreignWord = foreignWord;
+        this.nativeWord = nativeWord;
+    }
+
+
 
     public String getNativeWord() {
         return nativeWord;

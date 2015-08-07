@@ -25,20 +25,26 @@ import java.util.List;
  * An endpoint class we are exposing
  */
 @Api(name = "dictionaryApi", version = "v1",
-        scopes = {Constants.EMAIL_SCOPE}, clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID, Constants.API_EXPLORER_CLIENT_ID},
+        resource = "dictionary",
+        namespace = @ApiNamespace(
+                ownerDomain = "backend.words.antoshkaplus.com",
+                ownerName = "backend.words.antoshkaplus.com"),
+        scopes = {Constants.EMAIL_SCOPE},
+        clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID, Constants.API_EXPLORER_CLIENT_ID},
         audiences = {Constants.ANDROID_AUDIENCE})
 public class DictionaryEndpoint {
 
     /**
      * A simple endpoint method that takes a name and says Hi back
      */
-    @ApiMethod(name = "dictionary.update")
+    @ApiMethod(name = "updateDictionary")
     public void updateDictionary(Dictionary dictionary, User user)
             throws OAuthRequestException, InvalidParameterException {
 
+        String userId = user.getEmail();
         DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.delete(KeyFactory.createKey("Dictionary", user.getUserId()));
-        Entity userDictionary = new Entity("Dictionary", user.getUserId());
+        datastore.delete(KeyFactory.createKey("Dictionary", userId));
+        Entity userDictionary = new Entity("Dictionary", userId);
         datastore.put(userDictionary);
         for (Translation t : dictionary.getTranslations()) {
             Entity translation = new Entity("Translation", userDictionary.getKey());

@@ -3,6 +3,7 @@ package com.antoshkaplus.words;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -14,6 +15,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
+import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
+import com.antoshkaplus.words.backend.dictionaryApi.model.Dictionary;
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.dialog.RetryDialog;
 import com.antoshkaplus.words.model.ForeignWord;
@@ -21,10 +24,13 @@ import com.antoshkaplus.words.model.NativeWord;
 import com.antoshkaplus.words.model.Translation;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.translate.Translate;
 import com.google.api.services.translate.TranslateRequestInitializer;
 import com.google.api.services.translate.model.TranslationsListResponse;
@@ -53,9 +59,29 @@ public class MainActivity extends Activity implements
     private TranslationListFragment translationListFragment;
     private AddWordDialog addWordDialog;
 
+    private List<Translation> translationList;
+
+    GoogleAccountCredential credential;
+
+
+
+
+    static GoogleAccountCredential createCredential(Context context, String accountName) {
+        final String WEB_CLIENT_ID =
+                "server:client_id:251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com";
+        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
+                context, WEB_CLIENT_ID);
+        credential.setSelectedAccountName(accountName);
+        return credential;
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        credential = createCredential(this, "antoshkaplus@gmail.com");
+
         if (savedInstanceState != null) {
             guessWordFragment = (GuessWordFragment) getFragmentManager().getFragment(savedInstanceState, "guess_word_fragment");
             translationListFragment = (TranslationListFragment) getFragmentManager().getFragment(savedInstanceState, "translation_list_fragment");
@@ -71,16 +97,16 @@ public class MainActivity extends Activity implements
             PopulateWithInitialData();
 
 //            ListView lv = (ListView)findViewById(R.id.translations);
-            List<Translation> trs = translationRepository.getAllTranslations();
+            translationList = translationRepository.getAllTranslations();
 //            lv.setAdapter(new TranslationAdapter(this, trs));
 
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.container, guessWordFragment);
             ft.commit();
 
-            translationListFragment.setListAdapter(new TranslationAdapter(this, trs));
+            translationListFragment.setListAdapter(new TranslationAdapter(this, translationList));
 
-            game = new GuessWordGame(trs, 3);
+            game = new GuessWordGame(translationList, 3);
             game.NewGame();
             guessWordFragment.setGame(game);
         } catch (Exception ex) {
@@ -138,7 +164,40 @@ public class MainActivity extends Activity implements
                 return true;
             } else if (id == R.id.action_sync) {
                 // need to put everything in special data structures and send.
+                DictionaryApi.Builder builder = new DictionaryApi.Builder(
+                        AndroidHttp.newCompatibleTransport(),
+                        new AndroidJsonFactory(),
+//                        null);
+                        credential);
+               builder.setRootUrl("http://192.168.1.4:8080/_ah/api");
+                //builder.setApplicationName("antoshkaplus-words");
 
+                final DictionaryApi api = builder.build();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Dictionary dictionary = new Dictionary();
+                        List<com.antoshkaplus.words.backend.dictionaryApi.model.Translation> trs = new ArrayList<>();
+                        List<com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord> fws = new ArrayList<>();
+                        for (Translation t : translationList) {
+                            com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
+                            tt.setForeignWord(t.foreignWord.word);
+                            tt.setNativeWord(t.nativeWord.word);
+                            trs.add(tt);
+                            com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord fw = new com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord();
+                            fw.setWord(t.foreignWord.word);
+                            fw.setCreationDate(new DateTime(t.foreignWord.creationDate));
+                            fws.add(fw);
+                        }
+                        dictionary.setTranslations(trs);
+                        dictionary.setForeignWords(fws);
+                        try {
+                            api.updateDictionary(dictionary).execute();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }).start();
 
             }
             return super.onOptionsItemSelected(item);
