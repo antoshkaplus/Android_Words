@@ -50,9 +50,13 @@ public class MainActivity extends Activity implements
         TranslationListFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
+    private static final int GUESS_WORD_GAME_CHOICE_COUNT = 4;
+
 
     private TranslationRepository translationRepository;
     private Handler handler = new Handler();
+    private Runnable nextGameEvent = null;
+
     private GuessWordGame game;
 
     private GuessWordFragment guessWordFragment;
@@ -106,7 +110,7 @@ public class MainActivity extends Activity implements
 
             translationListFragment.setListAdapter(new TranslationAdapter(this, translationList));
 
-            game = new GuessWordGame(translationList, 3);
+            game = new GuessWordGame(translationList, GUESS_WORD_GAME_CHOICE_COUNT);
             game.NewGame();
             guessWordFragment.setGame(game);
         } catch (Exception ex) {
@@ -307,24 +311,30 @@ public class MainActivity extends Activity implements
 
 
     public void OnCorrectGuess(final GuessWordFragment fragment) {
-        handler.postDelayed(new Runnable() {
+        nextGameEvent = new Runnable() {
             @Override
             public void run() {
-                game.NewGame();
-                fragment.setGame(game);
+                OnNext(fragment);
             }
-        }, 2000);
-
+        };
+        handler.postDelayed(nextGameEvent, 2000);
     }
 
     public void OnIncorrectGuess(final GuessWordFragment fragment) {
-        handler.postDelayed(new Runnable() {
+        nextGameEvent = new Runnable() {
             @Override
             public void run() {
-                game.NewGame();
-                fragment.setGame(game);
+                OnNext(fragment);
             }
-        }, 2000);
+        };
+        handler.postDelayed(nextGameEvent, 2000);
+    }
+
+    @Override
+    public void OnNext(GuessWordFragment fragment) {
+        handler.removeCallbacks(nextGameEvent);
+        game.NewGame();
+        fragment.setGame(game);
     }
 
     class TranslateTask extends AsyncTask<String, Void, String> {

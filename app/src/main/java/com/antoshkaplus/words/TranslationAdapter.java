@@ -31,12 +31,12 @@ public class TranslationAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(android.R.layout.simple_list_item_2, null);
+            convertView = inflater.inflate(R.layout.view_translation, null);
         }
         Translation item = (Translation)getItem(position);
-        TextView foreignView = (TextView)convertView.findViewById(android.R.id.text1);
+        TextView foreignView = (TextView)convertView.findViewById(R.id.word_0);
         foreignView.setText(item.foreignWord.word);
-        TextView nativeView = (TextView)convertView.findViewById(android.R.id.text2);
+        TextView nativeView = (TextView)convertView.findViewById(R.id.word_1);
         nativeView.setText(item.nativeWord.word);
         return convertView;
     }

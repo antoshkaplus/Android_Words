@@ -5,14 +5,20 @@ import android.app.ListFragment;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.speech.tts.TextToSpeech;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.antoshkaplus.words.model.Translation;
 
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -23,7 +29,7 @@ import java.util.List;
  * Use the {@link TranslationListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TranslationListFragment extends ListFragment {
+public class TranslationListFragment extends ListFragment implements AdapterView.OnItemLongClickListener{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -37,6 +43,7 @@ public class TranslationListFragment extends ListFragment {
     private GridView translationListView;
 
     private OnFragmentInteractionListener mListener;
+    private TextToSpeech textToSpeech;
 
     /**
      * Use this factory method to create a new instance of
@@ -79,6 +86,12 @@ public class TranslationListFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
+        textToSpeech = new TextToSpeech(activity, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                textToSpeech.setLanguage(Locale.US);
+            }
+        });
         try {
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
@@ -93,7 +106,43 @@ public class TranslationListFragment extends ListFragment {
         mListener = null;
     }
 
-//    public void setTranslationList(List<Translation> translationList) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+//        ViewGroup vg = (ViewGroup)view;
+
+//        View vv= vg.getChildAt(0);
+//        View v = inflater.inflate(R.layout.fragment_translation_list, null);
+//        vg.addView(v);
+//        vv.bringToFront();
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getListView().setOnItemLongClickListener(this);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+        TextView tv = (TextView)view.findViewById(R.id.word_0);
+        textToSpeech.speak(tv.getText(), TextToSpeech.QUEUE_FLUSH, null, null);
+        return false;
+    }
+
+    //    public void setTranslationList(List<Translation> translationList) {
 //        this.translationList = translationList;
 //        // now need also insert everything into the view
 //        Activity a = getActivity();

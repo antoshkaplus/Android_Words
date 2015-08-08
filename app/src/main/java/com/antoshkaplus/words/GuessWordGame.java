@@ -46,6 +46,9 @@ public class GuessWordGame {
         return correctPosition == position;
     }
 
+    int getCorrectPosition() {
+        return correctPosition;
+    }
 
     List<Word> getGuesses() {
         return guesses;

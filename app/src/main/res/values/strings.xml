@@ -4,12 +4,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="translate">Translate</string>
 
+    <string name="guess__default_word">default word</string>
 
-    <string name="action_add_translation">Add Translation</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_guess_word">Guess word</string>
-    <string name="action_translation_list">Translation list</string>
-    <string name="action_sync">Sync</string>
+
+    <string name="action__add_translation">Add Translation</string>
+    <string name="action__settings">Settings</string>
+    <string name="action__guess_word">Guess word</string>
+    <string name="action__translation_list">Translation list</string>
+    <string name="action__sync">Sync</string>
 
     <string name="dialog__foreign_word__title">Foreign word</string>
     <string name="dialog__native_word__title">Native word</string>

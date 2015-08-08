@@ -10,6 +10,14 @@ Goals:
 * later on make some progress graphs
 
 
+guess word:
+* keep track of the score
+* nice synchronization. think about rules. downloading and uploading everything everytime is not a good idea
+* if provide remove functionality add ability to alter (always)
+* for translation list need ability to search for words, also some sorting, edit button to remove some.
+* maybe some graph with statistics how user progresses. should be multiple parameters. maybe keep it through slider somehow.
+* should make use of cursor from database connection sometime soon, as loading everything into the memory is going tot suck probably
+* add stting for how long should reset game, maybe in the near future would need to create controller
 
 * somehow I need to use google translate API
 
@@ -18,21 +26,6 @@ Goals:
 native language
 foreign language
 
-
-translation
-    native_word_id
-    foreign_word_id
-
-word
-    word
-    id
-
-
-
-backend is not going to be implemented soon
-
-
-in raw folder should have some initial data set
 
 word;translation
 
@@ -44,13 +37,6 @@ add backend... like we did in recursive lists. use google datastore api directly
 
 implement different options , add more games
 
-
-
-
-
 now it's time to write backend !!!!!
-
-
-
 
 
