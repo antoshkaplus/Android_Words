@@ -1,19 +1,26 @@
 package com.antoshkaplus.words.backend;
 
+import com.googlecode.objectify.annotation.Container;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+
 /**
  * Created by antoshkaplus on 8/5/15.
  */
+@Entity
 public class Translation {
-    private String foreignWord;
+    @Id
+    private Long id;
+    @Container
+    private ForeignWord foreignWord;
     private String nativeWord;
 
     public Translation() {}
 
-    public Translation(String foreignWord, String nativeWord) {
+    public Translation(ForeignWord foreignWord, String nativeWord) {
         this.foreignWord = foreignWord;
         this.nativeWord = nativeWord;
     }
-
 
 
     public String getNativeWord() {
@@ -24,11 +31,11 @@ public class Translation {
         this.nativeWord = nativeWord;
     }
 
-    public String getForeignWord() {
+    public ForeignWord getForeignWord() {
         return foreignWord;
     }
 
-    public void setForeignWord(String foreignWord) {
+    public void setForeignWord(ForeignWord foreignWord) {
         this.foreignWord = foreignWord;
     }
 

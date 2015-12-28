@@ -9,22 +9,21 @@ package com.antoshkaplus.words.backend;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 
 import java.security.InvalidParameterException;
 import java.util.List;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 
 /**
  * An endpoint class we are exposing
  */
-@Api(name = "dictionaryApi", version = "v1",
+@Api(name = "dictionaryApi",
+        version = "v1",
         resource = "dictionary",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.words.antoshkaplus.com",
@@ -42,22 +41,13 @@ public class DictionaryEndpoint {
             throws OAuthRequestException, InvalidParameterException {
 
         String userId = user.getEmail();
-        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-        datastore.delete(KeyFactory.createKey("Dictionary", userId));
-        Entity userDictionary = new Entity("Dictionary", userId);
-        datastore.put(userDictionary);
-        for (Translation t : dictionary.getTranslations()) {
-            Entity translation = new Entity("Translation", userDictionary.getKey());
-            translation.setProperty("foreignWord", t.getForeignWord());
-            translation.setProperty("nativeWord", t.getNativeWord());
-            datastore.put(translation);
-        }
-        for (ForeignWord f : dictionary.getForeignWords()) {
-            Entity foreignWord = new Entity("ForeignWord", userDictionary.getKey());
-            foreignWord.setProperty("foreignWord", f.getWord());
-            foreignWord.setProperty("creationDate", f.getCreationDate());
-            datastore.put(foreignWord);
-        }
+        ofy().delete().key(Key.create(Dictionary.class, userId));
+        Dictionary userDictionary = new Dictionary();
+        userDictionary.setUserId(userId);
+        userDictionary.setForeignWords(dictionary.getForeignWords());
+        userDictionary.setTranslations(dictionary.getTranslations());
+        // i probably have to save one by one
+        ofy().save();
     }
 
 }

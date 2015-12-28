@@ -1,13 +1,18 @@
 package com.antoshkaplus.words;
 
+import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +56,7 @@ public class MainActivity extends Activity implements
 
     private static final String TAG = "MainActivity";
     private static final int GUESS_WORD_GAME_CHOICE_COUNT = 4;
-
+    private static final int PERMISSIONS_REQUEST_GET_ACCOUNTS = 11;
 
     private TranslationRepository translationRepository;
     private Handler handler = new Handler();
@@ -167,42 +172,12 @@ public class MainActivity extends Activity implements
                 ft.commit();
                 return true;
             } else if (id == R.id.action_sync) {
-                // need to put everything in special data structures and send.
-                DictionaryApi.Builder builder = new DictionaryApi.Builder(
-                        AndroidHttp.newCompatibleTransport(),
-                        new AndroidJsonFactory(),
-//                        null);
-                        credential);
-               builder.setRootUrl("http://192.168.1.4:8080/_ah/api");
-                //builder.setApplicationName("antoshkaplus-words");
-
-                final DictionaryApi api = builder.build();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Dictionary dictionary = new Dictionary();
-                        List<com.antoshkaplus.words.backend.dictionaryApi.model.Translation> trs = new ArrayList<>();
-                        List<com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord> fws = new ArrayList<>();
-                        for (Translation t : translationList) {
-                            com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
-                            tt.setForeignWord(t.foreignWord.word);
-                            tt.setNativeWord(t.nativeWord.word);
-                            trs.add(tt);
-                            com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord fw = new com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord();
-                            fw.setWord(t.foreignWord.word);
-                            fw.setCreationDate(new DateTime(t.foreignWord.creationDate));
-                            fws.add(fw);
-                        }
-                        dictionary.setTranslations(trs);
-                        dictionary.setForeignWords(fws);
-                        try {
-                            api.updateDictionary(dictionary).execute();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }).start();
-
+                if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_DENIED) {
+                    requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS},
+                            PERMISSIONS_REQUEST_GET_ACCOUNTS);
+                } else {
+                    Sync();
+                }
             }
             return super.onOptionsItemSelected(item);
         } catch (Exception ex) {
@@ -210,6 +185,49 @@ public class MainActivity extends Activity implements
             throw ex;
         }
     }
+
+    // i just create new dictionary everytime and send it to the server
+    void Sync() {
+        // need to put everything in special data structures and send.
+
+        Account[] acc = AccountManager.get(this).getAccounts();
+
+        DictionaryApi.Builder builder = new DictionaryApi.Builder(
+                AndroidHttp.newCompatibleTransport(),
+                new AndroidJsonFactory(),
+//                        null);
+                credential);
+       // builder.setRootUrl("http://25.210.62.135:8080/_ah/api");
+        builder.setApplicationName("antoshkaplus-words");
+
+        final DictionaryApi api = builder.build();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Dictionary dictionary = new Dictionary();
+                List<com.antoshkaplus.words.backend.dictionaryApi.model.Translation> trs = new ArrayList<>();
+                List<com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord> fws = new ArrayList<>();
+                for (Translation t : translationList) {
+                    com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord fw = new com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord();
+                    fw.setWord(t.foreignWord.word);
+                    fw.setCreationDate(new DateTime(t.foreignWord.creationDate));
+                    fws.add(fw);
+                    com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
+                    tt.setForeignWord(fw);
+                    tt.setNativeWord(t.nativeWord.word);
+                    trs.add(tt);
+                }
+                dictionary.setTranslations(trs);
+                dictionary.setForeignWords(fws);
+                try {
+                    api.updateDictionary(dictionary).execute();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
