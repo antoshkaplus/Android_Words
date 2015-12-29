@@ -89,52 +89,8 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    // A function that attaches a "Say Hello" button click handler
-    function enableClick() {
-      document.getElementById('helloButton').onclick = function() {
-        var name = document.getElementById('nameInput').value;
-        gapi.client.myApi.sayHi({'name': name}).execute(
-          function(response) {
-            var outputAlertDiv = document.getElementById('outputAlert');
-            outputAlertDiv.style.visibility = 'visible';
-
-            if (!response.error) {
-              outputAlertDiv.className = 'alert alert-success';
-              outputAlertDiv.innerHTML = '<h2>' + response.result.data + '</h2>';
-            }
-            else if (response.error) {
-              outputAlertDiv.className = 'alert alert-danger';
-              outputAlertDiv.innerHTML = '<b>Error Code: </b>' + response.error.code + ' [' + response.error.message + ']';
-            }
-          }
-        );
-        return false;
-      }
-    }
-    // This is called initially
-    function init() {
-      var apiName = 'myApi';
-      var apiVersion = 'v1';
-      var apiRoot = 'https://' + window.location.host + '/_ah/api';
-      if (window.location.hostname == 'localhost'
-          || window.location.hostname == '127.0.0.1'
-          || ((window.location.port != "") && (window.location.port > 1023))) {
-            // We're probably running against the DevAppServer
-            apiRoot = 'http://' + window.location.host + '/_ah/api';
-      }
-      var callback = function() {
-        enableClick();
-      }
-      gapi.client.load(apiName, apiVersion, callback, apiRoot);
-    }
-
-</script>
-<!--
- Load the Google APIs Client Library for JavaScript
- More info here : https://developers.google.com/api-client-library/javascript/reference/referencedocs
--->
-
+<script type="text/javascript" src="js/index.js"></script>
 <script src="https://apis.google.com/js/client.js?onload=init"></script>
+
 </body>
 </html>
