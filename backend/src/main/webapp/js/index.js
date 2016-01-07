@@ -34,6 +34,7 @@ function init() {
         // We're probably running against the DevAppServer
       apiRoot = 'http://' + window.location.host + '/_ah/api';
   }
+  apiRoot = "https://antoshkaplus-words.appspot.com/_ah/api"
 
   var apisToLoad = 2
   var callback = function() {
@@ -62,10 +63,14 @@ function userAuthed() {
         if (!resp.code) {
             // user is signed in, call my endpoint
             console.log("user is signed in, continue with your bullshit")
+            gapi.client.dictionaryApi.getDictionary().execute(function(resp) {
+                console.log(resp)
+            })
         } else {
             console.log("user sucks dick")
             signin(false, userAuthed)
-        }
 
+
+        }
     });
 }

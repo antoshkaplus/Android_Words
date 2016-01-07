@@ -33,6 +33,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
         audiences = {Constants.ANDROID_AUDIENCE})
 public class DictionaryEndpoint {
 
+    public DictionaryEndpoint() {}
+
     /**
      * A simple endpoint method that takes a name and says Hi back
      */
@@ -47,7 +49,14 @@ public class DictionaryEndpoint {
         userDictionary.setForeignWords(dictionary.getForeignWords());
         userDictionary.setTranslations(dictionary.getTranslations());
         // i probably have to save one by one
-        ofy().save();
+        ofy().save().entity(userDictionary);
     }
-
+/*
+    @ApiMethod(name = "getDictionary")
+    public Dictionary getDictionary(User user)
+            throws  OAuthRequestException, InvalidParameterException {
+        String userId = user.getEmail();
+        return ofy().load().key(Key.create(Dictionary.class, userId)).now();
+    }
+    */
 }
