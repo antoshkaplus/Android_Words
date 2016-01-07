@@ -197,7 +197,7 @@ public class MainActivity extends Activity implements
                 new AndroidJsonFactory(),
 //                        null);
                 credential);
-        builder.setRootUrl("http://10.48.98.102:8080/_ah/api");
+       // builder.setRootUrl("http://192.168.1.108:8080/_ah/api");
         builder.setApplicationName("antoshkaplus-words");
 
         final DictionaryApi api = builder.build();

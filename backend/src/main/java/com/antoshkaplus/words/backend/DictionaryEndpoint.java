@@ -12,6 +12,7 @@ import com.google.api.server.spi.config.ApiNamespace;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyService;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -33,6 +34,12 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
         audiences = {Constants.ANDROID_AUDIENCE})
 public class DictionaryEndpoint {
 
+    static {
+        ObjectifyService.register(Dictionary.class);
+        ObjectifyService.register(ForeignWord.class);
+        ObjectifyService.register(Translation.class);
+    }
+
     public DictionaryEndpoint() {}
 
     /**
@@ -51,12 +58,13 @@ public class DictionaryEndpoint {
         // i probably have to save one by one
         ofy().save().entity(userDictionary);
     }
-/*
+
     @ApiMethod(name = "getDictionary")
     public Dictionary getDictionary(User user)
             throws  OAuthRequestException, InvalidParameterException {
         String userId = user.getEmail();
-        return ofy().load().key(Key.create(Dictionary.class, userId)).now();
+        Dictionary d = ofy().load().key(Key.create(Dictionary.class, userId)).now();
+        return d;
     }
-    */
+
 }

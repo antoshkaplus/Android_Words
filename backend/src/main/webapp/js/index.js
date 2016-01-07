@@ -34,7 +34,7 @@ function init() {
         // We're probably running against the DevAppServer
       apiRoot = 'http://' + window.location.host + '/_ah/api';
   }
-  apiRoot = "https://antoshkaplus-words.appspot.com/_ah/api"
+  //apiRoot = "https://antoshkaplus-words.appspot.com/_ah/api"
 
   var apisToLoad = 2
   var callback = function() {

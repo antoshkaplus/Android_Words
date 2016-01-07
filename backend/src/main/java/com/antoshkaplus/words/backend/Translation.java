@@ -1,6 +1,5 @@
 package com.antoshkaplus.words.backend;
 
-import com.googlecode.objectify.annotation.Container;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 
@@ -11,7 +10,6 @@ import com.googlecode.objectify.annotation.Id;
 public class Translation {
     @Id
     private Long id;
-    @Container
     private ForeignWord foreignWord;
     private String nativeWord;
 
