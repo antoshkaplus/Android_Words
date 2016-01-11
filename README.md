@@ -1,6 +1,16 @@
 # Android_Words
 Want to learn more English words. Hope this application is going to help me.
 
+
+#TODO
+* remote load 
+* web interface to add words
+* find out how to make copy
+* work with application 
+* better update strategy
+* maybe android library finally!!! git submodule???
+
+
 Goals:
 * load words I don't know from different sources
 * everyone should have translation
