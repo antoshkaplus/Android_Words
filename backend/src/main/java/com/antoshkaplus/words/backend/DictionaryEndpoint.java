@@ -11,7 +11,6 @@ import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 
 import java.security.InvalidParameterException;
@@ -35,36 +34,65 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class DictionaryEndpoint {
 
     static {
-        ObjectifyService.register(Dictionary.class);
         ObjectifyService.register(ForeignWord.class);
         ObjectifyService.register(Translation.class);
+        ObjectifyService.register(BackendUser.class);
     }
 
     public DictionaryEndpoint() {}
 
-    /**
-     * A simple endpoint method that takes a name and says Hi back
-     */
-    @ApiMethod(name = "updateDictionary")
-    public void updateDictionary(Dictionary dictionary, User user)
+    @ApiMethod(name = "addForeignWordList", path = "add_foreign_word_list")
+    public void addForeignWordList(ForeignWordList foreignWords, User user)
             throws OAuthRequestException, InvalidParameterException {
 
         String userId = user.getEmail();
-        ofy().delete().key(Key.create(Dictionary.class, userId));
-        Dictionary userDictionary = new Dictionary();
-        userDictionary.setUserId(userId);
-        userDictionary.setForeignWords(dictionary.getForeignWords());
-        userDictionary.setTranslations(dictionary.getTranslations());
-        // i probably have to save one by one
-        ofy().save().entity(userDictionary);
+        BackendUser backendUser = new BackendUser(userId);
+        for (ForeignWord f : foreignWords.getList()) {
+            f.setOwner(backendUser);
+        }
+        ofy().save().entities(foreignWords.getList());
     }
 
-    @ApiMethod(name = "getDictionary")
-    public Dictionary getDictionary(User user)
-            throws  OAuthRequestException, InvalidParameterException {
-        String userId = user.getEmail();
-        Dictionary d = ofy().load().key(Key.create(Dictionary.class, userId)).now();
-        return d;
+    @ApiMethod(name = "getForeignWordList", path = "get_foreign_word_list")
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    public ForeignWordList getForeignWordList(User user)
+            throws OAuthRequestException, InvalidParameterException {
+
+        BackendUser backendUser = new BackendUser(user.getEmail());
+        List<ForeignWord> words = ofy().load().type(ForeignWord.class).ancestor(backendUser).list();
+        ForeignWordList list = new ForeignWordList(words);
+        return list;
     }
+
+    @ApiMethod(name = "addTranslation", path = "add_translation")
+    public void addTranslation(Translation translation, User user)
+            throws OAuthRequestException, InvalidParameterException {
+
+        BackendUser backendUser = new BackendUser(user.getEmail());
+        Translation t = new Translation(translation.getForeignWord(), translation.getNativeWord(), backendUser.getKey());
+        ofy().save().entity(t);
+    }
+
+
+
+    @ApiMethod(name = "getTranslationList", path = "get_translation_list")
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    public TranslationList getTranslationList(User user) throws OAuthRequestException, InvalidParameterException {
+        BackendUser backendUser = new BackendUser(user.getEmail());
+        List<Translation> translations = ofy().load().type(Translation.class).ancestor(backendUser).list();
+        TranslationList list = new TranslationList(translations);
+        return list;
+    }
+
+
+    @ApiMethod(name = "removeTranslation", path = "remove_translation")
+    public void removeTranslation(Translation translation, User user)
+            throws OAuthRequestException, InvalidParameterException {
+
+        BackendUser backendUser = new BackendUser(user.getEmail());
+        translation.setOwner(backendUser);
+        ofy().delete().entity(translation);
+    }
+
 
 }

@@ -22,6 +22,8 @@ import android.widget.ListView;
 
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
 import com.antoshkaplus.words.backend.dictionaryApi.model.Dictionary;
+import com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWordList;
+import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.dialog.RetryDialog;
 import com.antoshkaplus.words.model.ForeignWord;
@@ -197,14 +199,16 @@ public class MainActivity extends Activity implements
                 new AndroidJsonFactory(),
 //                        null);
                 credential);
-       // builder.setRootUrl("http://192.168.1.108:8080/_ah/api");
+        builder.setRootUrl("http://192.168.1.108:8080/_ah/api");
         builder.setApplicationName("antoshkaplus-words");
 
         final DictionaryApi api = builder.build();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Dictionary dictionary = new Dictionary();
+
+
+
                 List<com.antoshkaplus.words.backend.dictionaryApi.model.Translation> trs = new ArrayList<>();
                 List<com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord> fws = new ArrayList<>();
                 for (Translation t : translationList) {
@@ -213,14 +217,18 @@ public class MainActivity extends Activity implements
                     fw.setCreationDate(new DateTime(t.foreignWord.creationDate));
                     fws.add(fw);
                     com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
-                    tt.setForeignWord(fw);
+                    tt.setForeignWord(fw.getWord());
                     tt.setNativeWord(t.nativeWord.word);
                     trs.add(tt);
                 }
-                dictionary.setTranslations(trs);
-                dictionary.setForeignWords(fws);
+
+                ForeignWordList foreignWordList = new ForeignWordList();
+                foreignWordList.setList(fws);
+                TranslationList translationList = new TranslationList();
+                translationList.setList(trs);
                 try {
-                    api.updateDictionary(dictionary).execute();
+                    api.addForeignWordList(foreignWordList);
+                    api.addTranslationList(translationList);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

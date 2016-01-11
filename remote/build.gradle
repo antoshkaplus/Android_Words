@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+
+dependencies {
+    compile 'com.google.appengine:appengine-remote-api:1.5.5'
+    compile 'com.google.appengine:appengine-api-1.0-sdk:1.9.30'
+}
+
+
