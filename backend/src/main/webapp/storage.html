@@ -1,0 +1,81 @@
+<!--
+  Copyright (c) 2012 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  use this file except in compliance with the License. You may obtain a copy of
+  the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  License for the specific language governing permissions and limitations under
+  the License.
+
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset='utf-8' />
+      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+      <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
+      <script type="text/javascript" src="js/storage.js"></script>
+  </head>
+  <body>
+    <!--Add a button for the user to click to initiate auth sequence -->
+    <button id="authorize-button" style="visibility: hidden">Authorize</button>
+    <header>
+      <h1>Google Cloud Storage JavaScript Client Library Application</h1>
+    </header>
+    <label id="api-label">Try a sample API call!</label>
+    <select id="api-selection-options">
+      <option value="null">
+        Please select an example API call from the dropdown menu
+      </option>
+      <option value="listBuckets">
+        List Buckets
+      </option>
+      <option value="insertBucket">
+        Insert Bucket
+      </option>
+      <option value="getBucket">
+        Get Bucket
+      </option>
+      <option value="getBucketAccessControls">
+        Get Bucket Access Controls
+      </option>
+      <option value="insertBucketAccessControls">
+        Insert Bucket Access Controls
+      </option>
+      <option value="listBucketsAccessControls">
+        List Buckets Access Control List
+      </option>
+      <option value="insertObject">
+        Insert Object
+      </option>
+      <option value="listObjects">
+        List Objects
+      </option>
+      <option value="getObjectAccessControls">
+        Get Object Access Controls
+      </option>
+      <option value="insertObjectAccessControls">
+        Insert Object Access Controls
+      </option>
+      <option value="listObjectsAccessControls">
+        List Objects Access Control List
+      </option>
+      <option value="deleteObject">
+        Delete Object
+      </option>
+      <option value="deleteBucket">
+        Delete Bucket
+      </option>
+    </select>
+    <br/>
+        <input type="file" id="filePicker" style="display: none" />
+    <div id="main-content">
+    </div>
+  </body>
+</html>

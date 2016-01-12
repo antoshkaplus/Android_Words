@@ -1,4 +1,12 @@
 
+function Translation(foreignWord, nativeWord) {
+    this.foreignWord = foreignWord;
+    this.nativeWord = nativeWord;
+    this.id = foreignWord + "_" + nativeWord;
+}
+
+
+
 
 // A function that attaches a "Say Hello" button click handler
 function enableClick() {
@@ -63,9 +71,10 @@ function userAuthed() {
         if (!resp.code) {
             // user is signed in, call my endpoint
             console.log("user is signed in, continue with your bullshit")
-            gapi.client.dictionaryApi.getDictionary().execute(function(resp) {
-                console.log(resp)
-            })
+            fillTranslationList()
+            //gapi.client.dictionaryApi.getDictionary().execute(function(resp) {
+            //    console.log(resp)
+            //})
         } else {
             console.log("user sucks dick")
             signin(false, userAuthed)
@@ -73,4 +82,57 @@ function userAuthed() {
 
         }
     });
+}
+
+// should blink add button until we are not connected
+function addTranslation() {
+    w_0 = $('#foreignWord').val()
+    w_1 = $('#nativeWord').val()
+    var translation = new Translation(w_0, w_1);
+    gapi.client.dictionaryApi.addTranslation(translation).execute(function(resp) {
+        console.log("translation saved")
+    })
+}
+
+function fillTranslationList() {
+    gapi.client.dictionaryApi.getTranslationList().execute(function(resp) {
+        ko.applyBindings({translationList: resp.list});
+        console.log(resp)
+    })
+}
+
+function addFileTranslationList() {
+    f = $("#translationListFile")[0].files[0];
+    if (f) {
+        var r = new FileReader();
+        r.onload = function(e) {
+            var contents = e.target.result;
+            var list = []
+            var translationList = {list: list}
+            translations = contents.split("\n")
+            for (t of translations) {
+                var foreign, native
+                t = t.split(";")
+                foreign = t[0]
+                native = t[1]
+                if (!foreign || !native) continue
+                list.push(new Translation(foreign, native));
+            }
+            gapi.client.dictionaryApi.addTranslationList(translationList).execute(function(resp) {
+                console.log(resp)
+            })
+        }
+        r.readAsText(f)
+    } else {
+        alert("Failed to load file")
+    }
+
+}
+
+
+function autoTranslate() {
+
+
+
+
 }

@@ -9,6 +9,8 @@ package com.antoshkaplus.words.backend;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.ObjectifyService;
@@ -69,8 +71,8 @@ public class DictionaryEndpoint {
             throws OAuthRequestException, InvalidParameterException {
 
         BackendUser backendUser = new BackendUser(user.getEmail());
-        Translation t = new Translation(translation.getForeignWord(), translation.getNativeWord(), backendUser.getKey());
-        ofy().save().entity(t);
+        translation.setOwner(backendUser);
+        ofy().save().entity(translation);
     }
 
 
@@ -94,5 +96,23 @@ public class DictionaryEndpoint {
         ofy().delete().entity(translation);
     }
 
+    @ApiMethod(name = "addTranslationList", path = "add_translation_list")
+    public void addTranslationList(TranslationList translationList, User user)
+            throws OAuthRequestException, InvalidParameterException {
+
+        BackendUser backendUser = new BackendUser(user.getEmail());
+        for (Translation t : translationList.getList()) {
+            t.setOwner(backendUser);
+        }
+        ofy().save().entities(translationList.getList());
+    }
+
+    /*
+    @ApiMethod(name = "uploadTranslationList", path = "upload_translation_list")
+    public void uploadTranslationList() {
+        BlobstoreService service = BlobstoreServiceFactory.getBlobstoreService();
+        service.getUploads()
+    }
+    */
 
 }

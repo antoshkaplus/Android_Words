@@ -5,12 +5,52 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet"
           href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <script src="//knockoutjs.com/downloads/knockout-3.4.0.js"></script>
 </head>
 <body role="document" style="padding-top: 70px;">
 
+<a href="storage.html" class="btn btn-info" role="button">Storage playground</a>
 
+<div class="panel panel-default">
+<form class="form-inline">
+    <div class="form-group">
+        <label for="foreignWord">Foreign</label>
+        <input type="text" class="form-control" id="foreignWord" placeholder="apple">
+    </div>
+    <div class="form-group">
+        <label for="nativeWord">Native</label>
+        <input type="text" class="form-control" id="nativeWord" placeholder="яблоко">
+    </div>
+    <button type="button" class="btn btn-default" onclick="addTranslation()">Add</button>
+    <button type="button" class="btn btn-default" onclick="autoTranslate()">Auto</button>
+</form>
+</div>
+
+
+
+<!-- try to upload file -->
+<div class="panel panel-default">
+<form>
+    <div class="fileinput fileinput-new" data-provides="fileinput">
+        <input id="translationListFile" type="file"/>
+    </div>
+    <button type="button" class="btn btn-default" onclick="addFileTranslationList()">Upload</button>
+</form>
+</div>
+
+<div class="panel panel-default">
+<table class="table">
+    <tbody data-bind="foreach: translationList">
+        <tr>
+            <td data-bind="text: foreignWord"></td>
+            <td data-bind="text: nativeWord"></td>
+        </tr>
+    </tbody>
+</table>
+</div>
 
 
 <script type="text/javascript" src="js/index.js"></script>

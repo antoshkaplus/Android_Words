@@ -21,7 +21,6 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
-import com.antoshkaplus.words.backend.dictionaryApi.model.Dictionary;
 import com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWordList;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
