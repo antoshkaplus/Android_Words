@@ -18,13 +18,18 @@
 <html>
   <head>
       <meta charset='utf-8' />
-      <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+      <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+      <link rel="stylesheet"
+          href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+      <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
       <script type="text/javascript" src="https://apis.google.com/js/client.js"></script>
       <script type="text/javascript" src="js/storage.js"></script>
   </head>
   <body>
-    <!--Add a button for the user to click to initiate auth sequence -->
-    <button id="authorize-button" style="visibility: hidden">Authorize</button>
+    <!--Add a button for the user to click to initiate auth sequence style="visibility: hidden" -->
+    <button id="authorize-button" >Authorize</button>
     <header>
       <h1>Google Cloud Storage JavaScript Client Library Application</h1>
     </header>
@@ -74,7 +79,8 @@
       </option>
     </select>
     <br/>
-        <input type="file" id="filePicker" style="display: none" />
+        <input type="file" id="filePicker" style="display: hidden" />
+        <button type="button" class="btn btn-default" onclick="gapi.auth.setToken(null);">Sign out</button>
     <div id="main-content">
     </div>
   </body>

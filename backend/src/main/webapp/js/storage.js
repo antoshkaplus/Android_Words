@@ -12,7 +12,7 @@ var PROJECT = 'antoshkaplus-words';
  * script. For more info see:
  * https://developers.google.com/console/help/new/#generatingoauth2
  */
-var clientId = 'YOUR_CLIENT_ID';
+var clientId = '251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com';
 
 /**
 * Enter the API key from the Google Developers Console, by following these
@@ -24,26 +24,24 @@ var clientId = 'YOUR_CLIENT_ID';
 * should display "Any referer allowed." For more info see:
 * https://developers.google.com/console/help/new/#generatingdevkeys
 */
-var apiKey = 'YOUR_API_KEY';
+var apiKey = 'AIzaSyCpNJPGA_zTpriCby8-z4XyAwEllC9wRlM';
 
 /**
  * To enter one or more authentication scopes, refer to the documentation
  * for the API.
  */
-var scopes = 'https://www.googleapis.com/auth/devstorage.full_control';
-
+var scopes = 'https://www.googleapis.com/auth/devstorage.read_write';
 /**
  * Constants for request parameters. Fill these values in with your custom
  * information.
  */
 var API_VERSION = 'v1';
-
 /**
  * Enter a unique bucket name to create a new bucket. The guidelines for
  * bucket naming can be found here:
  * https://developers.google.com/storage/docs/bucketnaming
  */
-var BUCKET = 'code-sample-bucket-' + Date.now();
+var BUCKET = 'antoshkaplus-words-userfiles';
 
 /**
  * The name of the object inserted via insertObject method.
@@ -58,8 +56,7 @@ var object = "";
  * like the example below.
  */
 var GROUP =
-'group-0000000000000000000000000000000000000000000000000000000000000000';
-
+'group-00b4903a974279cfffb640793e871fa5b9ee3c765acbf78a812b20f8167f7a38';
 /**
  * Valid values are user-userId, user-email, group-groupId, group-email,
  * allUsers, allAuthenticatedUsers
@@ -456,14 +453,14 @@ function executeRequest(request, apiRequestName) {
     //paramaters to the getCodeSnippet method call as 'request.wc.wc.params'
     //else pass request paramaters as 'request.wc.wc'
     if (apiRequestName != 'insertObject') {
-      apiRequestCodeSnippetEntry.innerHTML =
-        getCodeSnippet(request.wc.wc.method, request.wc.wc.params);
+      //apiRequestCodeSnippetEntry.innerHTML =
+      //  getCodeSnippet(request.wc.wc.method, request.wc.wc.params);
       //Selected API Command is not 'insertObject'
       //hide insert object button
       filePicker.style.display = 'none';
     } else {
-      apiRequestCodeSnippetEntry.innerHTML =
-        getCodeSnippet(request.wc.wc.method, request.wc.wc);
+      //apiRequestCodeSnippetEntry.innerHTML =
+      //  getCodeSnippet(request.wc.wc.method, request.wc.wc);
     }
     apiRequestCodeSnippetNode.appendChild(apiRequestCodeSnippetEntry);
     apiRequestNode.appendChild(apiRequestCodeSnippetNode);
