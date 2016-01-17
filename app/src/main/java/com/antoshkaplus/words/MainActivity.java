@@ -202,7 +202,7 @@ public class MainActivity extends Activity implements
 //                        null);
                 credential);
 
-        //builder.setRootUrl("http://192.168.1.108:8080/_ah/api");
+        //builder.setRootUrl("http://192.168.1.124:8080/_ah/api");
         //builder.setRootUrl("appspot")
         builder.setApplicationName("antoshkaplus-words");
         final DictionaryApi api = builder.build();
@@ -229,13 +229,8 @@ public class MainActivity extends Activity implements
                 translationList.setList(trs);
                 FragmentManager mgr = getFragmentManager();
                 try {
-                    com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
-                    tt.setForeignWord("tt");
-                    tt.setNativeWord("tt");
-                    api.addTranslation(tt);
-                    api.addForeignWordList(foreignWordList);
-                    api.addTranslationList(translationList);
-
+                    api.addForeignWordList(foreignWordList).execute();
+                    api.addTranslationList(translationList).execute();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     OkDialog.newInstance(

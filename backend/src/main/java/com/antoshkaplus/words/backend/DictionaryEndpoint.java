@@ -13,6 +13,7 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.google.appengine.repackaged.com.google.io.protocol.HtmlFormGenerator;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 
@@ -24,6 +25,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
  * An endpoint class we are exposing
+ *
+ * 
  */
 @Api(name = "dictionaryApi",
         version = "v1",
@@ -32,7 +35,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
                 ownerDomain = "backend.words.antoshkaplus.com",
                 ownerName = "backend.words.antoshkaplus.com"),
         scopes = {Constants.EMAIL_SCOPE},
-        clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID, Constants.API_EXPLORER_CLIENT_ID},
+        clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID_HORSE, Constants.ANDROID_CLIENT_ID_PONY, Constants.API_EXPLORER_CLIENT_ID},
         audiences = {Constants.ANDROID_AUDIENCE})
 public class DictionaryEndpoint {
 

@@ -7,7 +7,8 @@ import com.google.api.server.spi.Constant;
  */
 public class Constants {
     public static final String WEB_CLIENT_ID = "251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com";
-    public static final String ANDROID_CLIENT_ID = "251166830439-00f91bpu3kpu4lsrac95octfutovd9gv.apps.googleusercontent.com";
+    public static final String ANDROID_CLIENT_ID_HORSE = "251166830439-00f91bpu3kpu4lsrac95octfutovd9gv.apps.googleusercontent.com";
+    public static final String ANDROID_CLIENT_ID_PONY = "251166830439-hbf2io5ka9j5qlj61rhee3cnie5bi5t6.apps.googleusercontent.com";
     public static final String ANDROID_AUDIENCE = WEB_CLIENT_ID;
     public static final String API_EXPLORER_CLIENT_ID = Constant.API_EXPLORER_CLIENT_ID;
 
