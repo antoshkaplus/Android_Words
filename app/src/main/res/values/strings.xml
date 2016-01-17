@@ -3,7 +3,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="translate">Translate</string>
-
+    <string name="ok">OK</string>
     <string name="guess__default_word">default word</string>
 
 

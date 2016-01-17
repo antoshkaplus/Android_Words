@@ -35,6 +35,12 @@ public class Translation {
         this.owner = owner;
     }
 
+    public Translation(String foreignWord, String nativeWord, BackendUser owner) {
+        this(foreignWord, nativeWord);
+        this.owner = owner.getKey();
+    }
+
+
     public String getNativeWord() {
         return nativeWord;
     }

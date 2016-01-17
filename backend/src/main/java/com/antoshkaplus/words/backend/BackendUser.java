@@ -25,4 +25,10 @@ public class BackendUser {
     Key<BackendUser> getKey() {
         return Key.create(BackendUser.class, email);
     }
+
+
+
+//    public Key<BackendUser> getSuperKey() {
+//        return null;
+//    }
 }

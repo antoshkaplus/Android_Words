@@ -51,3 +51,13 @@ now it's time to write backend !!!!!
 
 
 backend/main/webapp need bootstrap folder inside
+
+
+HAVE TO RUN THROUGH LOCAL HOST. SOMETHING DOESn't WORK
+
+#Words
+have to rethink main application
+try to assign user..
+
+#Remote project
+looks good

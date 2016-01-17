@@ -27,8 +27,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="backend" exported="" />
     <orderEntry type="library" exported="" name="appengine-remote-api-1.5.5" level="project" />
     <orderEntry type="library" exported="" name="appengine-api-1.0-sdk-1.9.30" level="project" />
+    <orderEntry type="library" exported="" name="objectify-5.1.9" level="project" />
+    <orderEntry type="library" exported="" name="appengine-endpoints-1.9.30" level="project" />
+    <orderEntry type="library" exported="" name="appengine-endpoints-deps-1.9.30" level="project" />
+    <orderEntry type="library" exported="" name="servlet-api-2.5" level="project" />
+    <orderEntry type="library" exported="" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" name="remote.remote" level="project" />
   </component>
 </module>

@@ -13,6 +13,7 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 
 import java.security.InvalidParameterException;
@@ -47,12 +48,11 @@ public class DictionaryEndpoint {
     public void addForeignWordList(ForeignWordList foreignWords, User user)
             throws OAuthRequestException, InvalidParameterException {
 
-        String userId = user.getEmail();
-        BackendUser backendUser = new BackendUser(userId);
+        BackendUser backendUser = getBackendUser(user);
         for (ForeignWord f : foreignWords.getList()) {
             f.setOwner(backendUser);
         }
-        ofy().save().entities(foreignWords.getList());
+        ofy().save().entities(foreignWords.getList()).now();
     }
 
     @ApiMethod(name = "getForeignWordList", path = "get_foreign_word_list")
@@ -60,7 +60,7 @@ public class DictionaryEndpoint {
     public ForeignWordList getForeignWordList(User user)
             throws OAuthRequestException, InvalidParameterException {
 
-        BackendUser backendUser = new BackendUser(user.getEmail());
+        BackendUser backendUser = getBackendUser(user);
         List<ForeignWord> words = ofy().load().type(ForeignWord.class).ancestor(backendUser).list();
         ForeignWordList list = new ForeignWordList(words);
         return list;
@@ -70,9 +70,9 @@ public class DictionaryEndpoint {
     public void addTranslation(Translation translation, User user)
             throws OAuthRequestException, InvalidParameterException {
 
-        BackendUser backendUser = new BackendUser(user.getEmail());
+        BackendUser backendUser = getBackendUser(user);
         translation.setOwner(backendUser);
-        ofy().save().entity(translation);
+        ofy().save().entity(translation).now();
     }
 
 
@@ -80,7 +80,7 @@ public class DictionaryEndpoint {
     @ApiMethod(name = "getTranslationList", path = "get_translation_list")
     @SuppressWarnings("UnnecessaryLocalVariable")
     public TranslationList getTranslationList(User user) throws OAuthRequestException, InvalidParameterException {
-        BackendUser backendUser = new BackendUser(user.getEmail());
+        BackendUser backendUser = getBackendUser(user);
         List<Translation> translations = ofy().load().type(Translation.class).ancestor(backendUser).list();
         TranslationList list = new TranslationList(translations);
         return list;
@@ -91,20 +91,29 @@ public class DictionaryEndpoint {
     public void removeTranslation(Translation translation, User user)
             throws OAuthRequestException, InvalidParameterException {
 
-        BackendUser backendUser = new BackendUser(user.getEmail());
+        BackendUser backendUser = getBackendUser(user);
         translation.setOwner(backendUser);
-        ofy().delete().entity(translation);
+        ofy().delete().entity(translation).now();
     }
 
     @ApiMethod(name = "addTranslationList", path = "add_translation_list")
     public void addTranslationList(TranslationList translationList, User user)
             throws OAuthRequestException, InvalidParameterException {
 
-        BackendUser backendUser = new BackendUser(user.getEmail());
+        BackendUser backendUser = getBackendUser(user);
         for (Translation t : translationList.getList()) {
             t.setOwner(backendUser);
         }
-        ofy().save().entities(translationList.getList());
+        ofy().save().entities(translationList.getList()).now();
+    }
+
+    private BackendUser getBackendUser(User user) {
+        BackendUser backendUser = new BackendUser(user.getEmail());
+        BackendUser b = ofy().load().entity(backendUser).now();
+        if (b == null) {
+            ofy().save().entity(backendUser).now();
+        }
+        return backendUser;
     }
 
     /*

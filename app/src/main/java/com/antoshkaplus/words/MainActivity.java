@@ -24,6 +24,7 @@ import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
 import com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWordList;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
+import com.antoshkaplus.words.dialog.OkDialog;
 import com.antoshkaplus.words.dialog.RetryDialog;
 import com.antoshkaplus.words.model.ForeignWord;
 import com.antoshkaplus.words.model.NativeWord;
@@ -79,6 +80,7 @@ public class MainActivity extends Activity implements
     static GoogleAccountCredential createCredential(Context context, String accountName) {
         final String WEB_CLIENT_ID =
                 "server:client_id:251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com";
+
         GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
                 context, WEB_CLIENT_ID);
         credential.setSelectedAccountName(accountName);
@@ -193,20 +195,20 @@ public class MainActivity extends Activity implements
 
         Account[] acc = AccountManager.get(this).getAccounts();
 
+        //DictionaryApi.Builder b = new DictionaryApi.Builder()
         DictionaryApi.Builder builder = new DictionaryApi.Builder(
                 AndroidHttp.newCompatibleTransport(),
                 new AndroidJsonFactory(),
 //                        null);
                 credential);
-        builder.setRootUrl("http://192.168.1.108:8080/_ah/api");
-        builder.setApplicationName("antoshkaplus-words");
 
+        //builder.setRootUrl("http://192.168.1.108:8080/_ah/api");
+        //builder.setRootUrl("appspot")
+        builder.setApplicationName("antoshkaplus-words");
         final DictionaryApi api = builder.build();
         new Thread(new Runnable() {
             @Override
             public void run() {
-
-
 
                 List<com.antoshkaplus.words.backend.dictionaryApi.model.Translation> trs = new ArrayList<>();
                 List<com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord> fws = new ArrayList<>();
@@ -225,12 +227,25 @@ public class MainActivity extends Activity implements
                 foreignWordList.setList(fws);
                 TranslationList translationList = new TranslationList();
                 translationList.setList(trs);
+                FragmentManager mgr = getFragmentManager();
                 try {
+                    com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
+                    tt.setForeignWord("tt");
+                    tt.setNativeWord("tt");
+                    api.addTranslation(tt);
                     api.addForeignWordList(foreignWordList);
                     api.addTranslationList(translationList);
+
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    OkDialog.newInstance(
+                            getString(R.string.dialog__sync_failure__title),
+                            getString(R.string.dialog__sync_failure__text)).show(mgr, "failure");
                 }
+                OkDialog.newInstance(
+                        getString(R.string.dialog__sync_success__title),
+                        getString(R.string.dialog__sync_success__text)).show(mgr, "success");
+
             }
         }).start();
     }
@@ -334,6 +349,10 @@ public class MainActivity extends Activity implements
         translationRepository.addTranslationList(ts);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
     public void OnCorrectGuess(final GuessWordFragment fragment) {
         nextGameEvent = new Runnable() {
@@ -361,6 +380,10 @@ public class MainActivity extends Activity implements
         game.NewGame();
         fragment.setGame(game);
     }
+
+
+
+
 
     class TranslateTask extends AsyncTask<String, Void, String> {
         String foreignWord;
