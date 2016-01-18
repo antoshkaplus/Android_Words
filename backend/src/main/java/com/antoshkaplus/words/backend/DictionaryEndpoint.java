@@ -18,6 +18,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -26,7 +27,11 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 /**
  * An endpoint class we are exposing
  *
- * 
+ * Endpoints open only auto generated setter and getter of a model
+ * to Android client.
+ *
+ * Some properties have to be set in backend:
+ * Translation id, owner
  */
 @Api(name = "dictionaryApi",
         version = "v1",
@@ -75,6 +80,7 @@ public class DictionaryEndpoint {
 
         BackendUser backendUser = getBackendUser(user);
         translation.setOwner(backendUser);
+        translation.resetId();
         ofy().save().entity(translation).now();
     }
 
@@ -96,6 +102,7 @@ public class DictionaryEndpoint {
 
         BackendUser backendUser = getBackendUser(user);
         translation.setOwner(backendUser);
+        translation.resetId();
         ofy().delete().entity(translation).now();
     }
 
@@ -106,6 +113,7 @@ public class DictionaryEndpoint {
         BackendUser backendUser = getBackendUser(user);
         for (Translation t : translationList.getList()) {
             t.setOwner(backendUser);
+            t.resetId();
         }
         ofy().save().entities(translationList.getList()).now();
     }
@@ -118,6 +126,8 @@ public class DictionaryEndpoint {
         }
         return backendUser;
     }
+
+
 
     /*
     @ApiMethod(name = "uploadTranslationList", path = "upload_translation_list")

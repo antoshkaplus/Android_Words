@@ -27,7 +27,7 @@ public class Translation {
     public Translation(String foreignWord, String nativeWord) {
         this.foreignWord = foreignWord;
         this.nativeWord = nativeWord;
-        this.id = getId();
+        resetId();
     }
 
     public Translation(String foreignWord, String nativeWord, Key<BackendUser> owner) {
@@ -62,10 +62,14 @@ public class Translation {
     }
 
     public String getId() {
-        return foreignWord + "_" + nativeWord;
+        return id;
     }
 
     Key<Translation> getKey() {
         return Key.create(owner, Translation.class, id);
+    }
+
+    public void resetId() {
+        this.id = foreignWord + "_" + nativeWord;
     }
 }

@@ -2,6 +2,8 @@ package com.antoshkaplus.words.backend.remote;
 
 
 import com.antoshkaplus.words.backend.BackendUser;
+import com.antoshkaplus.words.backend.Dictionary;
+import com.antoshkaplus.words.backend.DictionaryEndpoint;
 import com.antoshkaplus.words.backend.ForeignWord;
 import com.antoshkaplus.words.backend.Translation;
 import com.antoshkaplus.words.backend.TranslationList;
@@ -10,10 +12,19 @@ import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
 import com.google.appengine.tools.remoteapi.RemoteApiOptions;
 import com.googlecode.objectify.ObjectifyService;
 //import com.googlecode.objectify.ObjectifyService;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -21,6 +32,7 @@ import java.util.Scanner;
 import javax.management.Query;
 
 
+// later start using endpoints
 // here we can actually test that everything works fine
 public class Words {
 
@@ -42,8 +54,26 @@ public class Words {
 
     private void run() {
         init();
-        addTranslation(new Translation("ff", "ff", user));
-        int sz = getTranslationList().size();
+        // we don't really need to ask file name yet
+        for (;;) {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("type command:");
+            String command = scanner.nextLine();
+            if (command.equals("exit")) {
+                break;
+            }
+            if (command.equals("backup")) {
+                System.out.println("file path:");
+                String filePath = scanner.nextLine();
+                try {
+                    FileWriter writer = new FileWriter(filePath);
+                    backup(writer);
+                    writer.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
         installer.uninstall();
     }
 
@@ -61,14 +91,10 @@ public class Words {
             System.out.println("password: ");
             password = scanner.nextLine();
         }
-        String filepath = "";
-        while (filepath.isEmpty()) {
-            System.out.println("output file:");
-            filepath = scanner.nextLine();
-        }
         RemoteApiOptions options = new RemoteApiOptions()
                 .server("antoshkaplus-words.appspot.com", 443)
                 .credentials(username, password);
+        // still may try to go to localhost
         //        .credentials("example@example.com", "haha")
         //        .server("localhost", 8080);
 
@@ -88,5 +114,60 @@ public class Words {
     private List<Translation> getTranslationList() {
         return ofy().load().type(Translation.class).ancestor(user).list();
     }
+
+    // should be used only by administrator
+    private List<BackendUser> getBackendUserList() {
+        return ofy().load().type(BackendUser.class).list();
+    }
+
+    public JSONObject translationToJsonObject(Translation t) {
+        JSONObject obj = new JSONObject();
+        obj.put("foreignWord", t.getForeignWord());
+        obj.put("nativeWord", t.getNativeWord());
+        return obj;
+    }
+
+    public JSONObject foreignWordToJsonObject(ForeignWord fw) {
+        JSONObject obj = new JSONObject();
+        obj.put("word", fw.getWord());
+        obj.put("creationDate", fw.getCreationDate());
+        return obj;
+    }
+
+    JSONObject collectJsonBackup() {
+        JSONObject root = new JSONObject();
+        JSONArray users = new JSONArray();
+        root.put("users", users);
+        for (BackendUser bu : getBackendUserList()) {
+            Dictionary dict = new Dictionary();
+            JSONObject userObj = new JSONObject();
+            userObj.put("email", bu.getEmail());
+            try {
+                JSONArray foreignWords = new JSONArray();
+                for (ForeignWord fw : dict.getForeignWordList(bu)) {
+                    foreignWords.add(foreignWordToJsonObject(fw));
+                }
+                userObj.put("foreignWords", foreignWords);
+                JSONArray translations = new JSONArray();
+                for (Translation t : dict.getTranslationList(bu)) {
+                    translations.add(translationToJsonObject(t));
+                }
+                userObj.put("translations", translations);
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            users.add(userObj);
+        }
+        return root;
+    }
+
+
+
+    private void backup(Writer writer) throws IOException {
+        JSONObject obj = collectJsonBackup();
+        obj.writeJSONString(writer);
+    }
+
 
 }

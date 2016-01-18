@@ -221,6 +221,7 @@ public class MainActivity extends Activity implements
                     tt.setForeignWord(fw.getWord());
                     tt.setNativeWord(t.nativeWord.word);
                     trs.add(tt);
+
                 }
 
                 ForeignWordList foreignWordList = new ForeignWordList();
@@ -228,18 +229,23 @@ public class MainActivity extends Activity implements
                 TranslationList translationList = new TranslationList();
                 translationList.setList(trs);
                 FragmentManager mgr = getFragmentManager();
+                boolean success = true;
                 try {
                     api.addForeignWordList(foreignWordList).execute();
                     api.addTranslationList(translationList).execute();
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    OkDialog.newInstance(
-                            getString(R.string.dialog__sync_failure__title),
-                            getString(R.string.dialog__sync_failure__text)).show(mgr, "failure");
+                    success = false;
+                }
+                
+                int titleId = R.string.dialog__sync_success__title;
+                int textId = R.string.dialog__sync_success__text;
+                if (!success) {
+                    titleId = R.string.dialog__sync_failure__title;
+                    textId = R.string.dialog__sync_failure__text;
                 }
                 OkDialog.newInstance(
-                        getString(R.string.dialog__sync_success__title),
-                        getString(R.string.dialog__sync_success__text)).show(mgr, "success");
+                        getString(titleId), getString(textId)).show(mgr, "syncResult");
 
             }
         }).start();

@@ -2,7 +2,6 @@
 function Translation(foreignWord, nativeWord) {
     this.foreignWord = foreignWord;
     this.nativeWord = nativeWord;
-    this.id = foreignWord + "_" + nativeWord;
 }
 
 
@@ -33,26 +32,35 @@ function enableClick() {
 
 // This is called initially
 function init() {
-  var apiName = 'dictionaryApi';
-  var apiVersion = 'v1';
-  var apiRoot = 'https://' + window.location.host + '/_ah/api';
-  if (window.location.hostname == 'localhost'
+    var apiName = 'dictionaryApi';
+    var apiVersion = 'v1';
+    var apiRoot = 'https://' + window.location.host + '/_ah/api';
+    if (window.location.hostname == 'localhost'
       || window.location.hostname == '127.0.0.1'
       || ((window.location.port != "") && (window.location.port > 1023))) {
         // We're probably running against the DevAppServer
       apiRoot = 'http://' + window.location.host + '/_ah/api';
-  }
-  //apiRoot = "https://antoshkaplus-words.appspot.com/_ah/api"
+    }
+    apiRoot = "https://antoshkaplus-words.appspot.com/_ah/api"
 
-  var apisToLoad = 2
-  var callback = function() {
+    var apisToLoad = 2
+    var callback = function() {
       if (--apisToLoad == 0) {
           signin(true, userAuthed);
       }
-  }
+    }
 
-  gapi.client.load(apiName, apiVersion, callback, apiRoot);
-  gapi.client.load('oauth2', 'v2', callback)
+    gapi.client.load(apiName, apiVersion, callback, apiRoot);
+    gapi.client.load('oauth2', 'v2', callback)
+
+    var ENTER_KEY_CODE = 13
+    $('#foreignWord').keyup(function(e){
+        if(e.keyCode == ENTER_KEY_CODE)
+        {
+            autoTranslate()
+        }
+    });
+
 }
 //server:client_id:
 var CLIENT_ID = "251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com"
@@ -88,10 +96,17 @@ function userAuthed() {
 function addTranslation() {
     w_0 = $('#foreignWord').val()
     w_1 = $('#nativeWord').val()
+    if (!w_0 || !w_1) {
+        console.log("one of the words is empty")
+        // make red one of the cells
+        return
+    }
     var translation = new Translation(w_0, w_1);
     gapi.client.dictionaryApi.addTranslation(translation).execute(function(resp) {
-        console.log("translation saved")
+        console.log("translation saved", resp)
+        $('#foreignWord').focus().select()
     })
+
 }
 
 function fillTranslationList() {
@@ -131,8 +146,13 @@ function addFileTranslationList() {
 
 
 function autoTranslate() {
-
-
-
-
+    var apiKey = 'AIzaSyCpNJPGA_zTpriCby8-z4XyAwEllC9wRlM'
+    var source = 'https://www.googleapis.com/language/translate/v2';
+    $.get( source, { key: apiKey, source: "en", target: "ru", q: $('#foreignWord').val() } )
+        .done(function( data ) {
+           var text = data.data.translations[0].translatedText
+               console.log(text)
+               $('#nativeWord').val(text);
+        });
 }
+
