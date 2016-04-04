@@ -4,12 +4,7 @@ Want to learn more English words. Hope this application is going to help me.
 
 #TODO
 * remote load 
-* web interface to add words
-* find out how to make copy
-* work with application 
 * better update strategy
-* maybe android library finally!!! git submodule???
-
 
 Goals:
 * load words I don't know from different sources
@@ -41,18 +36,10 @@ word;translation
 
 
 to do::
-ability to add new translations, with usage or TranslationApi from google
-
 add backend... like we did in recursive lists. use google datastore api directly
-
 implement different options , add more games
-
 now it's time to write backend !!!!!
-
-
 backend/main/webapp need bootstrap folder inside
-
-
 HAVE TO RUN THROUGH LOCAL HOST. SOMETHING DOESn't WORK
 
 #Words
@@ -61,3 +48,13 @@ try to assign user..
 
 #Remote project
 looks good
+
+
+
+
+
+
+
+
+
+

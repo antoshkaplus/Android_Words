@@ -7,44 +7,34 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
 
+import com.antoshkaplus.fly.dialog.OkDialog;
+import com.antoshkaplus.fly.dialog.RetryDialog;
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
 import com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWordList;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
-import com.antoshkaplus.words.dialog.OkDialog;
-import com.antoshkaplus.words.dialog.RetryDialog;
-import com.antoshkaplus.words.model.ForeignWord;
-import com.antoshkaplus.words.model.NativeWord;
 import com.antoshkaplus.words.model.Translation;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.translate.Translate;
 import com.google.api.services.translate.TranslateRequestInitializer;
 import com.google.api.services.translate.model.TranslationsListResponse;
-import com.google.api.services.translate.model.TranslationsResource;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -54,7 +44,7 @@ import android.os.Handler;
 
 public class MainActivity extends Activity implements
         GuessWordFragment.OnFragmentInteractionListener,
-        TranslationListFragment.OnFragmentInteractionListener {
+        TranslationListFragment.OnFragmentInteractionListener, SyncTask.Listener, TranslateTask.Listener {
 
     private static final String TAG = "MainActivity";
     private static final int GUESS_WORD_GAME_CHOICE_COUNT = 4;
@@ -72,27 +62,26 @@ public class MainActivity extends Activity implements
 
     private List<Translation> translationList;
 
+    SharedPreferences settings;
+
     GoogleAccountCredential credential;
 
-
-
-
-    static GoogleAccountCredential createCredential(Context context, String accountName) {
-        final String WEB_CLIENT_ID =
-                "server:client_id:251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com";
-
-        GoogleAccountCredential credential = GoogleAccountCredential.usingAudience(
-                context, WEB_CLIENT_ID);
-        credential.setSelectedAccountName(accountName);
-        return credential;
-    }
-
+    SharedPreferences.OnSharedPreferenceChangeListener settingsListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals(getString(R.string.pref__account__key))) {
+                ///onAccountChanged();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        credential = createCredential(this, "antoshkaplus@gmail.com");
+        credential = CredentialFactory.create(this, "antoshkaplus@gmail.com");
+        settings = PreferenceManager.getDefaultSharedPreferences(this);
+        settings.registerOnSharedPreferenceChangeListener(settingsListener);
 
         if (savedInstanceState != null) {
             guessWordFragment = (GuessWordFragment) getFragmentManager().getFragment(savedInstanceState, "guess_word_fragment");
@@ -104,10 +93,11 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
         translationRepository = new TranslationRepository(this);
         try {
-            translationRepository.Init("antoshkaplus@gmail.com");
-
-            PopulateWithInitialData();
-
+            PropertyStore store = new PropertyStore(this);
+            if (store.isFirstLaunch()) {
+                PopulateWithInitialData();
+                store.setFirstLaunch();
+            }
 //            ListView lv = (ListView)findViewById(R.id.translations);
             translationList = translationRepository.getAllTranslations();
 //            lv.setAdapter(new TranslationAdapter(this, trs));
@@ -116,13 +106,12 @@ public class MainActivity extends Activity implements
             ft.add(R.id.container, guessWordFragment);
             ft.commit();
 
-            translationListFragment.setListAdapter(new TranslationAdapter(this, translationList));
+            translationListFragment.setListAdapter(new TranslationAdapter(this, translationRepository));
 
             game = new GuessWordGame(translationList, GUESS_WORD_GAME_CHOICE_COUNT);
             game.NewGame();
             guessWordFragment.setGame(game);
         } catch (Exception ex) {
-
             ex.printStackTrace();
         }
 
@@ -160,6 +149,8 @@ public class MainActivity extends Activity implements
 
             //noinspection SimplifiableIfStatement
             if (id == R.id.action_settings) {
+                Intent i = new Intent(this, SettingsActivity.class);
+                startActivity(i);
                 return true;
             } else if (id == R.id.action_add_translation) {
                 showAddWordDialog();
@@ -189,66 +180,9 @@ public class MainActivity extends Activity implements
         }
     }
 
-    // i just create new dictionary everytime and send it to the server
+
     void Sync() {
-        // need to put everything in special data structures and send.
-
-        Account[] acc = AccountManager.get(this).getAccounts();
-
-        //DictionaryApi.Builder b = new DictionaryApi.Builder()
-        DictionaryApi.Builder builder = new DictionaryApi.Builder(
-                AndroidHttp.newCompatibleTransport(),
-                new AndroidJsonFactory(),
-//                        null);
-                credential);
-
-        //builder.setRootUrl("http://192.168.1.124:8080/_ah/api");
-        //builder.setRootUrl("appspot")
-        builder.setApplicationName("antoshkaplus-words");
-        final DictionaryApi api = builder.build();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                List<com.antoshkaplus.words.backend.dictionaryApi.model.Translation> trs = new ArrayList<>();
-                List<com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord> fws = new ArrayList<>();
-                for (Translation t : translationList) {
-                    com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord fw = new com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWord();
-                    fw.setWord(t.foreignWord.word);
-                    fw.setCreationDate(new DateTime(t.foreignWord.creationDate));
-                    fws.add(fw);
-                    com.antoshkaplus.words.backend.dictionaryApi.model.Translation tt = new com.antoshkaplus.words.backend.dictionaryApi.model.Translation();
-                    tt.setForeignWord(fw.getWord());
-                    tt.setNativeWord(t.nativeWord.word);
-                    trs.add(tt);
-
-                }
-
-                ForeignWordList foreignWordList = new ForeignWordList();
-                foreignWordList.setList(fws);
-                TranslationList translationList = new TranslationList();
-                translationList.setList(trs);
-                FragmentManager mgr = getFragmentManager();
-                boolean success = true;
-                try {
-                    api.addForeignWordList(foreignWordList).execute();
-                    api.addTranslationList(translationList).execute();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    success = false;
-                }
-                
-                int titleId = R.string.dialog__sync_success__title;
-                int textId = R.string.dialog__sync_success__text;
-                if (!success) {
-                    titleId = R.string.dialog__sync_failure__title;
-                    textId = R.string.dialog__sync_failure__text;
-                }
-                OkDialog.newInstance(
-                        getString(titleId), getString(textId)).show(mgr, "syncResult");
-
-            }
-        }).start();
+        new SyncTask(this).execute();
     }
 
 
@@ -295,11 +229,10 @@ public class MainActivity extends Activity implements
                     return;
                 }
                 // this one could be made as separate function
-                Translation t = new Translation(new ForeignWord(from, null), new NativeWord(to));
+                Translation t = new Translation(from, to, new Date());
                 // need to have my own exceptions
                 try {
                     translationRepository.addTranslation(t);
-
                 } catch (Exception ex) {
                     // should check for specific exception
                     showRetryDialog(
@@ -343,9 +276,7 @@ public class MainActivity extends Activity implements
         while ((line = reader.readLine()) != null) {
             String[] words = line.split(";");
             ts.add(new Translation(
-                    new ForeignWord(words[0], new Date()),
-                    new NativeWord(words[1])
-            ));
+                    words[0], words[1], new Date()));
         }
         translationRepository.addTranslationList(ts);
     }
@@ -383,41 +314,43 @@ public class MainActivity extends Activity implements
     }
 
 
-
-
-
-    class TranslateTask extends AsyncTask<String, Void, String> {
-        String foreignWord;
-
-        @Override
-        protected String doInBackground(String... strings) {
-            foreignWord = strings[0];
-//            GoogleCredential credential = new GoogleCredential().setAccessToken(
-//                    "oauth2:251166830439-0l5bm28ucq6mnhj92ti3s7v960e3h2ci.apps.googleusercontent.com");
-
-            Translate t = new Translate.Builder(
-                    AndroidHttp.newCompatibleTransport(),
-                    new JacksonFactory(),
-                    null)
-                    .setTranslateRequestInitializer(new TranslateRequestInitializer("AIzaSyCpNJPGA_zTpriCby8-z4XyAwEllC9wRlM"))
-                    .setApplicationName("Words")
-                    .build();
-            List<String> ls = new ArrayList<>();
-            ls.add(foreignWord);
-            try {
-                TranslationsListResponse response = t.translations().list(ls, "ru").execute();
-                String nativeWord = response.getTranslations().get(0).getTranslatedText();
-                return nativeWord;
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            addWordDialog.setTranslation(foreignWord, s);
-        }
+    private String retrieveAccount() {
+        return settings.getString(getString(R.string.pref__account__key), null);
     }
+
+    @Override
+    public void onSyncFinish(boolean success) {
+        // and this dialog logic that comes up
+        FragmentManager mgr = getFragmentManager();
+        int titleId = R.string.dialog__sync_success__title;
+        int textId = R.string.dialog__sync_success__text;
+        if (!success) {
+            titleId = R.string.dialog__sync_failure__title;
+            textId = R.string.dialog__sync_failure__text;
+        }
+        OkDialog.newInstance(
+                getString(titleId), getString(textId)).show(mgr, "syncResult");
+    }
+
+    @Override
+    public void onTranslateFinish(String foreignWord, String nativeWord) {
+        addWordDialog.setTranslation(foreignWord, nativeWord);
+    }
+
+    /*
+    private void onAccountChanged() {
+        String account = retrieveAccount();
+        credential.setSelectedAccountName(account);
+        repository = new ItemRepository(this, account);
+        try {
+            parentId = rootId = repository.getRootId();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        loadItems();
+        onItemsChanged();
+    }
+    */
+
 
 }

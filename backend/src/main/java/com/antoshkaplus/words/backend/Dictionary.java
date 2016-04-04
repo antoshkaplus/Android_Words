@@ -14,15 +14,6 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  */
 public class Dictionary {
 
-
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    public List<ForeignWord> getForeignWordList(BackendUser user)
-            throws OAuthRequestException, InvalidParameterException {
-
-        List<ForeignWord> words = ofy().load().type(ForeignWord.class).ancestor(user).list();
-        return words;
-    }
-
     @SuppressWarnings("UnnecessaryLocalVariable")
     public List<Translation> getTranslationList(BackendUser user)
             throws OAuthRequestException, InvalidParameterException {
@@ -30,5 +21,7 @@ public class Dictionary {
         List<Translation> translations = ofy().load().type(Translation.class).ancestor(user).list();
         return translations;
     }
+
+
 
 }

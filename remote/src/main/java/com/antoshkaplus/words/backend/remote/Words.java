@@ -3,18 +3,11 @@ package com.antoshkaplus.words.backend.remote;
 
 import com.antoshkaplus.words.backend.BackendUser;
 import com.antoshkaplus.words.backend.Dictionary;
-import com.antoshkaplus.words.backend.DictionaryEndpoint;
-import com.antoshkaplus.words.backend.ForeignWord;
 import com.antoshkaplus.words.backend.Translation;
-import com.antoshkaplus.words.backend.TranslationList;
-import com.google.appengine.api.datastore.*;
 import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
 import com.google.appengine.tools.remoteapi.RemoteApiOptions;
 import com.googlecode.objectify.ObjectifyService;
 //import com.googlecode.objectify.ObjectifyService;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -23,13 +16,9 @@ import org.json.simple.JSONObject;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import javax.management.Query;
 
 
 // later start using endpoints
@@ -38,7 +27,6 @@ public class Words {
 
 
     static {
-        ObjectifyService.register(ForeignWord.class);
         ObjectifyService.register(Translation.class);
         ObjectifyService.register(BackendUser.class);
     }
@@ -127,13 +115,6 @@ public class Words {
         return obj;
     }
 
-    public JSONObject foreignWordToJsonObject(ForeignWord fw) {
-        JSONObject obj = new JSONObject();
-        obj.put("word", fw.getWord());
-        obj.put("creationDate", fw.getCreationDate());
-        return obj;
-    }
-
     JSONObject collectJsonBackup() {
         JSONObject root = new JSONObject();
         JSONArray users = new JSONArray();
@@ -143,11 +124,6 @@ public class Words {
             JSONObject userObj = new JSONObject();
             userObj.put("email", bu.getEmail());
             try {
-                JSONArray foreignWords = new JSONArray();
-                for (ForeignWord fw : dict.getForeignWordList(bu)) {
-                    foreignWords.add(foreignWordToJsonObject(fw));
-                }
-                userObj.put("foreignWords", foreignWords);
                 JSONArray translations = new JSONArray();
                 for (Translation t : dict.getTranslationList(bu)) {
                     translations.add(translationToJsonObject(t));

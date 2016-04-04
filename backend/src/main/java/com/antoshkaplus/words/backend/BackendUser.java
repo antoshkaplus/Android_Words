@@ -11,10 +11,9 @@ import com.googlecode.objectify.annotation.Id;
  */
 @Entity
 public class BackendUser {
-
     @Id
     private String email;
-
+    private int version = 0;
 
     public BackendUser() {}
 
@@ -30,7 +29,14 @@ public class BackendUser {
         return email;
     }
 
-    //    public Key<BackendUser> getSuperKey() {
-//        return null;
-//    }
+    public int getVersion() {
+        return version;
+    }
+
+    public void increaseVersion() {
+        ++version;
+    }
+
+
+
 }

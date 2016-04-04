@@ -1,5 +1,6 @@
 package com.antoshkaplus.words.backend;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +10,9 @@ public class TranslationList {
 
     private List<Translation> list;
 
-    public TranslationList() {}
+    public TranslationList() {
+        this.list = new ArrayList<>();
+    }
 
     public TranslationList(List<Translation> list) {
         this.list = list;

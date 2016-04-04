@@ -8,11 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.antoshkaplus.words.model.Translation;
-
-import org.w3c.dom.Text;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.j256.ormlite.android.AndroidDatabaseResults;
 
 /**
  * Created by antoshkaplus on 7/30/15.
@@ -20,11 +16,17 @@ import java.util.List;
 public class TranslationAdapter extends BaseAdapter {
 
     Context context;
-    List<Translation> items = new ArrayList<>();
+    TranslationRepository repo;
+    AndroidDatabaseResults items;
 
-    public TranslationAdapter(Context context, List<Translation> items) {
+    public TranslationAdapter(Context context, TranslationRepository repo) {
         this.context = context;
-        this.items = items;
+        this.repo = repo;
+        try {
+            this.items = repo.getTranslationsRawResults();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -35,25 +37,34 @@ public class TranslationAdapter extends BaseAdapter {
         }
         Translation item = (Translation)getItem(position);
         TextView foreignView = (TextView)convertView.findViewById(R.id.word_0);
-        foreignView.setText(item.foreignWord.word);
+        foreignView.setText(item.foreignWord);
         TextView nativeView = (TextView)convertView.findViewById(R.id.word_1);
-        nativeView.setText(item.nativeWord.word);
+        nativeView.setText(item.nativeWord);
         return convertView;
     }
 
+
+
     @Override
     public Object getItem(int position) {
-        return items.get(position);
+        Translation translation = null;
+        try {
+            translation = repo.getTranslation(items, position);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return translation;
     }
 
     @Override
     public long getItemId(int position) {
-        return items.get(position).id;
+        // check for null
+        return ((Translation)getItem(position)).id;
     }
 
     @Override
     public int getCount() {
-        return items.size();
+        return items.getCount();
     }
 
 }

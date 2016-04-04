@@ -2,6 +2,7 @@ package com.antoshkaplus.words;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -30,36 +31,14 @@ import java.util.Locale;
  * create an instance of this fragment.
  */
 public class TranslationListFragment extends ListFragment implements AdapterView.OnItemLongClickListener{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private List<Translation> translationList;
-    private GridView translationListView;
 
     private OnFragmentInteractionListener mListener;
     private TextToSpeech textToSpeech;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TranslationListFragment.
-     */
     // TODO: Rename and change types and number of parameters
-    public static TranslationListFragment newInstance(String param1, String param2) {
+    public static TranslationListFragment newInstance(TranslationAdapter adapter) {
         TranslationListFragment fragment = new TranslationListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
+        fragment.setListAdapter(adapter);
         return fragment;
     }
 
@@ -70,10 +49,6 @@ public class TranslationListFragment extends ListFragment implements AdapterView
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -84,8 +59,9 @@ public class TranslationListFragment extends ListFragment implements AdapterView
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        Activity activity = (Activity)context;
         textToSpeech = new TextToSpeech(activity, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -109,12 +85,12 @@ public class TranslationListFragment extends ListFragment implements AdapterView
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-//        ViewGroup vg = (ViewGroup)view;
+        ViewGroup vg = (ViewGroup)view;
 
-//        View vv= vg.getChildAt(0);
-//        View v = inflater.inflate(R.layout.fragment_translation_list, null);
-//        vg.addView(v);
-//        vv.bringToFront();
+        View vv= vg.getChildAt(0);
+        View v = inflater.inflate(R.layout.fragment_translation_list, null);
+        vg.addView(v);
+        vv.bringToFront();
 
         return view;
     }
@@ -141,13 +117,6 @@ public class TranslationListFragment extends ListFragment implements AdapterView
         textToSpeech.speak(tv.getText(), TextToSpeech.QUEUE_FLUSH, null, null);
         return false;
     }
-
-    //    public void setTranslationList(List<Translation> translationList) {
-//        this.translationList = translationList;
-//        // now need also insert everything into the view
-//        Activity a = getActivity();
-//        setListAdapter(new TranslationAdapter(a, this.translationList));
-//    }
 
     /**
      * This interface must be implemented by activities that contain this

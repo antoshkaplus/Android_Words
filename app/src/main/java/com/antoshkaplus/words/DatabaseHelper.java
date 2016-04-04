@@ -5,11 +5,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.antoshkaplus.words.model.ForeignWord;
-import com.antoshkaplus.words.model.NativeWord;
 import com.antoshkaplus.words.model.Translation;
-import com.antoshkaplus.words.model.User;
-import com.antoshkaplus.words.model.UserTranslation;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.support.ConnectionSource;
@@ -26,8 +22,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // the DAO object we use to access the SimpleData table
-    private Dao<ForeignWord, Integer> foreignWordDao;
-    private Dao<NativeWord, Integer> nativeWordDao;
     private Dao<Translation, Integer> translationDao;
 
 
@@ -38,11 +32,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database,ConnectionSource connectionSource) {
         try {
-            TableUtils.createTable(connectionSource, ForeignWord.class);
-            TableUtils.createTable(connectionSource, NativeWord.class);
             TableUtils.createTable(connectionSource, Translation.class);
-            TableUtils.createTable(connectionSource, User.class);
-            TableUtils.createTable(connectionSource, UserTranslation.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);

@@ -1,1 +1,2 @@
-include ':app', ':backend', ':remote'
+// no colon in fly is required
+include ':app', ':backend', ':remote', 'fly:fly'

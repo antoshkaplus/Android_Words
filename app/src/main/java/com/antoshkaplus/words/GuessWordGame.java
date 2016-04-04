@@ -1,7 +1,6 @@
 package com.antoshkaplus.words;
 
 import com.antoshkaplus.words.model.Translation;
-import com.antoshkaplus.words.model.Word;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +16,8 @@ public class GuessWordGame {
     private static final Random rng = new Random(System.currentTimeMillis());
     private List<Translation> translationList;
 
-    private List<Word> guesses;
-    private Word word;
+    private List<String> guesses;
+    private String word;
     private int correctPosition;
 
     private int guessCount;
@@ -50,11 +49,11 @@ public class GuessWordGame {
         return correctPosition;
     }
 
-    List<Word> getGuesses() {
+    List<String> getGuesses() {
         return guesses;
     }
 
-    Word getWord() {
+    String getWord() {
         return word;
     }
 

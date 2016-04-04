@@ -2,7 +2,6 @@ package com.antoshkaplus.words;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.speech.tts.TextToSpeech;
@@ -13,8 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.antoshkaplus.words.model.Word;
 
 import java.util.Locale;
 
@@ -95,8 +92,8 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     void fillViews() {
-        guesses.setAdapter(new ArrayAdapter<Word>(getActivity(), android.R.layout.simple_list_item_1, game.getGuesses()));
-        word.setText(game.getWord().word);
+        guesses.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, game.getGuesses()));
+        word.setText(game.getWord());
     }
 
     @Override
@@ -120,7 +117,7 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        speak(game.getGuesses().get(position).word);
+        speak(game.getGuesses().get(position));
         return true;
     }
 

@@ -5,7 +5,7 @@
     <string name="translate">Translate</string>
     <string name="ok">OK</string>
     <string name="guess__default_word">default word</string>
-
+    <string name="default_word">default word</string>
 
     <string name="action__add_translation">Add Translation</string>
     <string name="action__settings">Settings</string>
@@ -26,11 +26,12 @@
     <string name="dialog__sync_failure__title">Bad news</string>
     <string name="dialog__sync_failure__text">Synchronization failed</string>
 
-
-
-
+    <string name="pref__account__title">Current account</string>
+    <string name="pref__account__key">pref__account__key</string>
 
     <string name="title_activity_guess_word">GuessWordActivity</string>
+
+    <string name="activity_settings__title">Settings</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
