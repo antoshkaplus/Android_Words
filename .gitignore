@@ -1,7 +1,11 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
+
+# user specific configuration
 /.idea/libraries
+/.idea/workspace.xml
+/.idea/encodings.xml
+
 .DS_Store
 /build
 /captures
