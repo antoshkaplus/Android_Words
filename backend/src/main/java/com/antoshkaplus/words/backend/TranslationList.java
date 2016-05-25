@@ -25,4 +25,24 @@ public class TranslationList {
         this.list = list;
     }
 
+    public void resetId() {
+        for (Translation t : list) {
+            if (t.getId() == null) {
+                t.resetId();
+            }
+        }
+    }
+
+    public int size() {
+        return list.size();
+    }
+
+    List<String> getIds() {
+        List<String> ids = new ArrayList<>(list.size());
+        for (Translation t : list) {
+            ids.add(t.getId());
+        }
+        return ids;
+    }
+
 }

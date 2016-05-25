@@ -61,10 +61,9 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
 
             PropertyStore store = new PropertyStore(context);
             Date lastSuccessfulUpdate = store.lastSuccessfulUpdate();
-            Date currentUpdate = new Date();
-            Version version = api.getDictionaryVersion().execute();
 
             TranslationList updateList = api.getUpdateList(new DateTime(lastSuccessfulUpdate)).execute();
+
             merge(updateList.getList());
 
             List<com.antoshkaplus.words.model.Translation> modelTrList = repo.getTraslationList(lastSuccessfulUpdate);
@@ -88,8 +87,8 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
         Collections.sort(update, new Comparator<Translation>() {
             @Override
             public int compare(Translation lhs, Translation rhs) {
-                long ld = value(lhs);
-                long rd = value(rhs);
+                long ld = lhs.getUpdateDate().getValue();
+                long rd = rhs.getUpdateDate().getValue();
                 // should not return long
                 if (ld < rd) return -1;
                 else if (ld == rd) return 0;
@@ -144,14 +143,6 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
 
     public void setListener(Listener listener) {
         this.listener = listener;
-    }
-
-    private long value(Translation t) {
-        long d = t.getCreationDate().getValue();
-        if (t.getDeleted()) {
-            d = t.getDeletionDate().getValue();
-        }
-        return d;
     }
 
     private com.antoshkaplus.words.model.Translation toModelTranslation(Translation tr) {

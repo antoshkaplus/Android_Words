@@ -17,6 +17,7 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.repackaged.com.google.io.protocol.HtmlFormGenerator;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 
@@ -24,6 +25,7 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -55,17 +57,8 @@ public class DictionaryEndpoint {
 
     public DictionaryEndpoint() {}
 
-    @ApiMethod(name = "addTranslation", path = "add_translation")
-    public void addTranslation(Translation translation, User user)
-            throws OAuthRequestException, InvalidParameterException {
 
-        BackendUser backendUser = getBackendUser(user);
-        translation.setOwner(backendUser);
-        translation.resetId();
-        ofy().save().entity(translation).now();
-    }
-
-    @ApiMethod(name = "getTranslationList", path = "get_translation_list")
+    @ApiMethod(name = "getTranslationListWhole", path = "get_translation_list_whole")
     @SuppressWarnings("UnnecessaryLocalVariable")
     public TranslationList getTranslationListWhole(User user) throws OAuthRequestException, InvalidParameterException {
         BackendUser backendUser = getBackendUser(user);
@@ -74,38 +67,71 @@ public class DictionaryEndpoint {
         return list;
     }
 
+    @ApiMethod(name = "getTranslationList", path = "get_translation_list")
     public TranslationList getTranslationList(@Named("timestamp")Date timestamp, User user) {
-        TranslationList list = new TranslationList();
-        return list;
+        Query<Translation> query = ofy().load().type(Translation.class).ancestor(null);
+        return new TranslationList(query.filter("updateDate >=", timestamp).list());
     }
 
-    public void removeTranslationList(TranslationList list, User user) {
+    // we may throw exception here in case something went wrong.
+    // that means unsuccessful operation
+    @ApiMethod(name = "updateTranslationList", path = "update_translation_list")
+    // need more meaningful names here
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    public void updateTranslationList(final TranslationList translationList, final User user)
+            throws OAuthRequestException, InvalidParameterException
+    {
+        // client doesn't know how to set id on new items and may forget to do add it on old ones
+        translationList.resetId();
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                BackendUser backendUser = getBackendUser(user);
+                Map<String, Translation> m = ofy().load().type(Translation.class).parent(backendUser).ids(translationList.getIds());
 
+                List<Translation> updates = new ArrayList<Translation>();
+                for (Translation t : translationList.getList()) {
+                    Translation r = m.get(t.getId());
+                    if (r != null) {
+                        Date rU = r.getUpdateDate();
+                        Date tU = t.getUpdateDate();
+                        if (rU.after(tU)) {
+                            continue;
+                        }
+                    }
+                    t.setOwner(backendUser);
+                    updates.add(t);
+                }
+                ofy().save().entities(updates).now();
+            }
+        });
+    }
 
+    @ApiMethod(name = "updateTranslation", path = "update_translation")
+    public void updateTranslation( Translation translation, final User user )
+        throws OAuthRequestException, InvalidParameterException
+    {
+        // try to add / remove only one Translation.
+        // good for users who work online and don't want to change too much stuff
     }
 
 
-    @ApiMethod(name = "removeTranslation", path = "remove_translation")
-    public void removeTranslation(Translation translation, User user)
-            throws OAuthRequestException, InvalidParameterException {
+//    @ApiMethod(name = "getDictionaryVersion", path = "get_dictionary_version")
+//    public Version getDictionaryVersion(User user) {
+//        BackendUser backendUser = new BackendUser(user.getEmail());
+//        backendUser = ofy().load().entity(backendUser).now();
+//        return new Version(backendUser.getVersion());
+//    }
 
-        BackendUser backendUser = getBackendUser(user);
-        translation.setOwner(backendUser);
-        translation.resetId();
-        ofy().delete().entity(translation).now();
-    }
-
-    @ApiMethod(name = "addTranslationList", path = "add_translation_list")
-    public void addTranslationList(TranslationList translationList, User user)
-            throws OAuthRequestException, InvalidParameterException {
-
-        BackendUser backendUser = getBackendUser(user);
-        for (Translation t : translationList.getList()) {
-            t.setOwner(backendUser);
-            t.resetId();
-        }
-        ofy().save().entities(translationList.getList()).now();
-    }
+    // clear everything that has creation or deletion date older than passed one
+    // for particular user
+//    private void clear(BackendUser user, Date date) {
+//        // maybe do this in batch
+//        Iterable<Key<Translation>> ts = ofy().load().type(Translation.class).ancestor(user).filter("deletionDate >=", date).keys().iterable();
+//        ofy().delete().keys(ts).now();
+//        ts = ofy().load().type(Translation.class).ancestor(user).filter("creationDate >=", date).keys().iterable();
+//        ofy().delete().keys(ts).now();
+//    }
 
     private BackendUser getBackendUser(User user) {
         BackendUser backendUser = new BackendUser(user.getEmail());
@@ -115,64 +141,6 @@ public class DictionaryEndpoint {
         }
         return backendUser;
     }
-
-    @ApiMethod(name = "getUpdateList", path = "get_update_list")
-    public TranslationList getUpdateList(@Named("timestamp")Date timestamp, User user) {
-        Query<Translation> query = ofy().load().type(Translation.class).ancestor(null);
-        TranslationList list = new TranslationList();
-        // can be duplicates
-        list.getList().addAll(query.filter("deletionDate >=", timestamp).list());
-        list.getList().addAll(query.filter("creationDate >=", timestamp).list());
-        return list;
-    }
-
-    // we may throw exception here in case something went wrong.
-    // that means unsuccessful operation
-    @ApiMethod(name = "increaseDictionaryVersion", path = "increase_dictionary_version")
-    // need more meaningful names here
-    @SuppressWarnings("UnnecessaryLocalVariable")
-    public Version increaseDictionaryVersion(final VersionTranslationList versionTranslationList, final @Named("timestamp")Date date, final User user)
-            throws OAuthRequestException, InvalidParameterException
-    {
-        Version version = ofy().transact(new Work<Version>() {
-            @Override
-            public Version run() {
-                BackendUser backendUser = ofy().load().key(Key.create(BackendUser.class, user.getEmail())).now();
-                int currentVersion = backendUser.getVersion();
-                if (currentVersion != versionTranslationList.version.getVersion()) {
-                    return versionTranslationList.version;
-                }
-                clear(backendUser, date);
-                try {
-                    addTranslationList(versionTranslationList.list, user);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-                backendUser.increaseVersion();
-                ofy().save().entity(backendUser);
-                return new Version(backendUser.getVersion());
-            }
-        });
-        return version;
-    }
-
-    @ApiMethod(name = "getDictionaryVersion", path = "get_dictionary_version")
-    public Version getDictionaryVersion(User user) {
-        BackendUser backendUser = new BackendUser(user.getEmail());
-        backendUser = ofy().load().entity(backendUser).now();
-        return new Version(backendUser.getVersion());
-    }
-
-    // clear everything that has creation or deletion date older than passed one
-    // for particular user
-    private void clear(BackendUser user, Date date) {
-        // maybe do this in batch
-        Iterable<Key<Translation>> ts = ofy().load().type(Translation.class).ancestor(user).filter("deletionDate >=", date).keys().iterable();
-        ofy().delete().keys(ts).now();
-        ts = ofy().load().type(Translation.class).ancestor(user).filter("creationDate >=", date).keys().iterable();
-        ofy().delete().keys(ts).now();
-    }
-
 
     /*
     @ApiMethod(name = "uploadTranslationList", path = "upload_translation_list")

@@ -27,23 +27,15 @@ public class Translation {
     @Index
     private String foreignWord;
     private String nativeWord;
-    @Index
+
     private Date creationDate;
-    @Index(IfNotNull.class)
-    private Date deletionDate;
-    @Parent
-    Key<BackendUser> owner;
 
-    // here we keep when record was created/deleted from
-    // server point of view.
-
-    // you want to set this variable at once on all records before
-    // making transaction
-
-    // this variable is another way of having version on each record
-    // version is needed to be able to synchronize from multiple devices
     @Index
     private Date updateDate;
+    private boolean deleted;
+
+    @Parent
+    Key<BackendUser> owner;
 
     public Translation() {}
 
@@ -100,11 +92,11 @@ public class Translation {
         return creationDate;
     }
 
-    public Date getDeletionDate() {
-        return deletionDate;
+    public Date getUpdateDate() {
+        return updateDate;
     }
 
     public boolean isDeleted() {
-        return deletionDate != null;
+        return deleted;
     }
 }
