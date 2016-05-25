@@ -17,7 +17,7 @@ WARN him that he is using another account!!! but it shouldn't be harmful anyway
 ###Client Side:
 - get timestamp of latest synchronization t_1
 - create timestamp t_0
-- get everything from the server after t_1
+- get everything from the server after or equal t_1
 - get everything from device after t_1
 - merge, if device update later, pick that update and assign timestamp to t_0
 (we want to extract and change in the same transaction)

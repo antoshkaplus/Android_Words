@@ -73,6 +73,12 @@ public class DictionaryEndpoint {
         return new TranslationList(query.filter("updateDate >=", timestamp).list());
     }
 
+    @ApiMethod(name = "getTranslationListByVersion", path = "get_translation_list_by_version")
+    public getTranslationList(@Named("version")Integer version, User user) {
+
+    }
+
+
     // we may throw exception here in case something went wrong.
     // that means unsuccessful operation
     @ApiMethod(name = "updateTranslationList", path = "update_translation_list")
@@ -100,9 +106,12 @@ public class DictionaryEndpoint {
                         }
                     }
                     t.setOwner(backendUser);
+                    t.setVersion(backendUser.getVersion());
                     updates.add(t);
                 }
                 ofy().save().entities(updates).now();
+                backendUser.increaseVersion();
+                ofy().save().entity(backendUser);
             }
         });
     }

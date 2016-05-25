@@ -1,2 +1,6 @@
 // no colon in fly is required
-include ':app', ':backend', ':remote', 'fly:fly'
+include ':app', ':backend', ':remote'
+
+include ':fly'
+
+project(':fly').projectDir = new File('fly/fly')

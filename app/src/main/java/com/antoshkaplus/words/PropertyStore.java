@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class PropertyStore {
 
+    private static final String LAST_UPDATE_VERSION = "lastUpdateVersion";
     private static final String LAST_SUCCESSFUL_UPDATE = "lastSuccessfulUpdate";
     private static final String FIRST_LAUNCH = "firstLaunch";
     private Context context;
@@ -45,5 +46,15 @@ public class PropertyStore {
         ed.apply();
     }
 
+    public int lastSyncVersion() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(LAST_UPDATE_VERSION, 0);
+    }
 
+    public void setLastSyncVersion(int lastSyncVersion) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor ed = prefs.edit();
+        ed.putLong(LAST_UPDATE_VERSION, lastSyncVersion);
+        ed.apply();
+    }
 }

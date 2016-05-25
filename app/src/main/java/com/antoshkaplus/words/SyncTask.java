@@ -6,11 +6,8 @@ import android.os.AsyncTask;
 
 import com.antoshkaplus.fly.dialog.OkDialog;
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
-import com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWordList;
 import com.antoshkaplus.words.backend.dictionaryApi.model.Translation;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
-import com.antoshkaplus.words.backend.dictionaryApi.model.Version;
-import com.antoshkaplus.words.backend.dictionaryApi.model.VersionTranslationList;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -61,8 +58,9 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
 
             PropertyStore store = new PropertyStore(context);
             Date lastSuccessfulUpdate = store.lastSuccessfulUpdate();
+            int lastSyncVersion = store.lastSyncVersion();
 
-            TranslationList updateList = api.getUpdateList(new DateTime(lastSuccessfulUpdate)).execute();
+            TranslationList updateList = api.getTranslationList(new DateTime(lastSuccessfulUpdate)).execute();
 
             merge(updateList.getList());
 
@@ -71,16 +69,11 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
             for (com.antoshkaplus.words.model.Translation modelTr : modelTrList) {
                 updateList.getList().add(toRemoteTranslation(modelTr));
             }
-            // going to delete everything on server side that is after or on lastSuccessfulUpdate
-            // and insert new items in one big transaction
-            VersionTranslationList list = new VersionTranslationList();
-            list.setList(updateList);
-            api.increaseDictionaryVersion(new DateTime(lastSuccessfulUpdate), list);
+
         } catch (Exception ex) {
             success = false;
         }
         return success;
-
     }
 
     private void merge(final List<Translation> update) throws Exception {

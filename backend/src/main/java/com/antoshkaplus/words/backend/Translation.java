@@ -34,6 +34,9 @@ public class Translation {
     private Date updateDate;
     private boolean deleted;
 
+    @Index
+    private int version;
+
     @Parent
     Key<BackendUser> owner;
 
@@ -98,5 +101,13 @@ public class Translation {
 
     public boolean isDeleted() {
         return deleted;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }

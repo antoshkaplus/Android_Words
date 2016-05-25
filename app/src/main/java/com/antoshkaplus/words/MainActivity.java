@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import com.antoshkaplus.fly.dialog.OkDialog;
 import com.antoshkaplus.fly.dialog.RetryDialog;
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
-import com.antoshkaplus.words.backend.dictionaryApi.model.ForeignWordList;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.model.Translation;
