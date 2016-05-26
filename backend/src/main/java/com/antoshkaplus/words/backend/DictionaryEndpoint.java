@@ -14,7 +14,9 @@ import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.google.appengine.repackaged.com.google.common.base.Flag;
 import com.google.appengine.repackaged.com.google.io.protocol.HtmlFormGenerator;
+import com.google.appengine.repackaged.org.antlr.runtime.debug.TraceDebugEventListener;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
@@ -57,6 +59,12 @@ public class DictionaryEndpoint {
 
     public DictionaryEndpoint() {}
 
+    @ApiMethod(name = "getVersion", path = "get_version")
+    public Version getVersion(User user) {
+        BackendUser backendUser = getBackendUser(user);
+        return new Version(backendUser.getVersion());
+    }
+
 
     @ApiMethod(name = "getTranslationListWhole", path = "get_translation_list_whole")
     @SuppressWarnings("UnnecessaryLocalVariable")
@@ -67,32 +75,38 @@ public class DictionaryEndpoint {
         return list;
     }
 
-    @ApiMethod(name = "getTranslationList", path = "get_translation_list")
-    public TranslationList getTranslationList(@Named("timestamp")Date timestamp, User user) {
-        Query<Translation> query = ofy().load().type(Translation.class).ancestor(null);
+    @ApiMethod(name = "getTranslationList_GE_Timestamp", path = "get_translation_list_ge_timestamp")
+    public TranslationList getTranslationList_GE_Timestamp(@Named("timestamp")Date timestamp, User user) {
+        Query<Translation> query = getTranslationQuery(user);
         return new TranslationList(query.filter("updateDate >=", timestamp).list());
     }
 
-    @ApiMethod(name = "getTranslationListByVersion", path = "get_translation_list_by_version")
-    public getTranslationList(@Named("version")Integer version, User user) {
-
+    // returns all items with version high than given
+    @ApiMethod(name = "getTranslationList_G_Version", path = "get_translation_list_g_version")
+    public TranslationList getTranslationList_G_Version(@Named("version")Integer version, User user) {
+        Query<Translation> query = getTranslationQuery(user);
+        return new TranslationList(query.filter("version >", version).list());
     }
-
 
     // we may throw exception here in case something went wrong.
     // that means unsuccessful operation
+    // fail or not
     @ApiMethod(name = "updateTranslationList", path = "update_translation_list")
     // need more meaningful names here
     @SuppressWarnings("UnnecessaryLocalVariable")
-    public void updateTranslationList(final TranslationList translationList, final User user)
+    public ResourceBoolean updateTranslationList(@Named("version")final Integer version, final TranslationList translationList, final User user)
             throws OAuthRequestException, InvalidParameterException
     {
         // client doesn't know how to set id on new items and may forget to do add it on old ones
         translationList.resetId();
-        ofy().transact(new VoidWork() {
+        Integer v = ofy().transact(new Work<Integer>() {
             @Override
-            public void vrun() {
+            public Integer run() {
                 BackendUser backendUser = getBackendUser(user);
+                if (backendUser.getVersion() != version) {
+                    return backendUser.getVersion();
+                }
+
                 Map<String, Translation> m = ofy().load().type(Translation.class).parent(backendUser).ids(translationList.getIds());
 
                 List<Translation> updates = new ArrayList<Translation>();
@@ -112,8 +126,10 @@ public class DictionaryEndpoint {
                 ofy().save().entities(updates).now();
                 backendUser.increaseVersion();
                 ofy().save().entity(backendUser);
+                return version;
             }
         });
+        return new ResourceBoolean(v.equals(version));
     }
 
     @ApiMethod(name = "updateTranslation", path = "update_translation")
@@ -150,6 +166,12 @@ public class DictionaryEndpoint {
         }
         return backendUser;
     }
+
+    private Query<Translation> getTranslationQuery(User user) {
+        BackendUser backendUser = getBackendUser(user);
+        return ofy().load().type(Translation.class).ancestor(backendUser);
+    }
+
 
     /*
     @ApiMethod(name = "uploadTranslationList", path = "upload_translation_list")

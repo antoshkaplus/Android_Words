@@ -6,8 +6,10 @@ import android.os.AsyncTask;
 
 import com.antoshkaplus.fly.dialog.OkDialog;
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
+import com.antoshkaplus.words.backend.dictionaryApi.model.ResourceBoolean;
 import com.antoshkaplus.words.backend.dictionaryApi.model.Translation;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
+import com.antoshkaplus.words.backend.dictionaryApi.model.Version;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
@@ -58,23 +60,48 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
 
             PropertyStore store = new PropertyStore(context);
             Date lastSuccessfulUpdate = store.lastSuccessfulUpdate();
-            int lastSyncVersion = store.lastSyncVersion();
+            int localVersion = store.lastSyncVersion();
 
-            TranslationList updateList = api.getTranslationList(new DateTime(lastSuccessfulUpdate)).execute();
 
-            merge(updateList.getList());
 
-            List<com.antoshkaplus.words.model.Translation> modelTrList = repo.getTraslationList(lastSuccessfulUpdate);
-            updateList.getList().clear();
-            for (com.antoshkaplus.words.model.Translation modelTr : modelTrList) {
-                updateList.getList().add(toRemoteTranslation(modelTr));
+            for (;;) {
+                Version v = api.getVersion().execute();
+                int remoteVersion = v.getVersion();
+
+                if (localVersion == remoteVersion) {
+                    return true;
+                }
+
+                // we get changed translations
+                TranslationList remoteUpdateList = api.getTranslationListGVersion(localVersion).execute();
+
+                // we should lock database for awhile while I'm doing all necessary updates
+
+                // merge to local
+                // merges stuff with what we have on local
+                // and returns new list that we would love to push to the server
+                List<Translation> mergedList = merge(remoteUpdateList.getList());
+
+
+                ResourceBoolean r = api.updateTranslationList(remoteVersion, mergedList);
+                localVersion = remoteVersion;
+                store.setLastSyncVersion(localVersion);
+
+                if (r.getValue()) {
+                    break;
+                }
+
             }
-
         } catch (Exception ex) {
             success = false;
         }
         return success;
     }
+
+    private boolean sync() {
+
+    }
+
 
     private void merge(final List<Translation> update) throws Exception {
         Collections.sort(update, new Comparator<Translation>() {
@@ -126,6 +153,8 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
             }
         });
     }
+
+
 
 
     // called from UI thread

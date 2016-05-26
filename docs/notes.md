@@ -30,7 +30,8 @@ client may decide to keep around flag if translation was updated or not
 and pick up stuff that was not updated
 * Client and Server sync process should be considered separately
 and as much as possible independently
-
+* For synchronization we will keep both: version and timestamp.
+It eases out the whole process and may be helpful in the future.
 
 android predefined text sizes:
 
