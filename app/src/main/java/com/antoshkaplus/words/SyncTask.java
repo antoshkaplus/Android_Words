@@ -103,55 +103,9 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
     }
 
 
-    private void merge(final List<Translation> update) throws Exception {
-        Collections.sort(update, new Comparator<Translation>() {
-            @Override
-            public int compare(Translation lhs, Translation rhs) {
-                long ld = lhs.getUpdateDate().getValue();
-                long rd = rhs.getUpdateDate().getValue();
-                // should not return long
-                if (ld < rd) return -1;
-                else if (ld == rd) return 0;
-                else return 1;
-            }
-        });
-
-        // merging updates from server and database in one transaction
-        repo.executeBatch(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                for (Translation tr : update) {
-                    TranslationKey key = new TranslationKey(tr.getForeignWord(), tr.getNativeWord());
-                    com.antoshkaplus.words.model.Translation modelTr = toModelTranslation(tr);
-                    // what if not there
-                    boolean processed = false;
-                    try {
-                        repo.getTranslation(key);
-                    } catch (Exception ex) {
-                        // probably item is not there
-                        if (!tr.getDeleted()) {
-                            repo.addTranslation(modelTr);
-                        }
-                        processed = true;
-                    }
-                    if (!processed) {
-                        long modelValue = modelTr.creationDate.getTime();
-                        long value = value(tr);
-                        if (tr.getDeleted()) {
-                            if (modelValue < value) {
-                                repo.deleteTranslation(modelTr);
-                            }
-                        } else {
-                            if (modelValue > value) {
-                                modelTr.creationDate.setTime(value);
-                                repo.updateTranslation(modelTr);
-                            }
-                        }
-                    }
-                }
-                return null;
-            }
-        });
+    private List<Translation> merge(final List<Translation> update, Date timestamp) throws Exception {
+        TranslationMerger merger = new TranslationMerger(repo);
+        merger.merge(update, timestamp);
     }
 
 
@@ -167,6 +121,8 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
         this.listener = listener;
     }
 
+
+    // this stuff should go away
     private com.antoshkaplus.words.model.Translation toModelTranslation(Translation tr) {
         com.antoshkaplus.words.model.Translation modelTr = new com.antoshkaplus.words.model.Translation(
                 tr.getForeignWord(), tr.getNativeWord(), new Date(tr.getCreationDate().getValue()));

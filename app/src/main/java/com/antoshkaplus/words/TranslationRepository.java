@@ -67,11 +67,13 @@ public class TranslationRepository {
     }
 
     @SuppressWarnings("unchecked")
-    public void getTranslation(TranslationKey key) throws Exception {
+    public Translation getTranslation(TranslationKey key) throws Exception {
         TreeMap map = new TreeMap<String, String>();
         map.put(Translation.FIELD_FOREIGN_WORD, key.foreignWord);
         map.put(Translation.FIELD_NATIVE_WORD, key.nativeWord);
-        helper.getDao(Translation.class).queryForFieldValues(map);
+        List<Translation> list = helper.getDao(Translation.class).queryForFieldValues(map);
+        if (list.isEmpty()) return null;
+        return list.get(0);
     }
 
     public void deleteTranslation(Translation translation) throws Exception {
@@ -85,4 +87,6 @@ public class TranslationRepository {
     public List<Translation> getTraslationList(Date date) throws Exception {
         return helper.getDao(Translation.class).queryBuilder().where().ge(Translation.FIELD_NAME_CREATION_DATE, date).query();
     }
+
+
 }

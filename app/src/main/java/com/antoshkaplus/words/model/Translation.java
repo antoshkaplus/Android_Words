@@ -17,7 +17,8 @@ public class Translation {
     public static final String FIELD_NATIVE_WORD = "native_word";
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME_CREATION_DATE = "creation_date";
-    public static final String FIELD_NAME_DELETION_DATE = "deletion_date";
+    public static final String FIELD_NAME_UPDATE_DATE = "update_date";
+    public static final String FIELD_NAME_DELETED = "deleted";
 
     @DatabaseField(columnName = FIELD_FOREIGN_WORD,
                     index = true,
@@ -35,8 +36,14 @@ public class Translation {
                     canBeNull = false)
     public Date creationDate;
 
-    //@DatabaseField(columnName = FIELD_NAME_DELETION_DATE)
-    //public Date deletionDate;
+    @DatabaseField(columnName = FIELD_NAME_UPDATE_DATE,
+                    canBeNull = false)
+    public Date updateDate;
+
+    @DatabaseField(columnName = FIELD_NAME_DELETED,
+                    canBeNull = false)
+    public boolean deleted;
+
 
 
     public Translation() {}
