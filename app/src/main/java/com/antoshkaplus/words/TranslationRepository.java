@@ -17,6 +17,9 @@ import java.util.concurrent.Callable;
 
 /**
  * Created by antoshkaplus on 7/28/15.
+ *
+ * we have to put logic that updates may be made only if updateDate is greater or equal to
+ * lastSyncWith the server
  */
 public class TranslationRepository {
 

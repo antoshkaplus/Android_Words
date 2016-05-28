@@ -88,11 +88,7 @@ public class DictionaryEndpoint {
         return new TranslationList(query.filter("version >", version).list());
     }
 
-    // we may throw exception here in case something went wrong.
-    // that means unsuccessful operation
-    // fail or not
     @ApiMethod(name = "updateTranslationList", path = "update_translation_list")
-    // need more meaningful names here
     @SuppressWarnings("UnnecessaryLocalVariable")
     public ResourceBoolean updateTranslationList(@Named("version")final Integer version, final TranslationList translationList, final User user)
             throws OAuthRequestException, InvalidParameterException
@@ -107,23 +103,12 @@ public class DictionaryEndpoint {
                     return backendUser.getVersion();
                 }
 
-                Map<String, Translation> m = ofy().load().type(Translation.class).parent(backendUser).ids(translationList.getIds());
-
-                List<Translation> updates = new ArrayList<Translation>();
                 for (Translation t : translationList.getList()) {
-                    Translation r = m.get(t.getId());
-                    if (r != null) {
-                        Date rU = r.getUpdateDate();
-                        Date tU = t.getUpdateDate();
-                        if (rU.after(tU)) {
-                            continue;
-                        }
-                    }
                     t.setOwner(backendUser);
-                    t.setVersion(backendUser.getVersion());
-                    updates.add(t);
+                    t.setVersion(version);
                 }
-                ofy().save().entities(updates).now();
+                ofy().save().entities(translationList.getList()).now();
+
                 backendUser.increaseVersion();
                 ofy().save().entity(backendUser);
                 return version;
@@ -131,32 +116,6 @@ public class DictionaryEndpoint {
         });
         return new ResourceBoolean(v.equals(version));
     }
-
-    @ApiMethod(name = "updateTranslation", path = "update_translation")
-    public void updateTranslation( Translation translation, final User user )
-        throws OAuthRequestException, InvalidParameterException
-    {
-        // try to add / remove only one Translation.
-        // good for users who work online and don't want to change too much stuff
-    }
-
-
-//    @ApiMethod(name = "getDictionaryVersion", path = "get_dictionary_version")
-//    public Version getDictionaryVersion(User user) {
-//        BackendUser backendUser = new BackendUser(user.getEmail());
-//        backendUser = ofy().load().entity(backendUser).now();
-//        return new Version(backendUser.getVersion());
-//    }
-
-    // clear everything that has creation or deletion date older than passed one
-    // for particular user
-//    private void clear(BackendUser user, Date date) {
-//        // maybe do this in batch
-//        Iterable<Key<Translation>> ts = ofy().load().type(Translation.class).ancestor(user).filter("deletionDate >=", date).keys().iterable();
-//        ofy().delete().keys(ts).now();
-//        ts = ofy().load().type(Translation.class).ancestor(user).filter("creationDate >=", date).keys().iterable();
-//        ofy().delete().keys(ts).now();
-//    }
 
     private BackendUser getBackendUser(User user) {
         BackendUser backendUser = new BackendUser(user.getEmail());
@@ -171,14 +130,5 @@ public class DictionaryEndpoint {
         BackendUser backendUser = getBackendUser(user);
         return ofy().load().type(Translation.class).ancestor(backendUser);
     }
-
-
-    /*
-    @ApiMethod(name = "uploadTranslationList", path = "upload_translation_list")
-    public void uploadTranslationList() {
-        BlobstoreService service = BlobstoreServiceFactory.getBlobstoreService();
-        service.getUploads()
-    }
-    */
 
 }

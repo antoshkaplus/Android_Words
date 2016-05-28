@@ -54,12 +54,15 @@ public class Translation {
         this.foreignWord = foreignWord;
         this.nativeWord = nativeWord;
         this.creationDate = new Date();
+        this.updateDate = new Date();
+        deleted = false;
     }
-
+    // not really good solution
     public Translation(String foreignWord, String nativeWord, Date creationDate) {
         this(foreignWord, nativeWord);
         this.creationDate = creationDate;
     }
+
 
 
 }

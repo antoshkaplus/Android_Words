@@ -6,8 +6,14 @@ import com.antoshkaplus.words.backend.Dictionary;
 import com.antoshkaplus.words.backend.Translation;
 import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
 import com.google.appengine.tools.remoteapi.RemoteApiOptions;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
-//import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Parent;
+
+import com.google.appengine.api.datastore.DatastoreService;
+
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -17,6 +23,7 @@ import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,7 +31,6 @@ import java.util.Scanner;
 // later start using endpoints
 // here we can actually test that everything works fine
 public class Words {
-
 
     static {
         ObjectifyService.register(Translation.class);
@@ -61,6 +67,17 @@ public class Words {
                     ex.printStackTrace();
                 }
             }
+            if (command.equals("foreign")) {
+                System.out.println("file path:");
+                String filePath = scanner.nextLine();
+                try {
+                    FileWriter writer = new FileWriter(filePath);
+                    outputForeignWords(writer);
+                    writer.close();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
         installer.uninstall();
     }
@@ -81,7 +98,7 @@ public class Words {
         }
         RemoteApiOptions options = new RemoteApiOptions()
                 .server("antoshkaplus-words.appspot.com", 443)
-                .credentials(username, password);
+                .useApplicationDefaultCredential();
         // still may try to go to localhost
         //        .credentials("example@example.com", "haha")
         //        .server("localhost", 8080);
@@ -137,6 +154,15 @@ public class Words {
         }
         return root;
     }
+
+    void outputForeignWords(Writer writer) {
+
+        List<> fw =  ofy().load().type(.class).ancestor(getBackendUserList().get(0)).list();
+        for (f : fw) {
+            System.out.println(f.id);
+        }
+    }
+
 
 
 

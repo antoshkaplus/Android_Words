@@ -62,8 +62,6 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
             Date lastSuccessfulUpdate = store.lastSuccessfulUpdate();
             int localVersion = store.lastSyncVersion();
 
-
-
             for (;;) {
                 Version v = api.getVersion().execute();
                 int remoteVersion = v.getVersion();
@@ -72,44 +70,26 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
                     return true;
                 }
 
-                // we get changed translations
-                TranslationList remoteUpdateList = api.getTranslationListGVersion(localVersion).execute();
+                TranslationList remoteList = api.getTranslationListGVersion(localVersion).execute();
 
-                // we should lock database for awhile while I'm doing all necessary updates
+                TranslationMerger merger = new TranslationMerger(repo);
+                List<Translation> mergedList = merger.merge(remoteList.getList(), lastSuccessfulUpdate);
 
-                // merge to local
-                // merges stuff with what we have on local
-                // and returns new list that we would love to push to the server
-                List<Translation> mergedList = merge(remoteUpdateList.getList());
+                remoteList.setList(mergedList);
 
-
-                ResourceBoolean r = api.updateTranslationList(remoteVersion, mergedList);
+                ResourceBoolean r = api.updateTranslationList(remoteVersion, remoteList).execute();
                 localVersion = remoteVersion;
                 store.setLastSyncVersion(localVersion);
 
                 if (r.getValue()) {
                     break;
                 }
-
             }
         } catch (Exception ex) {
             success = false;
         }
         return success;
     }
-
-    private boolean sync() {
-
-    }
-
-
-    private List<Translation> merge(final List<Translation> update, Date timestamp) throws Exception {
-        TranslationMerger merger = new TranslationMerger(repo);
-        merger.merge(update, timestamp);
-    }
-
-
-
 
     // called from UI thread
     @Override
@@ -119,22 +99,6 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
 
     public void setListener(Listener listener) {
         this.listener = listener;
-    }
-
-
-    // this stuff should go away
-    private com.antoshkaplus.words.model.Translation toModelTranslation(Translation tr) {
-        com.antoshkaplus.words.model.Translation modelTr = new com.antoshkaplus.words.model.Translation(
-                tr.getForeignWord(), tr.getNativeWord(), new Date(tr.getCreationDate().getValue()));
-        return modelTr;
-    }
-
-    private Translation toRemoteTranslation(com.antoshkaplus.words.model.Translation localTr) {
-        Translation remoteTr = new Translation();
-        remoteTr.setCreationDate(new DateTime(localTr.creationDate.getTime()));
-        remoteTr.setForeignWord(localTr.foreignWord);
-        remoteTr.setNativeWord(localTr.nativeWord);
-        return remoteTr;
     }
 
     public interface Listener {

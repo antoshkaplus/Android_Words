@@ -28,8 +28,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="backend" exported="" />
-    <orderEntry type="library" exported="" name="appengine-remote-api-1.5.5" level="project" />
-    <orderEntry type="library" exported="" name="appengine-api-1.0-sdk-1.9.30" level="project" />
+    <orderEntry type="library" exported="" name="appengine-remote-api-1.9.38" level="project" />
+    <orderEntry type="library" exported="" name="appengine-api-1.0-sdk-1.9.38" level="project" />
     <orderEntry type="library" exported="" name="objectify-5.1.9" level="project" />
     <orderEntry type="library" exported="" name="json-simple-1.1.1" level="project" />
     <orderEntry type="library" exported="" name="appengine-endpoints-1.9.30" level="project" />
@@ -38,5 +38,6 @@
     <orderEntry type="library" exported="" name="guava-18.0" level="project" />
     <orderEntry type="library" exported="" name="junit-4.10" level="project" />
     <orderEntry type="library" exported="" name="hamcrest-core-1.1" level="project" />
+    <orderEntry type="library" exported="" name="remote.remote" level="project" />
   </component>
 </module>
