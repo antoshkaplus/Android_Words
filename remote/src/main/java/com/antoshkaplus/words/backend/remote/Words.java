@@ -4,15 +4,20 @@ package com.antoshkaplus.words.backend.remote;
 import com.antoshkaplus.words.backend.BackendUser;
 import com.antoshkaplus.words.backend.Dictionary;
 import com.antoshkaplus.words.backend.Translation;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.socket.SocketServicePb;
 import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
 import com.google.appengine.tools.remoteapi.RemoteApiOptions;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Parent;
 
 import com.google.appengine.api.datastore.DatastoreService;
+import com.googlecode.objectify.annotation.Stringify;
 
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -23,8 +28,11 @@ import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -72,11 +80,23 @@ public class Words {
                 String filePath = scanner.nextLine();
                 try {
                     FileWriter writer = new FileWriter(filePath);
-                    outputForeignWords(writer);
+                    //outputForeignWords(writer);
                     writer.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            }
+            if (command.equals("new")) {
+                newForeignWords();
+            }
+            if (command.equals("update")) {
+                updateCreationDate();
+            }
+            if (command.equals("up2")) {
+                updateCreationDate2();
+            }
+            if (command.equals("users")) {
+                printUsers();
             }
         }
         installer.uninstall();
@@ -155,20 +175,79 @@ public class Words {
         return root;
     }
 
-    void outputForeignWords(Writer writer) {
+    private Map<String, Date> getForeignWords() {
+        DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+        Query q = new Query("ForeignWord");
+        List<Entity> fs = ds.prepare(q).asList(FetchOptions.Builder.withDefaults());
+        Map<String, Date> m = new HashMap<>(fs.size());
+        for (Entity e : fs) {
+            m.put(e.getKey().getName(), (Date)e.getProperty("creationDate"));
+        }
+        return m;
+    }
 
-        List<> fw =  ofy().load().type(.class).ancestor(getBackendUserList().get(0)).list();
-        for (f : fw) {
-            System.out.println(f.id);
+    private Map<String, Translation> getTranslations() {
+        List<Translation> ts = ofy().load().type(Translation.class).list();
+        Map<String, Translation> m = new HashMap<>(ts.size());
+        for (Translation t : ts) {
+            m.put(t.getForeignWord(), t);
+        }
+        return m;
+    }
+
+    private void newForeignWords() {
+        Map<String, Date> fws = getForeignWords();
+        Map<String, Translation> ts = getTranslations();
+        boolean noNew = true;
+        for (Map.Entry<String, Date> e : fws.entrySet()) {
+            if (!ts.containsKey(e.getKey())) {
+                noNew = false;
+                System.out.println(e.getKey() + e.getValue().getTime());
+            }
+        }
+        if (noNew) {
+            System.out.println("no new words");
         }
     }
 
+    private void updateCreationDate() {
+        Map<String, Translation> ts = getTranslations();
+        Map<String, Date> fws = getForeignWords();
 
+        System.out.println("translation count: " + ts.size());
+        System.out.println("foreign words count: " + fws.size());
+
+        List<Translation> updateList = new ArrayList<>(fws.size());
+        for (Map.Entry<String, Date> e : fws.entrySet()) {
+            Translation t = ts.get(e.getKey());
+            t.setCreationDate(e.getValue());
+            updateList.add(t);
+        }
+        ofy().save().entities(updateList).now();
+    }
+
+    private void printUsers() {
+        BackendUser user = ofy().load().type(BackendUser.class).list().get(0);
+        System.out.println(user.getEmail() + " " + user.getVersion());
+    }
 
 
     private void backup(Writer writer) throws IOException {
         JSONObject obj = collectJsonBackup();
         obj.writeJSONString(writer);
+    }
+
+    // property deleted updated automatically
+    private void updateCreationDate2() {
+        List<Translation> ts = ofy().load().type(Translation.class).list();
+        List<Translation> updateList = new ArrayList<>();
+        for (Translation t : ts) {
+            if (t.getCreationDate() == null) {
+                t.setCreationDate(new Date());
+                updateList.add(t);
+            }
+        }
+        ofy().save().entities(updateList).now();
     }
 
 

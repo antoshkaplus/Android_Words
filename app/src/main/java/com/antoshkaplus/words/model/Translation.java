@@ -19,6 +19,8 @@ public class Translation {
     public static final String FIELD_NAME_CREATION_DATE = "creation_date";
     public static final String FIELD_NAME_UPDATE_DATE = "update_date";
     public static final String FIELD_NAME_DELETED = "deleted";
+    public static final String FIELD_NAME_SYNCED = "synced";
+
 
     @DatabaseField(columnName = FIELD_FOREIGN_WORD,
                     index = true,
@@ -44,6 +46,13 @@ public class Translation {
                     canBeNull = false)
     public boolean deleted;
 
+    // synced with remote server or not
+    // with this flag don't need to worry about
+    // updated timestamps and sync timestamp collisions
+    @DatabaseField(columnName = FIELD_NAME_SYNCED,
+                    canBeNull = false,
+                    index = true)
+    public boolean synced;
 
 
     public Translation() {}
@@ -56,6 +65,7 @@ public class Translation {
         this.creationDate = new Date();
         this.updateDate = new Date();
         deleted = false;
+        synced = false;
     }
     // not really good solution
     public Translation(String foreignWord, String nativeWord, Date creationDate) {

@@ -24,6 +24,7 @@ import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.model.Translation;
+import com.google.android.gms.common.AccountPicker;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -48,6 +49,7 @@ public class MainActivity extends Activity implements
     private static final String TAG = "MainActivity";
     private static final int GUESS_WORD_GAME_CHOICE_COUNT = 4;
     private static final int PERMISSIONS_REQUEST_GET_ACCOUNTS = 11;
+    private final static int REQUEST_ACCOUNT_PICKER = 13;
 
     private TranslationRepository translationRepository;
     private Handler handler = new Handler();
@@ -169,7 +171,12 @@ public class MainActivity extends Activity implements
                     requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS},
                             PERMISSIONS_REQUEST_GET_ACCOUNTS);
                 } else {
-                    Sync();
+                    String account = retrieveAccount();
+                    if (account == null) {
+                        pickAccount();
+                    } else {
+                        sync(account);
+                    }
                 }
             }
             return super.onOptionsItemSelected(item);
@@ -180,8 +187,16 @@ public class MainActivity extends Activity implements
     }
 
 
-    void Sync() {
-        new SyncTask(this).execute();
+    void sync(String account) {
+        SyncTask task = new SyncTask(this, account);
+        task.setListener(this);
+        task.execute();
+    }
+
+    void pickAccount() {
+        Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
+                false, null, null, null, null);
+        startActivityForResult(intent, REQUEST_ACCOUNT_PICKER);
     }
 
 
@@ -285,6 +300,28 @@ public class MainActivity extends Activity implements
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                if (data != null && data.getExtras() != null) {
+                    String accountName =
+                            data.getExtras().getString(
+                                    AccountManager.KEY_ACCOUNT_NAME);
+                    if (accountName != null) {
+                        // maybe compare with previous account and warn about change
+                        //String prevAccount = settings.getString(getString(R.string.pref__account__key), null);
+                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                        editor.putString(getString(R.string.pref__account__key), accountName);
+                        editor.apply();
+                    }
+                }
+                break;
+        }
+    }
+
     public void OnCorrectGuess(final GuessWordFragment fragment) {
         nextGameEvent = new Runnable() {
             @Override
@@ -335,21 +372,6 @@ public class MainActivity extends Activity implements
     public void onTranslateFinish(String foreignWord, String nativeWord) {
         addWordDialog.setTranslation(foreignWord, nativeWord);
     }
-
-    /*
-    private void onAccountChanged() {
-        String account = retrieveAccount();
-        credential.setSelectedAccountName(account);
-        repository = new ItemRepository(this, account);
-        try {
-            parentId = rootId = repository.getRootId();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        loadItems();
-        onItemsChanged();
-    }
-    */
 
 
 }

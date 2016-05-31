@@ -42,7 +42,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * Translation id, owner
  */
 @Api(name = "dictionaryApi",
-        version = "v1",
+        version = "v2",
         resource = "dictionary",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.words.antoshkaplus.com",
@@ -61,15 +61,26 @@ public class DictionaryEndpoint {
 
     @ApiMethod(name = "getVersion", path = "get_version")
     public Version getVersion(User user) {
-        BackendUser backendUser = getBackendUser(user);
+        BackendUser backendUser = retrieveBackendUser(user);
         return new Version(backendUser.getVersion());
     }
+
+    @ApiMethod(name = "getBackendUser", path = "get_backend_user")
+    public BackendUser getBackendUser(User user) {
+        return retrieveBackendUser(user);
+    }
+
+    @ApiMethod(name = "getFuck", path = "get_fuck")
+    public BackendUser getFuck(User user) {
+        return retrieveBackendUser(user);
+    }
+
 
 
     @ApiMethod(name = "getTranslationListWhole", path = "get_translation_list_whole")
     @SuppressWarnings("UnnecessaryLocalVariable")
     public TranslationList getTranslationListWhole(User user) throws OAuthRequestException, InvalidParameterException {
-        BackendUser backendUser = getBackendUser(user);
+        BackendUser backendUser = retrieveBackendUser(user);
         List<Translation> translations = ofy().load().type(Translation.class).ancestor(backendUser).list();
         TranslationList list = new TranslationList(translations);
         return list;
@@ -95,10 +106,11 @@ public class DictionaryEndpoint {
     {
         // client doesn't know how to set id on new items and may forget to do add it on old ones
         translationList.resetId();
+        translationList.verify();
         Integer v = ofy().transact(new Work<Integer>() {
             @Override
             public Integer run() {
-                BackendUser backendUser = getBackendUser(user);
+                BackendUser backendUser = retrieveBackendUser(user);
                 if (backendUser.getVersion() != version) {
                     return backendUser.getVersion();
                 }
@@ -117,7 +129,7 @@ public class DictionaryEndpoint {
         return new ResourceBoolean(v.equals(version));
     }
 
-    private BackendUser getBackendUser(User user) {
+    private BackendUser retrieveBackendUser(User user) {
         BackendUser backendUser = new BackendUser(user.getEmail());
         BackendUser b = ofy().load().entity(backendUser).now();
         if (b == null) {
@@ -127,8 +139,9 @@ public class DictionaryEndpoint {
     }
 
     private Query<Translation> getTranslationQuery(User user) {
-        BackendUser backendUser = getBackendUser(user);
+        BackendUser backendUser = retrieveBackendUser(user);
         return ofy().load().type(Translation.class).ancestor(backendUser);
     }
+
 
 }

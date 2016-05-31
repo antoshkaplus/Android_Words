@@ -6,7 +6,9 @@ package com.antoshkaplus.words.backend;
 public class Version {
     private int version;
 
-    public Version() {}
+    public Version() {
+        version = 0;
+    }
 
     public Version(int version) {
         this.version = version;

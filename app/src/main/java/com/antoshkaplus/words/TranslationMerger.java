@@ -44,6 +44,15 @@ public class TranslationMerger {
         List<Translation> remote = new ArrayList<>();
         List<com.antoshkaplus.words.model.Translation> localIntersection = new ArrayList<>();
         List<com.antoshkaplus.words.model.Translation> localNotFound = new ArrayList<>();
+
+        void setSynced() {
+            for (com.antoshkaplus.words.model.Translation t : localIntersection) {
+                t.synced = true;
+            }
+            for (com.antoshkaplus.words.model.Translation t : localNotFound) {
+                t.synced = true;
+            }
+        }
     }
 
     private static class LocalTranslationList {
@@ -63,6 +72,7 @@ public class TranslationMerger {
                 return comp;
             }
         };
+
 
         LocalTranslationList(List<com.antoshkaplus.words.model.Translation> translationList) {
             init(translationList);
@@ -112,13 +122,15 @@ public class TranslationMerger {
     }
 
 
-    public List<Translation> merge(final List<Translation> remoteList, final Date localTimestamp) throws Exception {
+    public List<Translation> merge(final List<Translation> remoteList) throws Exception {
         final List<Translation> ts = new ArrayList<>(remoteList.size());
         // merging updates from server and database in one transaction
         repo.executeBatch(new Callable<Object>() {
             @Override
             public Object call() throws Exception {
-                Updates updates = computeUpdates(repo.getTraslationList(localTimestamp), remoteList);
+                Updates updates = computeUpdates(repo.getSyncedTranslationList(false), remoteList);
+
+                updates.setSynced();
                 for (com.antoshkaplus.words.model.Translation t : updates.localIntersection) {
                     repo.updateTranslation(t);
                 }
@@ -209,4 +221,5 @@ public class TranslationMerger {
         r.setNativeWord(t.nativeWord);
         return r;
     }
+
 }

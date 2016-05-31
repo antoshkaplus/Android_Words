@@ -91,5 +91,8 @@ public class TranslationRepository {
         return helper.getDao(Translation.class).queryBuilder().where().ge(Translation.FIELD_NAME_CREATION_DATE, date).query();
     }
 
+    public List<Translation> getSyncedTranslationList(boolean synced) throws Exception {
+        return helper.getDao(Translation.class).queryBuilder().where().eq(Translation.FIELD_NAME_SYNCED, synced).query();
+    }
 
 }

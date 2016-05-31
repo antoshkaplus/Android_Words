@@ -45,4 +45,20 @@ public class TranslationList {
         return ids;
     }
 
+    // could do it in endpoint method, but feels like it's better to do here
+    // throws exception if verification fails
+    public void verify() throws IllegalArgumentException {
+        for (Translation t : list) {
+            // we don't check for id, as db would throw something in that case
+            if (t.getUpdateDate() == null) {
+                throw new IllegalArgumentException(t.getForeignWord() + " updateDate not present");
+            }
+            if (t.getCreationDate() == null) {
+                throw new IllegalArgumentException(t.getForeignWord() + " creationDate not present");
+            }
+        }
+    }
+
+
+
 }

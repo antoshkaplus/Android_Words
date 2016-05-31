@@ -34,18 +34,6 @@ public class PropertyStore {
         ed.apply();
     }
 
-    public Date lastSuccessfulUpdate() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return new Date(prefs.getLong(LAST_SUCCESSFUL_UPDATE, 0));
-    }
-
-    public void setLastSuccessfulUpdate(Date date) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor ed = prefs.edit();
-        ed.putLong(LAST_SUCCESSFUL_UPDATE, date.getTime());
-        ed.apply();
-    }
-
     public int lastSyncVersion() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(LAST_UPDATE_VERSION, 0);

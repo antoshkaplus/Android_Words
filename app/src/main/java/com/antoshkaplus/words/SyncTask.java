@@ -29,24 +29,30 @@ import java.util.concurrent.Callable;
  * when we come here everything should be ready for processing.
  *
  */
-public class SyncTask extends AsyncTask<String, Void, Boolean> {
+public class SyncTask extends AsyncTask<Void, Void, Boolean> {
 
     private Context context;
     private Listener listener;
     private TranslationRepository repo;
+    // have to be initialized through constructor
+    // to not forget to pass it to execute
+    // also variable may be helpful later to pass it
+    // to callbacks
+    private String account;
 
-    public SyncTask(Context context) {
+    public SyncTask(Context context, String account) {
         this.context = context;
+        this.account = account;
         repo = new TranslationRepository(context);
     }
 
     @Override
-    protected Boolean doInBackground(String... params) {
+    protected Boolean doInBackground(Void... params) {
 
         boolean success = true;
         // sometimes we have to try again this operation because of contention in the DB
         try {
-            GoogleAccountCredential credential = CredentialFactory.create(context, params[0]);
+            GoogleAccountCredential credential = CredentialFactory.create(context, account);
 
             DictionaryApi.Builder builder = new DictionaryApi.Builder(
                     AndroidHttp.newCompatibleTransport(),
@@ -54,17 +60,17 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
                     credential);
 
             // later create something like configuration file
-            //builder.setRootUrl("http://192.168.1.124:8080/_ah/api");
+            builder.setRootUrl(BuildConfig.HOST);
             builder.setApplicationName("antoshkaplus-words");
             final DictionaryApi api = builder.build();
 
             PropertyStore store = new PropertyStore(context);
-            Date lastSuccessfulUpdate = store.lastSuccessfulUpdate();
             int localVersion = store.lastSyncVersion();
 
             for (;;) {
-                Version v = api.getVersion().execute();
-                int remoteVersion = v.getVersion();
+                //Version v = api.getVersion().execute();
+                TranslationList ts = api.getTranslationListWhole().execute();
+                int remoteVersion = api.getFuck().execute().getVersion(); //v.getVersion();
 
                 if (localVersion == remoteVersion) {
                     return true;
@@ -73,7 +79,7 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
                 TranslationList remoteList = api.getTranslationListGVersion(localVersion).execute();
 
                 TranslationMerger merger = new TranslationMerger(repo);
-                List<Translation> mergedList = merger.merge(remoteList.getList(), lastSuccessfulUpdate);
+                List<Translation> mergedList = merger.merge(remoteList.getList());
 
                 remoteList.setList(mergedList);
 
@@ -87,6 +93,7 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
             }
         } catch (Exception ex) {
             success = false;
+            ex.printStackTrace();
         }
         return success;
     }
@@ -94,6 +101,7 @@ public class SyncTask extends AsyncTask<String, Void, Boolean> {
     // called from UI thread
     @Override
     protected void onPostExecute(Boolean result) {
+        if (listener == null) return;
         listener.onSyncFinish(result);
     }
 

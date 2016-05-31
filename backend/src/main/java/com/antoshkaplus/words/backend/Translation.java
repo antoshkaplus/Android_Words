@@ -95,6 +95,10 @@ public class Translation {
         return creationDate;
     }
 
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public Date getUpdateDate() {
         return updateDate;
     }

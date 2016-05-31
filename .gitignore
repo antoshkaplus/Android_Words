@@ -14,3 +14,6 @@
 build/
 bootstrap/
 /output
+
+# don't forget environment variable GOOGLE_APPLICATION_CREDENTIALS
+remote_credentials.json
