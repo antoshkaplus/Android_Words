@@ -65,18 +65,6 @@ public class DictionaryEndpoint {
         return new Version(backendUser.getVersion());
     }
 
-    @ApiMethod(name = "getBackendUser", path = "get_backend_user")
-    public BackendUser getBackendUser(User user) {
-        return retrieveBackendUser(user);
-    }
-
-    @ApiMethod(name = "getFuck", path = "get_fuck")
-    public BackendUser getFuck(User user) {
-        return retrieveBackendUser(user);
-    }
-
-
-
     @ApiMethod(name = "getTranslationListWhole", path = "get_translation_list_whole")
     @SuppressWarnings("UnnecessaryLocalVariable")
     public TranslationList getTranslationListWhole(User user) throws OAuthRequestException, InvalidParameterException {
@@ -101,7 +89,7 @@ public class DictionaryEndpoint {
 
     @ApiMethod(name = "updateTranslationList", path = "update_translation_list")
     @SuppressWarnings("UnnecessaryLocalVariable")
-    public ResourceBoolean updateTranslationList(@Named("version")final Integer version, final TranslationList translationList, final User user)
+    public ResourceBoolean updateTranslationList(@Named("dbVersion")final Integer version, final TranslationList translationList, final User user)
             throws OAuthRequestException, InvalidParameterException
     {
         // client doesn't know how to set id on new items and may forget to do add it on old ones
@@ -122,7 +110,7 @@ public class DictionaryEndpoint {
                 ofy().save().entities(translationList.getList()).now();
 
                 backendUser.increaseVersion();
-                ofy().save().entity(backendUser);
+                ofy().save().entity(backendUser).now();
                 return version;
             }
         });
@@ -130,12 +118,13 @@ public class DictionaryEndpoint {
     }
 
     private BackendUser retrieveBackendUser(User user) {
-        BackendUser backendUser = new BackendUser(user.getEmail());
-        BackendUser b = ofy().load().entity(backendUser).now();
-        if (b == null) {
-            ofy().save().entity(backendUser).now();
+        BackendUser newUser = new BackendUser(user.getEmail());
+        BackendUser res = ofy().load().entity(newUser).now();
+        if (res == null) {
+            ofy().save().entity(newUser).now();
+            res = newUser;
         }
-        return backendUser;
+        return res;
     }
 
     private Query<Translation> getTranslationQuery(User user) {

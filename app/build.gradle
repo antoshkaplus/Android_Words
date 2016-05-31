@@ -21,11 +21,12 @@ android {
     }
     productFlavors {
         local {
-            buildConfigField 'String', 'HOST', '"http://25.254.207.189:8080/_ah/api"'
+            buildConfigField 'String', 'HOST', '"http://10.48.98.43:8080/_ah/api"'
+            //buildConfigField 'String', 'HOST', '"http://254.207.189:8080/_ah/api"'
         }
 
         remote {
-            buildConfigField 'String', 'HOST', '"https://appspot.com"'
+            buildConfigField 'String', 'HOST', '"https://antoshkaplus-words.appspot.com/_ah/api"'
         }
     }
 

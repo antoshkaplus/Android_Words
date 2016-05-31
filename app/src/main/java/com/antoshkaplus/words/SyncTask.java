@@ -59,7 +59,6 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
                     new AndroidJsonFactory(),
                     credential);
 
-            // later create something like configuration file
             builder.setRootUrl(BuildConfig.HOST);
             builder.setApplicationName("antoshkaplus-words");
             final DictionaryApi api = builder.build();
@@ -68,15 +67,21 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
             int localVersion = store.lastSyncVersion();
 
             for (;;) {
-                //Version v = api.getVersion().execute();
-                TranslationList ts = api.getTranslationListWhole().execute();
-                int remoteVersion = api.getFuck().execute().getVersion(); //v.getVersion();
+                Version v = api.getVersion().execute();
+                int remoteVersion = v.getVersion();
 
-                if (localVersion == remoteVersion) {
-                    return true;
+
+                TranslationList remoteList = new TranslationList();
+
+                // if localVersion equals remoteVersion we still
+                // have to update with unsync from local db
+                if (localVersion != remoteVersion) {
+                    remoteList = api.getTranslationListGVersion(localVersion).execute();
                 }
 
-                TranslationList remoteList = api.getTranslationListGVersion(localVersion).execute();
+                if (remoteList.getList() == null) {
+                    remoteList.setList(new ArrayList<Translation>());
+                }
 
                 TranslationMerger merger = new TranslationMerger(repo);
                 List<Translation> mergedList = merger.merge(remoteList.getList());

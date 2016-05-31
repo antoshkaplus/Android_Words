@@ -42,14 +42,21 @@ public class TranslationMerger {
 
     private static class Updates {
         List<Translation> remote = new ArrayList<>();
+        // local and remote intersection
         List<com.antoshkaplus.words.model.Translation> localIntersection = new ArrayList<>();
+        // remotes not found in locals
         List<com.antoshkaplus.words.model.Translation> localNotFound = new ArrayList<>();
+        // new local (not present in remote but may be on server)
+        List<com.antoshkaplus.words.model.Translation> localNew = new ArrayList<>();
 
         void setSynced() {
             for (com.antoshkaplus.words.model.Translation t : localIntersection) {
                 t.synced = true;
             }
             for (com.antoshkaplus.words.model.Translation t : localNotFound) {
+                t.synced = true;
+            }
+            for (com.antoshkaplus.words.model.Translation t : localNew) {
                 t.synced = true;
             }
         }
@@ -144,6 +151,10 @@ public class TranslationMerger {
                         repo.updateTranslation(t);
                     }
                 }
+                // can be done only after successful push to server????
+                for (com.antoshkaplus.words.model.Translation t : updates.localNew) {
+                    repo.updateTranslation(t);
+                }
                 ts.addAll(updates.remote);
                 return null;
             }
@@ -190,6 +201,7 @@ public class TranslationMerger {
         for (com.antoshkaplus.words.model.Translation t : localList.getList()) {
             updates.remote.add(toRemote(t));
         }
+        updates.localNew = localList.getList();
         return updates;
     }
 
