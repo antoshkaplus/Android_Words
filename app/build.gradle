@@ -42,6 +42,7 @@ dependencies {
     compile 'com.j256.ormlite:ormlite-core:4.48'
     compile 'com.j256.ormlite:ormlite-android:4.48'
     compile 'com.google.apis:google-api-services-translate:v2-rev41-1.20.0'
+    compile 'com.google.guava:guava:19.0'
 }
 
 //apply plugin: 'com.google.gms.google-services-auth'

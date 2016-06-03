@@ -5,6 +5,7 @@ import android.content.Context;
 import com.antoshkaplus.words.model.Translation;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.j256.ormlite.android.AndroidDatabaseResults;
+import com.j256.ormlite.dao.Dao;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,9 +34,16 @@ public class TranslationRepository {
     }
 
     public void addTranslationList(final List<Translation> translationList) throws Exception {
-        for (Translation t : translationList) {
-            addTranslation(t);
-        }
+        Callable<Object> c = new Callable<Object>() {
+            @Override
+            public Void call() throws Exception {
+                for (Translation t : translationList) {
+                    addTranslation(t);
+                }
+                return null;
+            }
+        };
+        executeBatch(c);
     }
 
     // returns false if translation already exists
@@ -61,8 +69,8 @@ public class TranslationRepository {
         return helper.getDao(Translation.class).mapSelectStarRow(results);
     }
 
-    public void executeBatch(Callable<?> callable) throws Exception {
-        helper.getDao(Translation.class).callBatchTasks(callable);
+    public <T> T executeBatch(Callable<T> callable) throws Exception {
+        return helper.getDao(Translation.class).callBatchTasks(callable);
     }
 
     public void refreshTranslation(Translation translation) throws Exception {
@@ -83,8 +91,21 @@ public class TranslationRepository {
         helper.getDao(Translation.class).delete(translation);
     }
 
-    public void updateTranslation(Translation translation) throws Exception {
-        helper.getDao(Translation.class).update(translation);
+    public void updateTranslation(final Translation translation) throws Exception {
+        Callable<Object> c = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Dao<Translation, Long> dao = helper.getDao(Translation.class);
+                Translation t = dao.queryBuilder()
+                        .selectColumns(Translation.FIELD_NAME_VERSION)
+                        .where().idEq(translation.id).queryForFirst();
+                translation.version = t.version;
+                translation.increaseVersion();
+                dao.update(translation);
+                return null;
+            }
+        };
+        executeBatch(c);
     }
 
     public List<Translation> getTraslationList(Date date) throws Exception {
@@ -93,6 +114,27 @@ public class TranslationRepository {
 
     public List<Translation> getSyncedTranslationList(boolean synced) throws Exception {
         return helper.getDao(Translation.class).queryBuilder().where().eq(Translation.FIELD_NAME_SYNCED, synced).query();
+    }
+
+    public boolean trySyncTranslation(final Translation translation) throws Exception {
+        // returns if success
+        Callable<Boolean> c = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                Dao<Translation, Long> dao = helper.getDao(Translation.class);
+                Translation t = dao.queryBuilder()
+                        .selectColumns(Translation.FIELD_NAME_VERSION)
+                        .where().idEq(translation.id).queryForFirst();
+                if (t.version == translation.version) {
+                    translation.synced = true;
+                    translation.increaseVersion();
+                    dao.update(translation);
+                    return true;
+                }
+                return false;
+            }
+        };
+        return executeBatch(c);
     }
 
 }

@@ -4,6 +4,7 @@ import com.antoshkaplus.words.backend.dictionaryApi.model.Translation;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.google.api.client.util.DateTime;
+import com.google.common.collect.Iterables;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import java.util.concurrent.Callable;
 public class TranslationMerger {
 
     private TranslationRepository repo;
+    private Updates updates = new Updates();
 
     private static class Updates {
         List<Translation> remote = new ArrayList<>();
@@ -48,20 +50,9 @@ public class TranslationMerger {
         List<com.antoshkaplus.words.model.Translation> localNotFound = new ArrayList<>();
         // new local (not present in remote but may be on server)
         List<com.antoshkaplus.words.model.Translation> localNew = new ArrayList<>();
-
-        void setSynced() {
-            for (com.antoshkaplus.words.model.Translation t : localIntersection) {
-                t.synced = true;
-            }
-            for (com.antoshkaplus.words.model.Translation t : localNotFound) {
-                t.synced = true;
-            }
-            for (com.antoshkaplus.words.model.Translation t : localNew) {
-                t.synced = true;
-            }
-        }
     }
 
+    // using this class to avoid explicit transformation from remote to local in code
     private static class LocalTranslationList {
 
         List<com.antoshkaplus.words.model.Translation> translationList;
@@ -129,15 +120,13 @@ public class TranslationMerger {
     }
 
 
-    public List<Translation> merge(final List<Translation> remoteList) throws Exception {
-        final List<Translation> ts = new ArrayList<>(remoteList.size());
+    public List<Translation> mergeRemote(final List<Translation> remoteList) throws Exception {
         // merging updates from server and database in one transaction
-        repo.executeBatch(new Callable<Object>() {
+        this.updates = repo.executeBatch(new Callable<Updates>() {
             @Override
-            public Object call() throws Exception {
+            public Updates call() throws Exception {
                 Updates updates = computeUpdates(repo.getSyncedTranslationList(false), remoteList);
 
-                updates.setSynced();
                 for (com.antoshkaplus.words.model.Translation t : updates.localIntersection) {
                     repo.updateTranslation(t);
                 }
@@ -155,13 +144,20 @@ public class TranslationMerger {
                 for (com.antoshkaplus.words.model.Translation t : updates.localNew) {
                     repo.updateTranslation(t);
                 }
-                ts.addAll(updates.remote);
-                return null;
+                return updates;
             }
         });
-        return ts;
+        return updates.remote;
     }
 
+    // syncing updates
+    void onRemoteUpdateSuccess() throws Exception {
+        Iterable<com.antoshkaplus.words.model.Translation> it = Iterables.concat(
+                updates.localNew, updates.localNotFound, updates.localIntersection);
+        for (com.antoshkaplus.words.model.Translation t :  it) {
+            repo.trySyncTranslation(t);
+        }
+    }
 
     private Updates computeUpdates(List<com.antoshkaplus.words.model.Translation> local,
                                    List<Translation> remote) {

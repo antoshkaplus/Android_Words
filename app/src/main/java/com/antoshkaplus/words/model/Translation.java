@@ -20,6 +20,7 @@ public class Translation {
     public static final String FIELD_NAME_UPDATE_DATE = "update_date";
     public static final String FIELD_NAME_DELETED = "deleted";
     public static final String FIELD_NAME_SYNCED = "synced";
+    public static final String FIELD_NAME_VERSION = "version";
 
 
     @DatabaseField(columnName = FIELD_FOREIGN_WORD,
@@ -54,6 +55,10 @@ public class Translation {
                     index = true)
     public boolean synced;
 
+    @DatabaseField(columnName = FIELD_NAME_VERSION,
+                    canBeNull = false)
+    public int version;
+
 
     public Translation() {}
 
@@ -66,6 +71,7 @@ public class Translation {
         this.updateDate = new Date();
         deleted = false;
         synced = false;
+        version = 0;
     }
     // not really good solution
     public Translation(String foreignWord, String nativeWord, Date creationDate) {
@@ -73,6 +79,8 @@ public class Translation {
         this.creationDate = creationDate;
     }
 
-
+    public void increaseVersion() {
+        ++version;
+    }
 
 }

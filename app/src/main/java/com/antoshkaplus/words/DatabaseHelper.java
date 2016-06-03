@@ -22,7 +22,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     private static final int DATABASE_VERSION = 2;
 
     // the DAO object we use to access the SimpleData table
-    private Dao<Translation, Integer> translationDao;
+    private Dao<Translation, Long> translationDao;
 
 
     public DatabaseHelper(Context context) {

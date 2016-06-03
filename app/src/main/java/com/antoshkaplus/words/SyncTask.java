@@ -84,17 +84,23 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
                 }
 
                 TranslationMerger merger = new TranslationMerger(repo);
-                List<Translation> mergedList = merger.merge(remoteList.getList());
+                List<Translation> mergedList = merger.mergeRemote(remoteList.getList());
 
                 remoteList.setList(mergedList);
 
                 ResourceBoolean r = api.updateTranslationList(remoteVersion, remoteList).execute();
+                store.setLastSyncVersion(remoteVersion);
                 localVersion = remoteVersion;
-                store.setLastSyncVersion(localVersion);
 
                 if (r.getValue()) {
+                    merger.onRemoteUpdateSuccess();
                     break;
                 }
+                // else there were changes in the db and we have to synchronize everything again
+                // we want to avoid doing it on server side to keep logic in one place
+
+                // we don't want to stress server with synchronization procedure too much
+                // there are may be per user preferences
             }
         } catch (Exception ex) {
             success = false;
