@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingBottom="5dp"
-    android:paddingTop="5dp"
     >
     <TextView
         android:id="@+id/word_0"
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/black"
         android:text="@string/default_word"
-        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@color/red"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_weight="1"
         />
@@ -21,8 +22,11 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:textColor="@color/black"
         android:text="@string/default_word"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:background="@color/blue"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         />
 </LinearLayout>

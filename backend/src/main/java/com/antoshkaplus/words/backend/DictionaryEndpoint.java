@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.Pack200;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -116,6 +117,36 @@ public class DictionaryEndpoint {
         });
         return new ResourceBoolean(v.equals(version));
     }
+
+    // use:
+    //  update date and create date as now
+    //  deleted = false
+    //  have to check if already exists first
+
+    // testing:
+    //  put one translation inside
+    //  put same translation inside : may need to check update/creation times later
+    @ApiMethod(name = "addTranslationOnline", path = "add_translation_online")
+    public void addTranslationOnline(final Translation shallowTranslation, final User user)
+            throws OAuthRequestException, InvalidParameterException
+    {
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                BackendUser backendUser = retrieveBackendUser(user);
+
+                final Translation tNew = new Translation(
+                        shallowTranslation.getForeignWord(),
+                        shallowTranslation.getNativeWord(),
+                        backendUser);
+
+                Translation tDb = ofy().load().type(Translation.class).parent(backendUser).id(tNew.getId()).now();
+                tNew.setCreationDateToEarliest(tDb);
+                ofy().save().entity(tNew);
+            }
+        });
+    }
+
 
     private BackendUser retrieveBackendUser(User user) {
         BackendUser newUser = new BackendUser(user.getEmail());

@@ -44,3 +44,9 @@ fly is our dependency
 
 never forget to call execute() with endpoints on client side
 and now() on backend side
+
+###some stuff from MainActivity layout
+android:paddingLeft="@dimen/activity_horizontal_margin"
+android:paddingRight="@dimen/activity_horizontal_margin"
+android:paddingTop="@dimen/activity_vertical_margin"
+android:paddingBottom="@dimen/activity_vertical_margin"

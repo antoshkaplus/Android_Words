@@ -35,7 +35,7 @@ var scopes = 'https://www.googleapis.com/auth/devstorage.read_write';
  * Constants for request parameters. Fill these values in with your custom
  * information.
  */
-var API_VERSION = 'v1';
+var API_VERSION = 'v2';
 /**
  * Enter a unique bucket name to create a new bucket. The guidelines for
  * bucket naming can be found here:

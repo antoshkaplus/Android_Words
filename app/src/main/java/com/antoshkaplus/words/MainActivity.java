@@ -89,6 +89,7 @@ public class MainActivity extends Activity implements
             translationListFragment = (TranslationListFragment) getFragmentManager().getFragment(savedInstanceState, "translation_list_fragment");
         } else {
             guessWordFragment = new GuessWordFragment();
+            // should be through newInstance
             translationListFragment = new TranslationListFragment();
         }
         setContentView(R.layout.activity_main);

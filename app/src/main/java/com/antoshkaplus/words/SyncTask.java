@@ -92,10 +92,15 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
                 store.setLastSyncVersion(remoteVersion);
                 localVersion = remoteVersion;
 
+
                 if (r.getValue()) {
+                    // it's tempting to increase remoteVersion because remote update
+                    // was successful, but there is no guarantee that remote version
+                    // actually changed
                     merger.onRemoteUpdateSuccess();
                     break;
                 }
+
                 // else there were changes in the db and we have to synchronize everything again
                 // we want to avoid doing it on server side to keep logic in one place
 

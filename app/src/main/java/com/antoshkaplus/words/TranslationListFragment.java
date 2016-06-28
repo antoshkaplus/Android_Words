@@ -2,6 +2,7 @@ package com.antoshkaplus.words;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.app.SearchManager;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,11 +10,14 @@ import android.app.Fragment;
 import android.speech.tts.TextToSpeech;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.antoshkaplus.words.model.Translation;
@@ -30,7 +34,7 @@ import java.util.Locale;
  * Use the {@link TranslationListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TranslationListFragment extends ListFragment implements AdapterView.OnItemLongClickListener{
+public class TranslationListFragment extends ListFragment implements AdapterView.OnItemLongClickListener, SearchView.OnQueryTextListener{
 
     private OnFragmentInteractionListener mListener;
     private TextToSpeech textToSpeech;
@@ -84,14 +88,8 @@ public class TranslationListFragment extends ListFragment implements AdapterView
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = super.onCreateView(inflater, container, savedInstanceState);
-        ViewGroup vg = (ViewGroup)view;
-
-        View vv= vg.getChildAt(0);
-        View v = inflater.inflate(R.layout.fragment_translation_list, null);
-        vg.addView(v);
-        vv.bringToFront();
-
+        setHasOptionsMenu(true);
+        View view = inflater.inflate(R.layout.fragment_translation_list, container, false);
         return view;
     }
 
@@ -99,6 +97,35 @@ public class TranslationListFragment extends ListFragment implements AdapterView
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getListView().setOnItemLongClickListener(this);
+
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_translation_list, menu);
+
+        SearchManager searchManager = (SearchManager)
+                getActivity().getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+
+        searchView.setSearchableInfo(searchManager.
+                getSearchableInfo(getActivity().getComponentName()));
+        searchView.setSubmitButtonEnabled(true);
+        searchView.setOnQueryTextListener(this);
+
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        TranslationAdapter adapter = (TranslationAdapter) getListAdapter();
+        adapter.getFilter().filter(newText);
+        return true;
     }
 
     @Override
@@ -117,6 +144,8 @@ public class TranslationListFragment extends ListFragment implements AdapterView
         textToSpeech.speak(tv.getText(), TextToSpeech.QUEUE_FLUSH, null, null);
         return false;
     }
+
+    
 
     /**
      * This interface must be implemented by activities that contain this

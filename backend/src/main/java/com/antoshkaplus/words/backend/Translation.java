@@ -46,6 +46,10 @@ public class Translation {
         this.foreignWord = foreignWord;
         this.nativeWord = nativeWord;
         resetId();
+        deleted = false;
+        Date date = new Date();
+        setCreationDate(date);
+        setUpdateDate(date);
     }
 
     public Translation(String foreignWord, String nativeWord, Key<BackendUser> owner) {
@@ -91,6 +95,18 @@ public class Translation {
         this.id = foreignWord + "_" + nativeWord;
     }
 
+    public void resetCreationDate() {
+        this.creationDate = new Date();
+    }
+
+    public void resetUpdateDate() {
+        this.updateDate = new Date();
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public Date getCreationDate() {
         return creationDate;
     }
@@ -113,5 +129,17 @@ public class Translation {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public void setCreationDateToEarliest(Translation t) {
+        if (t == null) return;
+        Date tD = t.creationDate;
+        if (creationDate == null || (tD != null && creationDate.after(tD))) {
+            creationDate = tD;
+        }
     }
 }

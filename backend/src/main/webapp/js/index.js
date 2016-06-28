@@ -33,7 +33,7 @@ function enableClick() {
 // This is called initially
 function init() {
     var apiName = 'dictionaryApi';
-    var apiVersion = 'v1';
+    var apiVersion = 'v2';
     var apiRoot = 'https://' + window.location.host + '/_ah/api';
     if (window.location.hostname == 'localhost'
       || window.location.hostname == '127.0.0.1'
@@ -102,7 +102,13 @@ function addTranslation() {
         return
     }
     var translation = new Translation(w_0, w_1);
-    gapi.client.dictionaryApi.addTranslation(translation).execute(function(resp) {
+    // it's now done a lot different
+    // have to code very different
+    // better go through whole synchronization process
+    // but with javascript
+    // and only with one element
+    // easy to test
+    gapi.client.dictionaryApi.addTranslationOnline(translation).execute(function(resp) {
         console.log("translation saved", resp)
         $('#foreignWord').focus().select()
     })
@@ -110,7 +116,7 @@ function addTranslation() {
 }
 
 function fillTranslationList() {
-    gapi.client.dictionaryApi.getTranslationList().execute(function(resp) {
+    gapi.client.dictionaryApi.getTranslationListWhole().execute(function(resp) {
         ko.applyBindings({translationList: resp.list});
         console.log(resp)
     })
