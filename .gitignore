@@ -1,4 +1,5 @@
 .gradle
+*.iml
 /local.properties
 
 # user specific configuration
