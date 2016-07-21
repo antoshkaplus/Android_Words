@@ -142,4 +142,12 @@ public class Translation {
             creationDate = tD;
         }
     }
+
+    public boolean emptyCreationDate() {
+        return creationDate == null;
+    }
+
+    public boolean emptyUpdateDate() {
+        return updateDate == null;
+    }
 }

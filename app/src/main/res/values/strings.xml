@@ -13,6 +13,8 @@
     <string name="action__translation_list">Translation list</string>
     <string name="action__sync">Sync</string>
 
+    <string name="toast__filter_failure__text">Error! Filter unknown failure.</string>
+
     <string name="dialog__foreign_word__title">Foreign word</string>
     <string name="dialog__native_word__title">Native word</string>
 
@@ -24,7 +26,11 @@
     <string name="dialog__sync_success__title">Good news</string>
     <string name="dialog__sync_success__text">Synchronization is successful</string>
     <string name="dialog__sync_failure__title">Bad news</string>
-    <string name="dialog__sync_failure__text">Synchronization failed</string>
+    <!-- this one can be anything -->
+    <string name="dialog__sync_failure__text">Synchronization failed. The reason is unknown. Please contact support.</string>
+    <!-- this one we know for sure that it's coming from server -->
+    <string name="dialog__sync_failure_server_data_validity__text">Synchronization failed due to server data is invalid. Please contact support.</string>>
+
 
     <string name="pref__account__title">Current account</string>
     <string name="pref__account__key">pref__account__key</string>

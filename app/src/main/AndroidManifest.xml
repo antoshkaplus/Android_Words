@@ -17,12 +17,14 @@
         >
         <activity
             android:name=".MainActivity"
-            android:label="Words" >
+            android:label="Words"
+            android:launchMode="singleTop">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
 
@@ -35,11 +37,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <meta-data
-            android:name="android.app.searchable"
-            android:resource="@xml/searchable">
-        </meta-data>
 
     </application>
 

@@ -1,8 +1,25 @@
 
+
+var deletedTranslations
+
+// class definitions
+
 function Translation(foreignWord, nativeWord) {
     this.foreignWord = foreignWord;
     this.nativeWord = nativeWord;
 }
+
+
+// viewModel init
+
+// much quicker reation than waiting for google api to load.
+// may meed to create viewModel object in the future.
+$(function() {
+    viewModel = {
+        translationList: ko.observable([])
+    }
+    ko.applyBindings(viewModel)
+})
 
 
 
@@ -32,6 +49,8 @@ function enableClick() {
 
 // This is called initially
 function init() {
+    deletedTranslations = Array()
+
     var apiName = 'dictionaryApi';
     var apiVersion = 'v2';
     var apiRoot = 'https://' + window.location.host + '/_ah/api';
@@ -92,8 +111,15 @@ function userAuthed() {
     });
 }
 
+// we call this function this way because of google api example naming.
+function signOut() {
+    gapi.auth.setToken(null)
+}
+
 // should blink add button until we are not connected
 function addTranslation() {
+    $("#alertErrorAddTranslation").hide()
+
     w_0 = $('#foreignWord').val()
     w_1 = $('#nativeWord').val()
     if (!w_0 || !w_1) {
@@ -109,15 +135,50 @@ function addTranslation() {
     // and only with one element
     // easy to test
     gapi.client.dictionaryApi.addTranslationOnline(translation).execute(function(resp) {
+        if (resp.error) {
+            $("#alertErrorAddTranslation").show()
+            return
+        }
         console.log("translation saved", resp)
         $('#foreignWord').focus().select()
     })
 
 }
 
+function removeTranslation() {
+    chs = $(this).closest("tr").children()
+    foreignWord = chs.eq(0).text()
+    nativeWord = chs.eq(1).text()
+    bF = true
+    bN = true
+    // later on can throw some alert about it to user
+    if (typeof foreignWord != 'string') {
+        bF = false
+    }
+    if (typeof nativeWord != 'string') {
+        bN = false
+    }
+    if (!bF || !bN) return
+    var translation = new Translation(foreignWord, nativeWord);
+    gapi.client.dictionaryApi.removeTranslationOnline(translation).execute(function(resp) {
+        if (resp.error) {
+            $('#alertErrorRemoveTranslation').show()
+            return
+        }
+        console.log("translation removed", resp)
+    })
+}
+
 function fillTranslationList() {
     gapi.client.dictionaryApi.getTranslationListWhole().execute(function(resp) {
-        ko.applyBindings({translationList: resp.list});
+        if (resp.error != null) {
+            // need to show some kind of sign to reload browser window
+            // later on may try to reload by myself
+            $("#alertErrorGetTranslationList").show()
+            return
+        }
+
+        viewModel.translationList(resp.list)
         console.log(resp)
     })
 }

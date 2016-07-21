@@ -12,6 +12,17 @@
 </head>
 <body role="document" style="padding-top: 70px;">
 
+<!-- here we place all possible alerts -->
+<!-- worst alerts first -->
+<div id="alertErrorAddTranslation" class="alert alert-danger collapse" role="alert">
+    <strong>Error!</strong> Translation was not added!
+</div>
+<div id="alertErrorGetTranslationList" class="alert alert-danger collapse" role="alert">
+    <strong>Error!</strong> Unable to get translation list!
+</div>
+
+
+
 <a href="storage.html" class="btn btn-info" role="button">Storage playground</a>
 
 <div class="panel panel-default">
@@ -26,6 +37,7 @@
     </div>
     <button type="button" id="addTranslationButton" class="btn btn-default" onclick="addTranslation()">Add</button>
     <button type="button" class="btn btn-default" onclick="autoTranslate()">Auto</button>
+    <button type="button" id="logOut" class="btn btn-default pull-right" onclick="signOut()">Log out</button>
 </form>
 </div>
 
@@ -44,10 +56,13 @@
 <div class="panel panel-default">
 <table class="table">
     <tbody data-bind="foreach: translationList">
+        <!-- ko ifnot: deleted -->
         <tr>
             <td data-bind="text: foreignWord"></td>
             <td data-bind="text: nativeWord"></td>
+            <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
         </tr>
+        <!-- /ko -->
     </tbody>
 </table>
 </div>

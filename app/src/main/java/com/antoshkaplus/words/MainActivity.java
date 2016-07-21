@@ -356,14 +356,19 @@ public class MainActivity extends Activity implements
     }
 
     @Override
-    public void onSyncFinish(boolean success) {
+    public void onSyncFinish(SyncResult result) {
         // and this dialog logic that comes up
         FragmentManager mgr = getFragmentManager();
         int titleId = R.string.dialog__sync_success__title;
         int textId = R.string.dialog__sync_success__text;
-        if (!success) {
+        if (result != SyncResult.SUCCESS) {
             titleId = R.string.dialog__sync_failure__title;
+        }
+
+        if (result == SyncResult.FAILURE_UNKNOWN) {
             textId = R.string.dialog__sync_failure__text;
+        } else if (result == SyncResult.FAILURE_SERVER_DATA_VALIDITY) {
+            textId = R.string.dialog__sync_failure_server_data_validity__text;
         }
         OkDialog.newInstance(
                 getString(titleId), getString(textId)).show(mgr, "syncResult");

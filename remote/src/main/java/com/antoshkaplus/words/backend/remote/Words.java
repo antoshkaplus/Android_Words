@@ -31,6 +31,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -97,6 +98,9 @@ public class Words {
             }
             if (command.equals("users")) {
                 printUsers();
+            }
+            if (command.equals("fillmiss")) {
+                fillMissingValues();
             }
         }
         installer.uninstall();
@@ -250,5 +254,26 @@ public class Words {
         ofy().save().entities(updateList).now();
     }
 
+    private void fillMissingValues() {
+        com.googlecode.objectify.cmd.Query<Translation> q = ofy().load().type(Translation.class);
+        List<Key<Translation>> cts = q.filter("creationDate ==", null).keys().list();
+        List<Key<Translation>> uts = q.filter("updateDate ==", null).keys().list();
 
+        HashSet<Key<Translation>> sts = new HashSet<>(cts);
+        for (Key<Translation> t : uts) {
+            sts.add(t);
+        }
+
+        Map<Key<Translation>, Translation> ts = ofy().load().keys(sts);
+
+        for (Translation t : ts.values()) {
+            if (t.emptyCreationDate()) {
+                t.setCreationDate(new Date());
+            }
+            if (t.emptyUpdateDate()) {
+                t.setUpdateDate(t.getCreationDate());
+            }
+        }
+        ofy().save().entities(ts.values()).now();
+    }
 }

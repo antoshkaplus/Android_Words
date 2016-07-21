@@ -118,6 +118,30 @@ public class DictionaryEndpoint {
         return new ResourceBoolean(v.equals(version));
     }
 
+
+
+    @ApiMethod(name = "removeTranslationOnline", path = "remove_translation_online", httpMethod = "POST")
+    public void removeTranslationOnline(final Translation shallowTranslation, final User user)
+            throws OAuthRequestException, InvalidParameterException
+    {
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                BackendUser backendUser = retrieveBackendUser(user);
+
+                final Translation tRem = new Translation(
+                        shallowTranslation.getForeignWord(),
+                        shallowTranslation.getNativeWord(),
+                        backendUser);
+                tRem.setDeleted(true);
+
+                Translation tDb = ofy().load().type(Translation.class).parent(backendUser).id(tRem.getId()).now();
+                tRem.setCreationDateToEarliest(tDb);
+                ofy().save().entity(tRem).now();
+            }
+        });
+    }
+
     // use:
     //  update date and create date as now
     //  deleted = false
@@ -142,7 +166,7 @@ public class DictionaryEndpoint {
 
                 Translation tDb = ofy().load().type(Translation.class).parent(backendUser).id(tNew.getId()).now();
                 tNew.setCreationDateToEarliest(tDb);
-                ofy().save().entity(tNew);
+                ofy().save().entity(tNew).now();
             }
         });
     }

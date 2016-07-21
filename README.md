@@ -2,18 +2,21 @@
 Want to learn more English words. Hope this application is going to help me.
 
 
-#TODO
+# TODO
 
-##overall
-* list of words with search
-* create app one russian, 4 guesses... reverse way
+## overall
+* **create app one russian, 4 guesses... reverse way**
 * later on make some progress graphs
 * add more games
 * by hand testing notes
 * unit tests
 
-##guess word:
-* keep track of the score
+* move to UUID
+
+* fix web for words. show error. delete operation.
+
+## guess word:
+* **keep track of the score.**
 * nice synchronization. think about rules. downloading and uploading everything everytime is not a good idea
 * if provide remove functionality add ability to alter (always)
 * for translation list need ability to search for words, also some sorting, edit button to remove some.
@@ -21,11 +24,13 @@ Want to learn more English words. Hope this application is going to help me.
 * should make use of cursor from database connection sometime soon, as loading everything into the memory is going tot suck probably
 * add setting for how long should reset game, maybe in the near future would need to create controller
 
-##app
+## app
 * user log out operation
 * rethink log in
 
-
+## web
+* show more error messages
+* show authorization errors if exists
 
 
 

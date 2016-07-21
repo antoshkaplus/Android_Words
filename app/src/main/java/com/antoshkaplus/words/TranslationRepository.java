@@ -6,6 +6,7 @@ import com.antoshkaplus.words.model.Translation;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.SelectArg;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,7 +62,17 @@ public class TranslationRepository {
     }
 
     public AndroidDatabaseResults getTranslationsRawResults() throws Exception {
+
         return (AndroidDatabaseResults) helper.getDao(Translation.class).iterator().getRawResults();
+    }
+
+    // case insensitive by default
+    public AndroidDatabaseResults getSuggestionTranslations(String scrap) throws Exception {
+        String pattern = scrap + "%";
+        SelectArg foreignPattern = new SelectArg(pattern);
+        SelectArg nativePatten = new SelectArg(pattern);
+        return (AndroidDatabaseResults) helper.getDao(Translation.class).queryBuilder().where().like(Translation.FIELD_FOREIGN_WORD, foreignPattern)
+                .or().like(Translation.FIELD_NATIVE_WORD, nativePatten).iterator().getRawResults();
     }
 
     public Translation getTranslation(AndroidDatabaseResults results, int position) throws Exception {
@@ -80,8 +91,12 @@ public class TranslationRepository {
     @SuppressWarnings("unchecked")
     public Translation getTranslation(TranslationKey key) throws Exception {
         TreeMap map = new TreeMap<String, String>();
-        map.put(Translation.FIELD_FOREIGN_WORD, key.foreignWord);
-        map.put(Translation.FIELD_NATIVE_WORD, key.nativeWord);
+        // to format quotes
+        SelectArg foreignArg = new SelectArg(key.foreignWord);
+        SelectArg nativeArg = new SelectArg(key.nativeWord);
+
+        map.put(Translation.FIELD_FOREIGN_WORD, foreignArg);
+        map.put(Translation.FIELD_NATIVE_WORD, nativeArg);
         List<Translation> list = helper.getDao(Translation.class).queryForFieldValues(map);
         if (list.isEmpty()) return null;
         return list.get(0);

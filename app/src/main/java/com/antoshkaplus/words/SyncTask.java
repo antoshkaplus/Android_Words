@@ -29,7 +29,7 @@ import java.util.concurrent.Callable;
  * when we come here everything should be ready for processing.
  *
  */
-public class SyncTask extends AsyncTask<Void, Void, Boolean> {
+public class SyncTask extends AsyncTask<Void, Void, SyncResult> {
 
     private Context context;
     private Listener listener;
@@ -46,10 +46,16 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
         repo = new TranslationRepository(context);
     }
 
-    @Override
-    protected Boolean doInBackground(Void... params) {
+    public enum Result {
 
-        boolean success = true;
+
+    }
+
+    // somehow on failure we have to provide more info about failure
+    @Override
+    protected SyncResult doInBackground(Void... params) {
+
+        SyncResult result = SyncResult.SUCCESS;
         // sometimes we have to try again this operation because of contention in the DB
         try {
             GoogleAccountCredential credential = CredentialFactory.create(context, account);
@@ -83,6 +89,11 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
                     remoteList.setList(new ArrayList<Translation>());
                 }
 
+                if (!isValid(remoteList)) {
+                    result = SyncResult.FAILURE_SERVER_DATA_VALIDITY;
+                    break;
+                }
+
                 TranslationMerger merger = new TranslationMerger(repo);
                 List<Translation> mergedList = merger.mergeRemote(remoteList.getList());
 
@@ -108,15 +119,27 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
                 // there are may be per user preferences
             }
         } catch (Exception ex) {
-            success = false;
+            result = SyncResult.FAILURE_UNKNOWN;
             ex.printStackTrace();
         }
-        return success;
+        return result;
+    }
+
+
+    private boolean isValid(TranslationList translations) {
+        for (Translation t : translations.getList()) {
+            if (t.getCreationDate() == null || t.getUpdateDate() == null ||
+                    t.getVersion() == null || t.getDeleted() == null ||
+                    t.getForeignWord() == null || t.getNativeWord() == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // called from UI thread
     @Override
-    protected void onPostExecute(Boolean result) {
+    protected void onPostExecute(SyncResult result) {
         if (listener == null) return;
         listener.onSyncFinish(result);
     }
@@ -126,7 +149,7 @@ public class SyncTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     public interface Listener {
-        void onSyncFinish(boolean success);
+        void onSyncFinish(SyncResult result);
     }
 
 }

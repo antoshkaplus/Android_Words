@@ -3,7 +3,9 @@ package com.antoshkaplus.words;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -34,7 +36,7 @@ import java.util.Locale;
  * Use the {@link TranslationListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TranslationListFragment extends ListFragment implements AdapterView.OnItemLongClickListener, SearchView.OnQueryTextListener{
+public class TranslationListFragment extends ListFragment implements AdapterView.OnItemLongClickListener, SearchView.OnQueryTextListener {
 
     private OnFragmentInteractionListener mListener;
     private TextToSpeech textToSpeech;
@@ -102,18 +104,26 @@ public class TranslationListFragment extends ListFragment implements AdapterView
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
         inflater.inflate(R.menu.menu_translation_list, menu);
 
-        SearchManager searchManager = (SearchManager)
-                getActivity().getSystemService(Context.SEARCH_SERVICE);
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+
+        searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW | MenuItem.SHOW_AS_ACTION_IF_ROOM);
+
+
         SearchView searchView = (SearchView) searchMenuItem.getActionView();
 
-        searchView.setSearchableInfo(searchManager.
-                getSearchableInfo(getActivity().getComponentName()));
+        // on submit we should select the item???
+        // show some kind of word view with date too
         searchView.setSubmitButtonEnabled(true);
         searchView.setOnQueryTextListener(this);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
