@@ -27,13 +27,13 @@ Want to learn more English words. Hope this application is going to help me.
 ## app
 * user log out operation
 * rethink log in
+* try to remove .impl file. it changes often and often only order of statements changes. 
 
 ## web
 * show more error messages
 * show authorization errors if exists
 
-
-
+## start use git the right way
 
 
 
