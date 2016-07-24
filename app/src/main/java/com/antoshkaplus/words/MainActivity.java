@@ -44,7 +44,9 @@ import android.os.Handler;
 
 public class MainActivity extends Activity implements
         GuessWordFragment.OnFragmentInteractionListener,
-        TranslationListFragment.OnFragmentInteractionListener, SyncTask.Listener, TranslateTask.Listener {
+        TranslationListFragment.OnFragmentInteractionListener,
+        SyncTask.Listener,
+        TranslateTask.Listener {
 
     private static final String TAG = "MainActivity";
     private static final int GUESS_WORD_GAME_CHOICE_COUNT = 4;
@@ -52,8 +54,7 @@ public class MainActivity extends Activity implements
     private final static int REQUEST_ACCOUNT_PICKER = 13;
 
     private TranslationRepository translationRepository;
-    private Handler handler = new Handler();
-    private Runnable nextGameEvent = null;
+
 
     private GuessWordGame game;
 
@@ -112,6 +113,7 @@ public class MainActivity extends Activity implements
 
             game = new GuessWordGame(translationList, GUESS_WORD_GAME_CHOICE_COUNT);
             game.NewGame();
+
             guessWordFragment.setGame(game);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -322,34 +324,6 @@ public class MainActivity extends Activity implements
                 break;
         }
     }
-
-    public void OnCorrectGuess(final GuessWordFragment fragment) {
-        nextGameEvent = new Runnable() {
-            @Override
-            public void run() {
-                OnNext(fragment);
-            }
-        };
-        handler.postDelayed(nextGameEvent, 2000);
-    }
-
-    public void OnIncorrectGuess(final GuessWordFragment fragment) {
-        nextGameEvent = new Runnable() {
-            @Override
-            public void run() {
-                OnNext(fragment);
-            }
-        };
-        handler.postDelayed(nextGameEvent, 2000);
-    }
-
-    @Override
-    public void OnNext(GuessWordFragment fragment) {
-        handler.removeCallbacks(nextGameEvent);
-        game.NewGame();
-        fragment.setGame(game);
-    }
-
 
     private String retrieveAccount() {
         return settings.getString(getString(R.string.pref__account__key), null);

@@ -1,16 +1,23 @@
 package com.antoshkaplus.words;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -24,7 +31,10 @@ import java.util.Locale;
  * Use the {@link GuessWordFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GuessWordFragment extends Fragment implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, View.OnClickListener {
+public class GuessWordFragment extends Fragment implements
+        AdapterView.OnItemClickListener,
+        AdapterView.OnItemLongClickListener,
+        View.OnClickListener {
 
     private OnFragmentInteractionListener mListener;
 
@@ -35,6 +45,10 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
     private TextToSpeech textToSpeech;
 
     private boolean gameOver = true;
+
+    private Handler handler = new Handler();
+
+    private Runnable nextGameEvent = null;
 
     public static GuessWordFragment newInstance() {
         GuessWordFragment fragment = new GuessWordFragment();
@@ -47,6 +61,7 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_guess_word, container, false);
         v.setOnClickListener(this);
         guesses = (ListView)v.findViewById(R.id.guesses);
@@ -61,7 +76,7 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
         textToSpeech = new TextToSpeech(activity, new TextToSpeech.OnInitListener() {
             @Override
@@ -83,6 +98,25 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
         mListener = null;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_guess_word, menu);
+        MenuItem searchMenuItem = menu.findItem(R.id.action_switch_game_type);
+        searchMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_switch_game_type) {
+            game.switchGameType();
+            OnNext(this);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     void setGame(GuessWordGame game) {
         gameOver = false;
         this.game = game;
@@ -99,7 +133,7 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (gameOver) {
-            mListener.OnNext(this);
+            OnNext(this);
             return;
         }
         gameOver = true;
@@ -107,11 +141,10 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
         View correctView = guesses.getChildAt(correctPosition);
         correctView.setBackgroundColor(Color.GREEN);
         if (game.IsCorrect(position)) {
-            mListener.OnCorrectGuess(this);
-
+            OnCorrectGuess(this);
         } else {
             view.setBackgroundColor(Color.RED);
-            mListener.OnIncorrectGuess(this);
+            OnIncorrectGuess(this);
         }
     }
 
@@ -127,15 +160,40 @@ public class GuessWordFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public void onClick(View view) {
-        mListener.OnNext(this);
+        OnNext(this);
     }
 
 
-    public interface OnFragmentInteractionListener {
 
-        void OnCorrectGuess(GuessWordFragment fragment);
-        void OnIncorrectGuess(GuessWordFragment fragment);
-        void OnNext(GuessWordFragment fragment);
+    public void OnCorrectGuess(final GuessWordFragment fragment) {
+        nextGameEvent = new Runnable() {
+            @Override
+            public void run() {
+                OnNext(fragment);
+            }
+        };
+        handler.postDelayed(nextGameEvent, 2000);
+    }
+
+    public void OnIncorrectGuess(final GuessWordFragment fragment) {
+        nextGameEvent = new Runnable() {
+            @Override
+            public void run() {
+                OnNext(fragment);
+            }
+        };
+        handler.postDelayed(nextGameEvent, 2000);
+    }
+
+    public void OnNext(GuessWordFragment fragment) {
+        handler.removeCallbacks(nextGameEvent);
+        game.NewGame();
+        fragment.setGame(game);
+    }
+
+
+
+    public interface OnFragmentInteractionListener {
     }
 
 }

@@ -12,6 +12,21 @@ import java.util.Random;
  */
 public class GuessWordGame {
 
+    public enum Type {
+        ForeignWord,
+        NativeWord;
+
+        private Type another;
+
+        static {
+            ForeignWord.another = NativeWord;
+            NativeWord.another = ForeignWord;
+        }
+
+        public Type getAnother() {
+            return another;
+        }
+    }
 
     private static final Random rng = new Random(System.currentTimeMillis());
     private List<Translation> translationList;
@@ -19,7 +34,7 @@ public class GuessWordGame {
     private List<String> guesses;
     private String word;
     private int correctPosition;
-
+    Type gameType = Type.NativeWord;
     private int guessCount;
 
     GuessWordGame(List<Translation> translationList, int guessCount) {
@@ -31,15 +46,16 @@ public class GuessWordGame {
         guesses = new ArrayList<>(guessCount);
         correctPosition = rng.nextInt(guessCount);
         for (int i = 0; i < guessCount; i++) {
-            // be sure to use Vector.remove() or you may get the same item twice
             Collections.swap(translationList, i, rng.nextInt(translationList.size()-i) + i);
             Translation t = translationList.get(i);
             if (correctPosition == i) {
-                word = t.nativeWord;
+                word = gameType == Type.NativeWord ? t.nativeWord : t.foreignWord;
             }
-            guesses.add(t.foreignWord);
+            guesses.add(gameType == Type.NativeWord ? t.foreignWord : t.nativeWord);
         }
     }
+
+
 
     boolean IsCorrect(int position) {
         return correctPosition == position;
@@ -57,5 +73,13 @@ public class GuessWordGame {
         return word;
     }
 
+    public void setGameType(Type gameType) {
+        this.gameType = gameType;
+    }
 
+    public Type getGameType() {
+        return gameType;
+    }
+
+    public void switchGameType() { this.gameType = this.gameType.getAnother(); }
 }
