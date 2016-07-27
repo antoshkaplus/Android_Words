@@ -45,6 +45,7 @@ import android.os.Handler;
 public class MainActivity extends Activity implements
         GuessWordFragment.OnFragmentInteractionListener,
         TranslationListFragment.OnFragmentInteractionListener,
+        StatsListFragment.OnFragmentInteractionListener,
         SyncTask.Listener,
         TranslateTask.Listener {
 
@@ -60,6 +61,8 @@ public class MainActivity extends Activity implements
 
     private GuessWordFragment guessWordFragment;
     private TranslationListFragment translationListFragment;
+    private StatsListFragment statsListFragment;
+
     private AddWordDialog addWordDialog;
 
     private List<Translation> translationList;
@@ -92,6 +95,7 @@ public class MainActivity extends Activity implements
             guessWordFragment = new GuessWordFragment();
             // should be through newInstance
             translationListFragment = new TranslationListFragment();
+            statsListFragment = new StatsListFragment();
         }
         setContentView(R.layout.activity_main);
         translationRepository = new TranslationRepository(this);
@@ -110,6 +114,7 @@ public class MainActivity extends Activity implements
             ft.commit();
 
             translationListFragment.setListAdapter(new TranslationAdapter(this, translationRepository));
+            statsListFragment.setListAdapter(new StatsAdapter(this, translationRepository));
 
             game = new GuessWordGame(translationList, GUESS_WORD_GAME_CHOICE_COUNT);
             game.NewGame();
@@ -129,9 +134,11 @@ public class MainActivity extends Activity implements
     @Override
     protected void onResume() {
         super.onResume();
-        if (translationListFragment == null || guessWordFragment == null) {
+        if (translationListFragment == null || guessWordFragment == null || statsListFragment == null) {
+            // what about initialization ???
             translationListFragment = new TranslationListFragment();
             guessWordFragment = new GuessWordFragment();
+            statsListFragment = new StatsListFragment();
         }
 
     }
@@ -162,6 +169,11 @@ public class MainActivity extends Activity implements
             } else if (id == R.id.action_translation_list) {
                 FragmentTransaction ft = getFragmentManager().beginTransaction();
                 ft.replace(R.id.container, translationListFragment);
+                ft.commit();
+                return true;
+            } else if (id == R.id.action_stats_list) {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.container, statsListFragment);
                 ft.commit();
                 return true;
             } else if (id == R.id.action_guess_word) {
@@ -208,12 +220,15 @@ public class MainActivity extends Activity implements
         super.onSaveInstanceState(outState, outPersistentState);
         getFragmentManager().putFragment(outState, "guess_word_fragment", guessWordFragment);
         getFragmentManager().putFragment(outState, "translation_list_fragment", translationListFragment);
+        getFragmentManager().putFragment(outState, "stats_list_fragment", statsListFragment);
     }
 
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
+        guessWordFragment = (GuessWordFragment) getFragmentManager().getFragment(savedInstanceState, "guess_word_fragment");
+        translationListFragment = (TranslationListFragment) getFragmentManager().getFragment(savedInstanceState, "translation_list_fragment");
+        statsListFragment = (StatsListFragment) getFragmentManager().getFragment(savedInstanceState, "stats_list_fragment");
     }
 
     public void showAddWordDialog() {

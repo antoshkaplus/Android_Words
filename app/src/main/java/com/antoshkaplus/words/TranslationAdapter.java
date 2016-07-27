@@ -71,6 +71,11 @@ public class TranslationAdapter extends BaseAdapter implements Filterable {
     }
 
     @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    @Override
     public int getCount() {
         return items.getCount();
     }

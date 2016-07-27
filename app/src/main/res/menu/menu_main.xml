@@ -12,6 +12,9 @@
     <item android:id="@+id/action_translation_list"
         android:title="@string/action__translation_list"/>
 
+    <item android:id="@+id/action_stats_list"
+        android:title="@string/action__stats_list"/>
+
     <item android:id="@+id/action_settings"
         android:title="@string/action__settings"
         android:orderInCategory="100"
@@ -19,5 +22,8 @@
 
     <item android:id="@+id/action_sync"
         android:title="@string/action__sync"/>
+
+
+
 
 </menu>

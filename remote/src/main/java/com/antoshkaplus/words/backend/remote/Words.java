@@ -29,6 +29,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,6 +103,23 @@ public class Words {
             if (command.equals("fillmiss")) {
                 fillMissingValues();
             }
+            if (command.equals("add")) {
+                Translation t = new Translation("foreign", "native");
+                ofy().save().entity(t).now();
+            }
+            if (command.equals("size")) {
+                int size = ofy().load().type(Translation.class).count();
+                System.out.println(size);
+            }
+            if (command.equals("test")) {
+                Translation t = new Translation("foreign", "native");
+                ofy().save().entity(t).now();
+
+                ArrayList<String> ids = new ArrayList<>();
+                ids.add("foreign_native");
+                Map<String, Translation> ts = ofy().load().type(Translation.class).ids(ids);
+                System.out.println("test end");
+            }
         }
         installer.uninstall();
     }
@@ -120,9 +138,13 @@ public class Words {
             System.out.println("password: ");
             password = scanner.nextLine();
         }
+
         RemoteApiOptions options = new RemoteApiOptions()
-                .server("antoshkaplus-words.appspot.com", 443)
-                .useApplicationDefaultCredential();
+                .server("localhost", 8080).useDevelopmentServerCredential();
+
+//        RemoteApiOptions options = new RemoteApiOptions()
+//                .server("antoshkaplus-words.appspot.com", 443)
+//                .useApplicationDefaultCredential();
         // still may try to go to localhost
         //        .credentials("example@example.com", "haha")
         //        .server("localhost", 8080);

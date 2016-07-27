@@ -172,6 +172,61 @@ public class DictionaryEndpoint {
     }
 
 
+    // with lambda those two methods would be awesome.
+    // right now would have to use inheritance to code reuse.
+
+    @ApiMethod(name = "increaseSuccessScore", path = "increase_success_score")
+    public void increaseSuccessScore(final ForeignWordScoreList list, final User user) {
+        final BackendUser backendUser = retrieveBackendUser(user);
+        final List<String> fwList = list.getForeignWords();
+
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                Map<String, ForeignWordStats> m = ofy().load().type(ForeignWordStats.class).parent(backendUser).ids(fwList);
+                for (int i = 0; i < fwList.size(); ++i) {
+                    ForeignWordScore f = list.getList().get(i);
+                    String fw = fwList.get(i);
+                    ForeignWordStats s = m.get(fw);
+                    if (s == null) {
+                        s = new ForeignWordStats(f.foreignWord);
+                        s.setOwner(backendUser);
+                        m.put(fw, s);
+                    }
+                    s.increaseSuccessScore(f.score);
+                }
+                ofy().save().entities(m.values()).now();
+            }
+        });
+    }
+
+    @ApiMethod(name = "increaseFailureScore", path = "increase_failure_score")
+    public void increaseFailureScore(final ForeignWordScoreList list, final User user) {
+        final BackendUser backendUser = retrieveBackendUser(user);
+        final List<String> fwList = list.getForeignWords();
+
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                Map<String, ForeignWordStats> m = ofy().load().type(ForeignWordStats.class).parent(backendUser).ids(fwList);
+                for (int i = 0; i < fwList.size(); ++i) {
+                    ForeignWordScore f = list.getList().get(i);
+                    String fw = fwList.get(i);
+                    ForeignWordStats s = m.get(fw);
+                    if (s == null) {
+                        s = new ForeignWordStats(f.foreignWord);
+                        s.setOwner(backendUser);
+                        m.put(fw, s);
+                    }
+                    s.increaseFailureScore(f.score);
+                }
+                ofy().save().entities(m.values()).now();
+            }
+        });
+    }
+
+
+
     private BackendUser retrieveBackendUser(User user) {
         BackendUser newUser = new BackendUser(user.getEmail());
         BackendUser res = ofy().load().entity(newUser).now();

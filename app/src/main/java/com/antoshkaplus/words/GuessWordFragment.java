@@ -50,6 +50,9 @@ public class GuessWordFragment extends Fragment implements
 
     private Runnable nextGameEvent = null;
 
+
+    private TranslationRepository repo;
+
     public static GuessWordFragment newInstance() {
         GuessWordFragment fragment = new GuessWordFragment();
         Bundle args = new Bundle();
@@ -78,6 +81,8 @@ public class GuessWordFragment extends Fragment implements
     @Override
     public void onAttach(Context activity) {
         super.onAttach(activity);
+        repo = new TranslationRepository(activity);
+
         textToSpeech = new TextToSpeech(activity, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -140,11 +145,14 @@ public class GuessWordFragment extends Fragment implements
         int correctPosition = game.getCorrectPosition();
         View correctView = guesses.getChildAt(correctPosition);
         correctView.setBackgroundColor(Color.GREEN);
+
+        // should just call callback with position.
+        // but two of them separate a lot more
         if (game.IsCorrect(position)) {
-            OnCorrectGuess(this);
+            OnCorrectGuess(game);
         } else {
             view.setBackgroundColor(Color.RED);
-            OnIncorrectGuess(this);
+            OnIncorrectGuess(game, position);
         }
     }
 
@@ -165,21 +173,36 @@ public class GuessWordFragment extends Fragment implements
 
 
 
-    public void OnCorrectGuess(final GuessWordFragment fragment) {
+    public void OnCorrectGuess(GuessWordGame game) {
+        try {
+            repo.increaseSuccessScore(game.getForeignWord(game.getCorrectPosition()), 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+
         nextGameEvent = new Runnable() {
             @Override
             public void run() {
-                OnNext(fragment);
+                OnNext(GuessWordFragment.this);
             }
         };
         handler.postDelayed(nextGameEvent, 2000);
     }
 
-    public void OnIncorrectGuess(final GuessWordFragment fragment) {
+    public void OnIncorrectGuess(GuessWordGame game, int chosenPosition) {
+        try {
+            repo.increaseFailureScore(game.getForeignWord(game.getCorrectPosition()), 1);
+            repo.increaseFailureScore(game.getForeignWord(chosenPosition), 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();
+        }
+
         nextGameEvent = new Runnable() {
             @Override
             public void run() {
-                OnNext(fragment);
+                OnNext(GuessWordFragment.this);
             }
         };
         handler.postDelayed(nextGameEvent, 2000);

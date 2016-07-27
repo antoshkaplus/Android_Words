@@ -15,7 +15,8 @@ Want to learn more English words. Hope this application is going to help me.
 * fix web for words. show error. delete operation.
 
 ## guess word:
-* **keep track of the score.**
+* **keep track of the score.** this feature should be tested first locally through remoteApi and after that on android devoce locally
+    have to write unittests for it
 * nice synchronization. think about rules. downloading and uploading everything everytime is not a good idea
 * if provide remove functionality add ability to alter (always)
 * for translation list need ability to search for words, also some sorting, edit button to remove some.

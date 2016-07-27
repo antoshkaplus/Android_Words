@@ -2,6 +2,7 @@ package com.antoshkaplus.words;
 
 import android.content.Context;
 
+import com.antoshkaplus.words.model.Stats;
 import com.antoshkaplus.words.model.Translation;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.j256.ormlite.android.AndroidDatabaseResults;
@@ -62,8 +63,42 @@ public class TranslationRepository {
     }
 
     public AndroidDatabaseResults getTranslationsRawResults() throws Exception {
-
         return (AndroidDatabaseResults) helper.getDao(Translation.class).iterator().getRawResults();
+    }
+
+    // should be able to pass some kind of sorting parameters
+    public AndroidDatabaseResults getStatsRawResults() throws Exception {
+        return (AndroidDatabaseResults) helper.getDao(Stats.class).iterator().getRawResults();
+    }
+
+    public void increaseSuccessScore(final String word, final int score) throws Exception {
+        Callable<Object> c = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Dao<Stats, String> dao = helper.getDao(Stats.class);
+                Stats s = new Stats(word);
+                s = dao.createIfNotExists(s);
+                s.localScore.success += score;
+                dao.update(s);
+                return null;
+            }
+        };
+        executeBatch(c);
+    }
+
+    public void increaseFailureScore(final String word, final int score) throws Exception {
+        Callable<Object> c = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Dao<Stats, String> dao = helper.getDao(Stats.class);
+                Stats s = new Stats(word);
+                s = dao.createIfNotExists(s);
+                s.localScore.failure += score;
+                dao.update(s);
+                return null;
+            }
+        };
+        executeBatch(c);
     }
 
     // case insensitive by default
@@ -79,6 +114,12 @@ public class TranslationRepository {
         results.moveAbsolute(position);
         return helper.getDao(Translation.class).mapSelectStarRow(results);
     }
+
+    public Stats getStats(AndroidDatabaseResults results, int position) throws Exception {
+        results.moveAbsolute(position);
+        return helper.getDao(Stats.class).mapSelectStarRow(results);
+    }
+
 
     public <T> T executeBatch(Callable<T> callable) throws Exception {
         return helper.getDao(Translation.class).callBatchTasks(callable);

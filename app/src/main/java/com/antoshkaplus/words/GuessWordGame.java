@@ -32,10 +32,15 @@ public class GuessWordGame {
     private List<Translation> translationList;
 
     private List<String> guesses;
+    // should optimize it later. now is irrelevant.
+    private List<Translation> translationGuesses;
+
     private String word;
     private int correctPosition;
     Type gameType = Type.NativeWord;
     private int guessCount;
+
+
 
     GuessWordGame(List<Translation> translationList, int guessCount) {
         this.translationList = translationList;
@@ -44,6 +49,8 @@ public class GuessWordGame {
 
     void NewGame() {
         guesses = new ArrayList<>(guessCount);
+        translationGuesses = new ArrayList<>(guessCount);
+
         correctPosition = rng.nextInt(guessCount);
         for (int i = 0; i < guessCount; i++) {
             Collections.swap(translationList, i, rng.nextInt(translationList.size()-i) + i);
@@ -52,6 +59,7 @@ public class GuessWordGame {
                 word = gameType == Type.NativeWord ? t.nativeWord : t.foreignWord;
             }
             guesses.add(gameType == Type.NativeWord ? t.foreignWord : t.nativeWord);
+            translationGuesses.add(t);
         }
     }
 
@@ -82,4 +90,9 @@ public class GuessWordGame {
     }
 
     public void switchGameType() { this.gameType = this.gameType.getAnother(); }
+
+    String getForeignWord(int position) {
+        return translationGuesses.get(position).foreignWord;
+    }
+
 }
