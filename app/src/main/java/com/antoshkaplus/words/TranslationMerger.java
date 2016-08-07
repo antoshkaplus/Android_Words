@@ -65,7 +65,7 @@ public class TranslationMerger {
 
                 int comp = t_0.foreignWord.compareTo(t_1.foreignWord);
                 if (comp == 0) {
-                    comp = t_0.nativeWord.compareTo(t_0.nativeWord);
+                    comp = t_0.nativeWord.compareTo(t_1.nativeWord);
                 }
                 return comp;
             }
