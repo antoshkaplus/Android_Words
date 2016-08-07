@@ -20,6 +20,7 @@ public class Stats {
     public String foreignWord;
 
     // on sync will reset server score and zero local one
+    // need AutoCreate to get object with id when Stats created
 
     // local changes (unsync)
     @DatabaseField(columnName = FIELD_LOCAL_SCORE, foreign = true, foreignAutoCreate = true, foreignAutoRefresh = true)
@@ -45,5 +46,6 @@ public class Stats {
     public int getFailureScore() {
         return localScore.failure + serverScore.failure;
     }
+
 
 }

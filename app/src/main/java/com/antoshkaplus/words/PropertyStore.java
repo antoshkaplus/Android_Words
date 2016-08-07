@@ -14,6 +14,8 @@ public class PropertyStore {
     private static final String LAST_UPDATE_VERSION = "lastUpdateVersion";
     private static final String LAST_SUCCESSFUL_UPDATE = "lastSuccessfulUpdate";
     private static final String FIRST_LAUNCH = "firstLaunch";
+    private static final String STATS_LAST_UPDATE_VERSION = "statsLastUpdateVersion";
+
 
     // means that never was synchronized
     // server would have version zero
@@ -39,7 +41,7 @@ public class PropertyStore {
         ed.apply();
     }
 
-    public int lastSyncVersion() {
+    public int getLastSyncVersion() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(LAST_UPDATE_VERSION, LAST_SYNC_VERSION_INIT);
     }
@@ -48,6 +50,18 @@ public class PropertyStore {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor ed = prefs.edit();
         ed.putInt(LAST_UPDATE_VERSION, lastSyncVersion);
+        ed.apply();
+    }
+
+    public int getStatsLastUpdateVersion() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getInt(STATS_LAST_UPDATE_VERSION, LAST_SYNC_VERSION_INIT);
+    }
+
+    public void setStatsLastUpdateVersion(Integer statsLastUpdateVersion) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor ed = prefs.edit();
+        ed.putInt(STATS_LAST_UPDATE_VERSION, statsLastUpdateVersion);
         ed.apply();
     }
 }

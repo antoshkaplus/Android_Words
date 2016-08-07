@@ -20,6 +20,11 @@
 <div id="alertErrorGetTranslationList" class="alert alert-danger collapse" role="alert">
     <strong>Error!</strong> Unable to get translation list!
 </div>
+<div id="alertErrorGetStatsList" class="alert alert-danger collapse" role="alert">
+    <strong>Error!</strong> Unable to get translation list!
+</div>
+
+
 
 
 
@@ -54,17 +59,49 @@
 </div>
 
 <div class="panel panel-default">
-<table class="table">
-    <tbody data-bind="foreach: translationList">
-        <!-- ko ifnot: deleted -->
-        <tr>
-            <td data-bind="text: foreignWord"></td>
-            <td data-bind="text: nativeWord"></td>
-            <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
-        </tr>
-        <!-- /ko -->
-    </tbody>
-</table>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Foreign Word</th>
+                        <th>Native Word</th>
+                        <th>Remove</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach: translationList">
+                    <!-- ko ifnot: deleted -->
+                    <tr>
+                        <td data-bind="text: foreignWord"></td>
+                        <td data-bind="text: nativeWord"></td>
+                        <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
+                    </tr>
+                    <!-- /ko -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Foreign Word</th>
+                        <th>Success Score</th>
+                        <th>Failure Score</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach: statsList">
+                    <tr>
+                        <td data-bind="text: foreignWord"></td>
+                        <td data-bind="text: successScore"></td>
+                        <td data-bind="text: failureScore"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>
+
+
 </div>
 
 

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.jar.Pack200;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -54,6 +55,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class DictionaryEndpoint {
 
     static {
+        ObjectifyService.register(ForeignWordStats.class);
         ObjectifyService.register(Translation.class);
         ObjectifyService.register(BackendUser.class);
     }
@@ -120,6 +122,7 @@ public class DictionaryEndpoint {
 
 
 
+
     @ApiMethod(name = "removeTranslationOnline", path = "remove_translation_online", httpMethod = "POST")
     public void removeTranslationOnline(final Translation shallowTranslation, final User user)
             throws OAuthRequestException, InvalidParameterException
@@ -174,6 +177,62 @@ public class DictionaryEndpoint {
 
     // with lambda those two methods would be awesome.
     // right now would have to use inheritance to code reuse.
+
+    // why not use stats object over here. and load all changed stats all together
+
+    @ApiMethod(name = "updateForeignWordStats", path = "update_foreign_word_stats")
+    public void updateForeignWordStats(@Named("updateUUID")final String uuid, final ForeignWordStatsList list, final User user) {
+        final BackendUser backendUser = retrieveBackendUser(user);
+        final List<String> wordsList = list.getForeignWords();
+
+        Update u = ofy().load().type(Update.class).parent(backendUser).id(uuid).now();
+        if (u != null) {
+            return;
+        }
+
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                backendUser.increaseVersion();
+                Map<String, ForeignWordStats> m = ofy().load().type(ForeignWordStats.class).parent(backendUser).ids(wordsList);
+                for (int i = 0; i < wordsList.size(); ++i) {
+                    ForeignWordStats s = list.getList().get(i);
+                    String w = wordsList.get(i);
+                    ForeignWordStats localS = m.get(w);
+                    if (localS == null) {
+                        localS = new ForeignWordStats(w);
+                        localS.setOwner(backendUser);
+                        m.put(w, localS);
+                    }
+                    localS.updateFrom(s);
+                    localS.setVersion(backendUser.getVersion());
+                }
+                ofy().save().entities(m.values()).now();
+                Update u = new Update(uuid, backendUser);
+                ofy().save().entity(u).now();
+                ofy().save().entity(backendUser);
+            }
+        });
+
+    }
+
+    // returns all items with version high than given
+    // can figure out new version from elements
+    @ApiMethod(name = "getStatsList_G_Version", path = "get_stats_list_g_version")
+    public ForeignWordStatsList getStatsList_G_Version(@Named("version")Integer version, User user) {
+        BackendUser backendUser = retrieveBackendUser(user);
+        Query<ForeignWordStats> query = ofy().load().type(ForeignWordStats.class).ancestor(backendUser);
+        return new ForeignWordStatsList(query.filter("version >", version).list());
+    }
+
+    @ApiMethod(name = "getStatsListWhole", path = "get_stats_list_whole")
+    public ForeignWordStatsList getStatsListWhole(User user) {
+        BackendUser backendUser = retrieveBackendUser(user);
+        List<ForeignWordStats> list = ofy().load().type(ForeignWordStats.class).ancestor(backendUser).list();
+        return new ForeignWordStatsList(list);
+    }
+
+
 
     @ApiMethod(name = "increaseSuccessScore", path = "increase_success_score")
     public void increaseSuccessScore(final ForeignWordScoreList list, final User user) {

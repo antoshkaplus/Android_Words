@@ -3,9 +3,13 @@ package com.antoshkaplus.words;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,17 +21,45 @@ import android.widget.AdapterView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.antoshkaplus.words.model.Translation;
+
 /**
  * Created by antoshkaplus on 7/25/16.
  */
 public class StatsListFragment extends ListFragment {
 
     private OnFragmentInteractionListener mListener;
+    private TranslationRepository repo;
+
+
+
+    private DatabaseChangedReceiver receiver = new DatabaseChangedReceiver() {
+
+        Context ctx;
+        Intent intent;
+
+        Handler handler = new Handler();
+        Runnable update = new Runnable() {
+            @Override
+            public void run() {
+                StatsAdapter adapter = new StatsAdapter(ctx, repo);
+                setListAdapter(adapter);
+            }
+        };
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            handler.removeCallbacks(update);
+            ctx = context;
+            this.intent = intent;
+            handler.post(update);
+        }
+    };
+
 
     // TODO: Rename and change types and number of parameters
-    public static StatsListFragment newInstance(StatsAdapter adapter) {
+    public static StatsListFragment newInstance(Context ctx) {
         StatsListFragment fragment = new StatsListFragment();
-        fragment.setListAdapter(adapter);
         return fragment;
     }
 
@@ -97,6 +129,21 @@ public class StatsListFragment extends ListFragment {
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,
+                new IntentFilter(DatabaseChangedReceiver.ACTION_DATABASE_CHANGED));
+        repo = new TranslationRepository(getContext());
+        setListAdapter(new StatsAdapter(getContext(), repo));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
     }
 
     /**

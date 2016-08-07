@@ -36,8 +36,19 @@ public class Score {
     // intentially initialize with zeros
     public Score() {
         id = 0;
+        reset();
+    }
+
+    public void reset() {
         success = 0;
         failure = 0;
     }
+
+    public void moveTo(Score s) {
+        s.success = success;
+        s.failure = failure;
+        reset();
+    }
+
 
 }

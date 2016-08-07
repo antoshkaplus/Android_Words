@@ -37,7 +37,7 @@ public class StatsAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.view_translation, null);
+            convertView = inflater.inflate(R.layout.view_stats, null);
         }
         Stats item = (Stats)getItem(position);
         TextView foreignView = (TextView)convertView.findViewById(R.id.foreign_word);

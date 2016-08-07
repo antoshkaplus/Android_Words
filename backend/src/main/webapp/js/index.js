@@ -16,7 +16,8 @@ function Translation(foreignWord, nativeWord) {
 // may meed to create viewModel object in the future.
 $(function() {
     viewModel = {
-        translationList: ko.observable([])
+        translationList: ko.observable([]),
+        statsList: ko.observable([])
     }
     ko.applyBindings(viewModel)
 })
@@ -182,6 +183,20 @@ function fillTranslationList() {
         console.log(resp)
     })
 }
+
+function fillStatsList() {
+    gapi.client.dictionaryApi.getStatsListWhole().execute(function(resp) {
+        if (resp.error != null) {
+            $("#alertErrorGetStatsList").show()
+            return
+        }
+        viewModel.statsList(resp.list)
+        console.log(resp)
+    })
+
+}
+
+
 
 function addFileTranslationList() {
     f = $("#translationListFile")[0].files[0];

@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.antoshkaplus.words.model.Score;
 import com.antoshkaplus.words.model.Stats;
+import com.antoshkaplus.words.model.StatsUpdate;
 import com.antoshkaplus.words.model.Translation;
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.dao.Dao;
@@ -21,7 +22,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
     // name of the database file for your application -- change to something appropriate for your app
     private static final String DATABASE_NAME = "recursive_lists";
     // any time you make changes to your database objects, you may have to increase the database version
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     // the DAO object we use to access the SimpleData table
     private Dao<Translation, Long> translationDao;
@@ -37,6 +38,7 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             TableUtils.createTable(connectionSource, Translation.class);
             TableUtils.createTable(connectionSource, Score.class);
             TableUtils.createTable(connectionSource, Stats.class);
+            TableUtils.createTable(connectionSource, StatsUpdate.class);
         } catch (SQLException e) {
             Log.e(DatabaseHelper.class.getName(), "Can't create database", e);
             throw new RuntimeException(e);
@@ -44,7 +46,6 @@ public class DatabaseHelper extends OrmLiteSqliteOpenHelper {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
     }
 
     @Override

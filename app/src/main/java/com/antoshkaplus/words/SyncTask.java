@@ -1,27 +1,19 @@
 package com.antoshkaplus.words;
 
-import android.app.FragmentManager;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.antoshkaplus.fly.dialog.OkDialog;
 import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
 import com.antoshkaplus.words.backend.dictionaryApi.model.ResourceBoolean;
 import com.antoshkaplus.words.backend.dictionaryApi.model.Translation;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.backend.dictionaryApi.model.Version;
-import com.antoshkaplus.words.model.TranslationKey;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.util.DateTime;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Created by antoshkaplus on 1/24/16.
@@ -70,7 +62,7 @@ public class SyncTask extends AsyncTask<Void, Void, SyncResult> {
             final DictionaryApi api = builder.build();
 
             PropertyStore store = new PropertyStore(context);
-            int localVersion = store.lastSyncVersion();
+            int localVersion = store.getLastSyncVersion();
 
             for (;;) {
                 Version v = api.getVersion().execute();
@@ -118,6 +110,23 @@ public class SyncTask extends AsyncTask<Void, Void, SyncResult> {
                 // we don't want to stress server with synchronization procedure too much
                 // there are may be per user preferences
             }
+
+            // top one should be runnable too.
+            if (result != SyncResult.SUCCESS) {
+                return result;
+            }
+            StatsUpdateBackend statsUpdateBackend = new StatsUpdateBackend(context, account);
+            result = statsUpdateBackend.call();
+            if (result != SyncResult.SUCCESS) {
+                return result;
+            }
+            StatsUpdateLocal statsUpdateLocal = new StatsUpdateLocal(context, account);
+            result = statsUpdateLocal.call();
+            if (result != SyncResult.SUCCESS) {
+                return result;
+            }
+
+
         } catch (Exception ex) {
             result = SyncResult.FAILURE_UNKNOWN;
             ex.printStackTrace();

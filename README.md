@@ -8,7 +8,7 @@ Want to learn more English words. Hope this application is going to help me.
 * later on make some progress graphs
 * add more games
 * by hand testing notes
-* unit tests
+* unit tests everywhere
 
 * move to UUID
 

@@ -7,7 +7,9 @@ import com.googlecode.objectify.annotation.Id;
 /**
  * Created by antoshkaplus on 1/10/16.
  *
- *
+ * it's best to keep version in it's user's entity group
+ * because it's changing too often and may cause contention
+ * if application is used by many users
  */
 @Entity
 public class BackendUser {

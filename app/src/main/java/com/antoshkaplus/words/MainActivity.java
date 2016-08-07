@@ -114,7 +114,6 @@ public class MainActivity extends Activity implements
             ft.commit();
 
             translationListFragment.setListAdapter(new TranslationAdapter(this, translationRepository));
-            statsListFragment.setListAdapter(new StatsAdapter(this, translationRepository));
 
             game = new GuessWordGame(translationList, GUESS_WORD_GAME_CHOICE_COUNT);
             game.NewGame();

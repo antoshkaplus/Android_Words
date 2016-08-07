@@ -7,6 +7,7 @@ package com.antoshkaplus.words.backend;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 
 @Entity
@@ -18,14 +19,34 @@ public class ForeignWordStats {
     private int successScore;
     private int failureScore;
 
+    // have to keep version around for
+    // synchronization purposes
+    @Index
+    private int version;
+
     @Parent
     private Key<BackendUser> owner;
 
+
+    ForeignWordStats() {}
 
     ForeignWordStats(String foreignWord) {
         this.foreignWord = foreignWord;
         successScore = 0;
         failureScore = 0;
+    }
+
+    public void updateFrom(ForeignWordStats s) {
+        successScore += s.successScore;
+        failureScore += s.failureScore;
+    }
+
+    public void setFailureScore(int failureScore) {
+        this.failureScore = failureScore;
+    }
+
+    public void setSuccessScore(int successScore) {
+        this.successScore = successScore;
     }
 
     public String getForeignWord() {
@@ -42,5 +63,9 @@ public class ForeignWordStats {
 
     public void setOwner(BackendUser owner) {
         this.owner = owner.getKey();
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }

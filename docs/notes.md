@@ -5,16 +5,16 @@ BUT once user synchronized with one account and would like to synchronize with a
 WARN him that he is using another account!!! but it shouldn't be harmful anyway
 
 
-#Sync process:
+# Sync translation process:
 
-###Server Side:
+### Server Side:
 - client gets all updates after particular timestamp t_1
 - client merges everything
 - client sends his updates (should have timestamp later than t_1)
 - server merges received updates
 (later update always wins)
 
-###Client Side:
+### Client Side:
 - get timestamp of latest synchronization t_1
 - create timestamp t_0
 - get everything from the server after or equal t_1
@@ -24,7 +24,7 @@ WARN him that he is using another account!!! but it shouldn't be harmful anyway
 - pick up everything after or at t_0 and send to the server
 - assign last update to t_0
 
-###Notes:
+### Notes:
 * To not miss client's stuff because of t_0 timestamp
 client may decide to keep around flag if translation was updated or not
 and pick up stuff that was not updated
@@ -32,6 +32,21 @@ and pick up stuff that was not updated
 and as much as possible independently
 * For synchronization we will keep both: version and timestamp.
 It eases out the whole process and may be helpful in the future.
+
+
+# General sync process
+- check if update object present and special flag on
+    - if flag not on - remove update object and
+- in transaction
+    - get update object
+    - put update object to local storage
+    - extract update object from db
+    - seal update object with special flag
+-
+
+
+
+
 
 android predefined text sizes:
 
@@ -52,3 +67,7 @@ android:paddingTop="@dimen/activity_vertical_margin"
 android:paddingBottom="@dimen/activity_vertical_margin"
 
 if you ask datastore for ids that are not there, it would return nothing
+
+about backend:
+if a single API is particularly complex you can use multiple API classes.
+with same name and version strings for annotations.

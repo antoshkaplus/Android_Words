@@ -1,20 +1,23 @@
 package com.antoshkaplus.words;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.antoshkaplus.words.model.Score;
 import com.antoshkaplus.words.model.Stats;
+import com.antoshkaplus.words.model.StatsUpdate;
 import com.antoshkaplus.words.model.Translation;
 import com.antoshkaplus.words.model.TranslationKey;
 import com.j256.ormlite.android.AndroidDatabaseResults;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
@@ -29,9 +32,10 @@ public class TranslationRepository {
     private static final String TAG = "TranslationRepository";
 
     private DatabaseHelper helper;
-
+    private Context ctx; // to broadcast
 
     public TranslationRepository(Context ctx) {
+        this.ctx = ctx;
         helper = new DatabaseHelper(ctx);
     }
 
@@ -46,12 +50,14 @@ public class TranslationRepository {
             }
         };
         executeBatch(c);
+        notifyDatabaseChanged(Translation.TABLE_NAME);
     }
 
     // returns false if translation already exists
     public boolean addTranslation(Translation translation) throws Exception {
         try {
             helper.getDao(Translation.class).create(translation);
+            notifyDatabaseChanged(Translation.TABLE_NAME);
         } catch (Exception ex) {
             return false;
         }
@@ -78,12 +84,14 @@ public class TranslationRepository {
                 Dao<Stats, String> dao = helper.getDao(Stats.class);
                 Stats s = new Stats(word);
                 s = dao.createIfNotExists(s);
-                s.localScore.success += score;
                 dao.update(s);
+                s.localScore.failure += score;
+                helper.getDao(Score.class).update(s.localScore);
                 return null;
             }
         };
         executeBatch(c);
+        notifyDatabaseChanged(Score.TABLE_NAME, Stats.TABLE_NAME);
     }
 
     public void increaseFailureScore(final String word, final int score) throws Exception {
@@ -93,12 +101,14 @@ public class TranslationRepository {
                 Dao<Stats, String> dao = helper.getDao(Stats.class);
                 Stats s = new Stats(word);
                 s = dao.createIfNotExists(s);
-                s.localScore.failure += score;
                 dao.update(s);
+                s.localScore.failure += score;
+                helper.getDao(Score.class).update(s.localScore);
                 return null;
             }
         };
         executeBatch(c);
+        notifyDatabaseChanged(Score.TABLE_NAME, Stats.TABLE_NAME);
     }
 
     // case insensitive by default
@@ -120,6 +130,24 @@ public class TranslationRepository {
         return helper.getDao(Stats.class).mapSelectStarRow(results);
     }
 
+    public void createOrRefresh(Stats s) throws Exception {
+        helper.getDao(Stats.class).createIfNotExists(s);
+        helper.getDao(Stats.class).refresh(s);
+    }
+
+
+
+
+    public void update(Stats s) throws Exception {
+        helper.getDao(Stats.class).update(s);
+    }
+
+    public void update(List<Stats> stats) throws Exception {
+        for (Stats s : stats) {
+            update(s);
+        }
+    }
+
 
     public <T> T executeBatch(Callable<T> callable) throws Exception {
         return helper.getDao(Translation.class).callBatchTasks(callable);
@@ -127,6 +155,7 @@ public class TranslationRepository {
 
     public void refreshTranslation(Translation translation) throws Exception {
         helper.getDao(Translation.class).refresh(translation);
+        notifyDatabaseChanged(Translation.TABLE_NAME);
     }
 
     @SuppressWarnings("unchecked")
@@ -145,19 +174,27 @@ public class TranslationRepository {
 
     public void deleteTranslation(Translation translation) throws Exception {
         helper.getDao(Translation.class).delete(translation);
+        notifyDatabaseChanged(Translation.TABLE_NAME);
     }
 
     public void updateTranslation(final Translation translation) throws Exception {
         Callable<Object> c = new Callable<Object>() {
             @Override
             public Object call() throws Exception {
-                Dao<Translation, Long> dao = helper.getDao(Translation.class);
-                Translation t = dao.queryBuilder()
-                        .selectColumns(Translation.FIELD_NAME_VERSION)
-                        .where().idEq(translation.id).queryForFirst();
-                translation.version = t.version;
-                translation.increaseVersion();
-                dao.update(translation);
+                try {
+                    Dao<Translation, Long> dao = helper.getDao(Translation.class);
+                    Translation t = dao.queryBuilder()
+                            .selectColumns(Translation.FIELD_NAME_VERSION)
+                            .where().idEq(translation.id).queryForFirst();
+                    translation.version = t.version;
+                    translation.increaseVersion();
+                    dao.update(translation);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    Dao<Translation, Long> dao = helper.getDao(Translation.class);
+                    Translation t = dao.queryForId(translation.id);
+                    throw new RuntimeException(ex);
+                }
                 return null;
             }
         };
@@ -190,7 +227,54 @@ public class TranslationRepository {
                 return false;
             }
         };
-        return executeBatch(c);
+        boolean r = executeBatch(c);
+        notifyDatabaseChanged(Translation.TABLE_NAME);
+        return r;
     }
+
+    void notifyDatabaseChanged(String... tableNames) {
+        Intent i = new Intent(DatabaseChangedReceiver.ACTION_DATABASE_CHANGED);
+        DatabaseChangedReceiver.putTableNames(i, tableNames);
+        LocalBroadcastManager.getInstance(ctx).sendBroadcast(i);
+    }
+
+    List<StatsUpdate> getStatsUpdates() throws Exception {
+        return helper.getDao(StatsUpdate.class).queryForAll();
+    }
+
+    void resetStatsUpdates() throws Exception {
+        helper.getDao(StatsUpdate.class).deleteBuilder().delete();
+    }
+
+    public void prepareStatsUpdates() throws Exception {
+
+        Callable<Object> c = new Callable<Object>() {
+            @Override
+            public Object call() throws Exception {
+                Dao<Score, Long> scoreDao = helper.getDao(Score.class);
+                Dao<Stats, String> statsDao = helper.getDao(Stats.class);
+                Dao<StatsUpdate, String> updateDao = helper.getDao(StatsUpdate.class);
+
+                QueryBuilder<Score, Long> scoreQB = scoreDao.queryBuilder();
+                QueryBuilder<Stats, String> statsQB = statsDao.queryBuilder();
+
+                List<Stats> stats = statsQB.join(scoreQB).where()
+                        .ne(Score.FIELD_FAILURE, 0).or().ne(Score.FIELD_SUCCESS, 0).query();
+
+                for (Stats s : stats) {
+                    Score score = new Score();
+                    s.localScore.moveTo(score);
+                    // update in place to avoid looping second time
+                    scoreDao.update(s.localScore);
+                    StatsUpdate u = new StatsUpdate(s.foreignWord, score);
+                    updateDao.create(u);
+                }
+                return null;
+            }
+        };
+        executeBatch(c);
+
+    }
+
 
 }
