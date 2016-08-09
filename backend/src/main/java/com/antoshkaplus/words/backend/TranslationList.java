@@ -8,25 +8,25 @@ import java.util.List;
  */
 public class TranslationList {
 
-    private List<Translation> list;
+    private List<com.antoshkaplus.words.backend.model.Translation> list;
 
     public TranslationList() {
         this.list = new ArrayList<>();
     }
 
-    public TranslationList(List<Translation> list) {
+    public TranslationList(List<com.antoshkaplus.words.backend.model.Translation> list) {
         this.list = list;
     }
 
-    public List<Translation> getList() {
+    public List<com.antoshkaplus.words.backend.model.Translation> getList() {
         return list;
     }
-    public void setList(List<Translation> list) {
+    public void setList(List<com.antoshkaplus.words.backend.model.Translation> list) {
         this.list = list;
     }
 
     public void resetId() {
-        for (Translation t : list) {
+        for (com.antoshkaplus.words.backend.model.Translation t : list) {
             if (t.getId() == null) {
                 t.resetId();
             }
@@ -39,7 +39,7 @@ public class TranslationList {
 
     List<String> getIds() {
         List<String> ids = new ArrayList<>(list.size());
-        for (Translation t : list) {
+        for (com.antoshkaplus.words.backend.model.Translation t : list) {
             ids.add(t.getId());
         }
         return ids;
@@ -48,7 +48,7 @@ public class TranslationList {
     // could do it in endpoint method, but feels like it's better to do here
     // throws exception if verification fails
     public void verify() throws IllegalArgumentException {
-        for (Translation t : list) {
+        for (com.antoshkaplus.words.backend.model.Translation t : list) {
             // we don't check for id, as db would throw something in that case
             if (t.getUpdateDate() == null) {
                 throw new IllegalArgumentException(t.getForeignWord() + " updateDate not present");

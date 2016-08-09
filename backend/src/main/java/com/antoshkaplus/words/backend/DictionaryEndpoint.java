@@ -6,30 +6,24 @@
 
 package com.antoshkaplus.words.backend;
 
+import com.antoshkaplus.words.backend.model.*;
+import com.antoshkaplus.words.backend.model.BackendUser;
+import com.antoshkaplus.words.backend.model.Translation;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.google.appengine.repackaged.com.google.common.base.Flag;
-import com.google.appengine.repackaged.com.google.io.protocol.HtmlFormGenerator;
-import com.google.appengine.repackaged.org.antlr.runtime.debug.TraceDebugEventListener;
-import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 
 import java.security.InvalidParameterException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
-import java.util.jar.Pack200;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -58,6 +52,7 @@ public class DictionaryEndpoint {
         ObjectifyService.register(ForeignWordStats.class);
         ObjectifyService.register(Translation.class);
         ObjectifyService.register(BackendUser.class);
+        ObjectifyService.register(Update.class);
     }
 
     public DictionaryEndpoint() {}
@@ -210,7 +205,7 @@ public class DictionaryEndpoint {
                 ofy().save().entities(m.values()).now();
                 Update u = new Update(uuid, backendUser);
                 ofy().save().entity(u).now();
-                ofy().save().entity(backendUser);
+                ofy().save().entity(backendUser).now();
             }
         });
 

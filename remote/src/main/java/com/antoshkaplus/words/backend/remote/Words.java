@@ -1,23 +1,19 @@
 package com.antoshkaplus.words.backend.remote;
 
 
-import com.antoshkaplus.words.backend.BackendUser;
+import com.antoshkaplus.words.backend.model.BackendUser;
 import com.antoshkaplus.words.backend.Dictionary;
-import com.antoshkaplus.words.backend.Translation;
+import com.antoshkaplus.words.backend.model.Translation;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.socket.SocketServicePb;
 import com.google.appengine.tools.remoteapi.RemoteApiInstaller;
 import com.google.appengine.tools.remoteapi.RemoteApiOptions;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
-import com.googlecode.objectify.annotation.Id;
-import com.googlecode.objectify.annotation.Parent;
 
 import com.google.appengine.api.datastore.DatastoreService;
-import com.googlecode.objectify.annotation.Stringify;
 
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -29,7 +25,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;

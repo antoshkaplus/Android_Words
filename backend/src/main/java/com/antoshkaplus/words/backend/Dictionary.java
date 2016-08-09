@@ -1,5 +1,7 @@
 package com.antoshkaplus.words.backend;
 
+import com.antoshkaplus.words.backend.model.BackendUser;
+import com.antoshkaplus.words.backend.model.Translation;
 import com.google.appengine.api.oauth.OAuthRequestException;
 
 import java.security.InvalidParameterException;

@@ -1,5 +1,7 @@
 package com.antoshkaplus.words.backend;
 
+import com.antoshkaplus.words.backend.model.ForeignWordStats;
+
 import java.util.ArrayList;
 import java.util.List;
 

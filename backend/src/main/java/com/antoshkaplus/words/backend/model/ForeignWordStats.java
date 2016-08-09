@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.model;
 
 /**
  * Created by antoshkaplus on 7/23/16.
@@ -28,9 +28,9 @@ public class ForeignWordStats {
     private Key<BackendUser> owner;
 
 
-    ForeignWordStats() {}
+    public ForeignWordStats() {}
 
-    ForeignWordStats(String foreignWord) {
+    public ForeignWordStats(String foreignWord) {
         this.foreignWord = foreignWord;
         successScore = 0;
         failureScore = 0;
@@ -45,19 +45,27 @@ public class ForeignWordStats {
         this.failureScore = failureScore;
     }
 
+    public int getFailureScore() {
+        return failureScore;
+    }
+
     public void setSuccessScore(int successScore) {
         this.successScore = successScore;
+    }
+
+    public int getSuccessScore() {
+        return successScore;
     }
 
     public String getForeignWord() {
         return foreignWord;
     }
 
-    void increaseSuccessScore(int delta) {
+    public void increaseSuccessScore(int delta) {
         successScore += delta;
     }
 
-    void increaseFailureScore(int delta) {
+    public void increaseFailureScore(int delta) {
         failureScore += delta;
     }
 

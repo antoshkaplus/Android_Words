@@ -100,6 +100,7 @@ function userAuthed() {
             // user is signed in, call my endpoint
             console.log("user is signed in, continue with your bullshit")
             fillTranslationList()
+            fillStatsList()
             //gapi.client.dictionaryApi.getDictionary().execute(function(resp) {
             //    console.log(resp)
             //})

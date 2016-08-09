@@ -16,8 +16,11 @@ import com.j256.ormlite.stmt.SelectArg;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
@@ -33,6 +36,8 @@ public class TranslationRepository {
 
     private DatabaseHelper helper;
     private Context ctx; // to broadcast
+    private boolean isBatchExecution = false;
+    private Set<String> batchChangedTables = new HashSet<>();
 
     public TranslationRepository(Context ctx) {
         this.ctx = ctx;
@@ -84,8 +89,7 @@ public class TranslationRepository {
                 Dao<Stats, String> dao = helper.getDao(Stats.class);
                 Stats s = new Stats(word);
                 s = dao.createIfNotExists(s);
-                dao.update(s);
-                s.localScore.failure += score;
+                s.localScore.success += score;
                 helper.getDao(Score.class).update(s.localScore);
                 return null;
             }
@@ -101,7 +105,6 @@ public class TranslationRepository {
                 Dao<Stats, String> dao = helper.getDao(Stats.class);
                 Stats s = new Stats(word);
                 s = dao.createIfNotExists(s);
-                dao.update(s);
                 s.localScore.failure += score;
                 helper.getDao(Score.class).update(s.localScore);
                 return null;
@@ -130,17 +133,22 @@ public class TranslationRepository {
         return helper.getDao(Stats.class).mapSelectStarRow(results);
     }
 
-    public void createOrRefresh(Stats s) throws Exception {
-        helper.getDao(Stats.class).createIfNotExists(s);
-        helper.getDao(Stats.class).refresh(s);
+    public Stats createIfNotExists(Stats s) throws Exception {
+        return helper.getDao(Stats.class).createIfNotExists(s);
     }
-
-
 
 
     public void update(Stats s) throws Exception {
         helper.getDao(Stats.class).update(s);
+        notifyDatabaseChanged(Stats.TABLE_NAME);
     }
+
+    public void update(Score s) throws Exception {
+        helper.getDao(Score.class).update(s);
+        // notify that Stats changed as it's the main table
+        notifyDatabaseChanged(Stats.TABLE_NAME);
+    }
+
 
     public void update(List<Stats> stats) throws Exception {
         for (Stats s : stats) {
@@ -150,7 +158,14 @@ public class TranslationRepository {
 
 
     public <T> T executeBatch(Callable<T> callable) throws Exception {
-        return helper.getDao(Translation.class).callBatchTasks(callable);
+        isBatchExecution = true;
+        T r = helper.getDao(Translation.class).callBatchTasks(callable);
+        isBatchExecution = false;
+        if (!batchChangedTables.isEmpty()) {
+            notifyDatabaseChanged((String[])batchChangedTables.toArray(new String[batchChangedTables.size()]));
+            batchChangedTables.clear();
+        }
+        return r;
     }
 
     public void refreshTranslation(Translation translation) throws Exception {
@@ -232,7 +247,14 @@ public class TranslationRepository {
         return r;
     }
 
+
+
+
     void notifyDatabaseChanged(String... tableNames) {
+        if (isBatchExecution) {
+            batchChangedTables.addAll(Arrays.asList(tableNames));
+            return;
+        }
         Intent i = new Intent(DatabaseChangedReceiver.ACTION_DATABASE_CHANGED);
         DatabaseChangedReceiver.putTableNames(i, tableNames);
         LocalBroadcastManager.getInstance(ctx).sendBroadcast(i);
@@ -258,8 +280,8 @@ public class TranslationRepository {
                 QueryBuilder<Score, Long> scoreQB = scoreDao.queryBuilder();
                 QueryBuilder<Stats, String> statsQB = statsDao.queryBuilder();
 
-                List<Stats> stats = statsQB.join(scoreQB).where()
-                        .ne(Score.FIELD_FAILURE, 0).or().ne(Score.FIELD_SUCCESS, 0).query();
+                scoreQB.where().ne(Score.FIELD_FAILURE, 0).or().ne(Score.FIELD_SUCCESS, 0);
+                List<Stats> stats = statsQB.join(scoreQB).query();
 
                 for (Stats s : stats) {
                     Score score = new Score();

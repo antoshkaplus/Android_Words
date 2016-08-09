@@ -92,13 +92,14 @@ public class StatsUpdateBackend implements Callable<SyncResult> {
             for (StatsUpdate u : updates) {
                 ForeignWordStats s = new ForeignWordStats();
                 s.setForeignWord(u.foreignWord);
-
+                s.setFailureScore(u.localScore.failure);
+                s.setSuccessScore(u.localScore.success);
                 list.add(s);
             }
             ForeignWordStatsList backendList = new ForeignWordStatsList();
             backendList.setList(list);
 
-            api.updateForeignWordStats(uuid, backendList);
+            api.updateForeignWordStats(uuid, backendList).execute();
 
             repo.resetStatsUpdates();
 

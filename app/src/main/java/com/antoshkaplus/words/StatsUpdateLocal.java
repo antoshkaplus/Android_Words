@@ -50,17 +50,21 @@ public class StatsUpdateLocal implements Callable<SyncResult> {
         SyncResult r = SyncResult.SUCCESS;
         try {
             Version backendVersion = api.getVersion().execute();
-            final ForeignWordStatsList stats = api.getStatsListGVersion(store.getStatsLastUpdateVersion()).execute();
+            int lastUpdateVersion = store.getStatsLastUpdateVersion();
+            final ForeignWordStatsList stats = api.getStatsListGVersion(lastUpdateVersion).execute();
             // we have to create transaction in repo.
             Callable<Void> c = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
+                    if (stats.getList() == null) {
+                        return null;
+                    }
                     for (ForeignWordStats fs : stats.getList()) {
                         Stats s = new Stats(fs.getForeignWord());
-                        repo.createOrRefresh(s);
+                        s = repo.createIfNotExists(s);
                         s.serverScore.failure = fs.getFailureScore();
                         s.serverScore.success = fs.getSuccessScore();
-                        repo.update(s);
+                        repo.update(s.serverScore);
                     }
                     return null;
                 }

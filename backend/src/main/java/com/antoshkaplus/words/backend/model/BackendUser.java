@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.model;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;

@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.model;
 
 
 import com.googlecode.objectify.Key;
@@ -20,9 +20,9 @@ public class Update {
     @Parent
     Key<BackendUser> owner;
 
-    Update() {}
+    public Update() {}
 
-    Update(String uuid, BackendUser user) {
+    public Update(String uuid, BackendUser user) {
         this.uuid = uuid;
         owner = user.getKey();
         timestamp = new Date();

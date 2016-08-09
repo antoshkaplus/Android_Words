@@ -35,18 +35,36 @@ It eases out the whole process and may be helpful in the future.
 
 
 # General sync process
-- check if update object present and special flag on
-    - if flag not on - remove update object and
-- in transaction
-    - get update object
-    - put update object to local storage
-    - extract update object from db
-    - seal update object with special flag
--
+
+Divided in two parts
+
+**Update backend:**
+* have to set update tables
+* backend keeps track of update UUIDs
+* try to get updates from update tables
+* if nothing there
+    * generate new update UUID
+    * prepare updates
+    * get updates out
+    * we can leave if nothing is there
+* if something there
+    * check if update UUID in place
+    * if not create new one
+* send updates to server with specified UUID
+    * server checks if UUID already successfully used
+    * if used them server side does nothing
+* if everything goes well and server reponded positively
+    we reset update tables
+* no reason to reset UUID. it will be done automatically
+
+**Update local:**
+* we keep last version of server db from which we've got update
+* request from server updates with db version higher than what we have
+* update everything locally
 
 
 
-
+# Android docs
 
 android predefined text sizes:
 
