@@ -15,10 +15,10 @@ Want to learn more English words. Hope this application is going to help me.
 
 * move to UUID
 
-* fix web for words. show error. delete operation.
+* fix web for words. show error.
 
 ## guess word:
-* **keep track of the score.** this feature should be tested first locally through remoteApi and after that on android devoce locally
+* **keep track of the score.** this feature should be tested first locally through remoteApi and after that on android device locally
     have to write unittests for it
 * if provide remove functionality add ability to alter (always)
 * for translation list need ability to search for words, also some sorting, edit button to remove some.
@@ -29,8 +29,7 @@ Want to learn more English words. Hope this application is going to help me.
 
 
 ## app
-* user log out operation
-* rethink log in
+* pass
 
 ## web
 * show more error messages

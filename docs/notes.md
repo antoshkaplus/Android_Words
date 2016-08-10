@@ -63,6 +63,14 @@ Divided in two parts
 * update everything locally
 
 
+# Testing Ideas
+* Current device application has to be removed
+* Switch to non-production environment
+* Add translation on your device locally and sync with local server
+    if you see it on local server everything should be fine
+* Put back production version on your device
+
+
 
 # Android docs
 

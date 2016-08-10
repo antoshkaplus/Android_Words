@@ -38,6 +38,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import android.os.Handler;
@@ -56,6 +57,7 @@ public class MainActivity extends Activity implements
 
     private TranslationRepository translationRepository;
 
+    private boolean syncing = false;
 
     private GuessWordGame game;
 
@@ -181,16 +183,15 @@ public class MainActivity extends Activity implements
                 ft.commit();
                 return true;
             } else if (id == R.id.action_sync) {
-                if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_DENIED) {
-                    requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS},
-                            PERMISSIONS_REQUEST_GET_ACCOUNTS);
+                if (!syncing) {
+                    sync();
                 } else {
-                    String account = retrieveAccount();
-                    if (account == null) {
-                        pickAccount();
-                    } else {
-                        sync(account);
-                    }
+                    FragmentManager mgr = getFragmentManager();
+                    int titleId = R.string.dialog__sync__title;
+                    int textId = R.string.dialog__sync__text;
+                    // through some dialog box that do it now
+                    OkDialog.newInstance(
+                            getString(titleId), getString(textId)).show(mgr, "syncing");
                 }
             }
             return super.onOptionsItemSelected(item);
@@ -201,10 +202,22 @@ public class MainActivity extends Activity implements
     }
 
 
-    void sync(String account) {
-        SyncTask task = new SyncTask(this, account);
-        task.setListener(this);
-        task.execute();
+    void sync() {
+        syncing = true;
+        if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS},
+                    PERMISSIONS_REQUEST_GET_ACCOUNTS);
+        } else {
+            String account = retrieveAccount();
+            if (account == null) {
+                pickAccount();
+            } else {
+                // syncing task itself
+                SyncTask task = new SyncTask(this, account);
+                task.setListener(this);
+                task.execute();
+            }
+        }
     }
 
     void pickAccount() {
@@ -314,7 +327,13 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST_GET_ACCOUNTS) {
+            if (grantResults.length == 0 || grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                syncing = false;
+            } else if (syncing) {
+                sync();
+            }
+        }
     }
 
 
@@ -333,7 +352,13 @@ public class MainActivity extends Activity implements
                         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
                         editor.putString(getString(R.string.pref__account__key), accountName);
                         editor.apply();
+                        sync();
+                    } else {
+                        throw new RuntimeException("account name can't be null");
                     }
+                } else {
+                    // picker failed
+                    syncing = false;
                 }
                 break;
         }
@@ -346,6 +371,7 @@ public class MainActivity extends Activity implements
     @Override
     public void onSyncFinish(SyncResult result) {
         // and this dialog logic that comes up
+        syncing = false;
         FragmentManager mgr = getFragmentManager();
         int titleId = R.string.dialog__sync_success__title;
         int textId = R.string.dialog__sync_success__text;

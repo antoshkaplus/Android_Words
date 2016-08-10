@@ -34,6 +34,9 @@
     <!-- this one we know for sure that it's coming from server -->
     <string name="dialog__sync_failure_server_data_validity__text">Synchronization failed due to server data is invalid. Please contact support.</string>>
 
+    <string name="dialog__sync__title">Syncing…</string>
+    <string name="dialog__sync__text">Synchronization is already started.</string>
+
 
     <string name="pref__account__title">Current account</string>
     <string name="pref__account__key">pref__account__key</string>
