@@ -12,58 +12,30 @@ import java.util.Random;
  */
 public class GuessWordGame {
 
-    public enum Type {
-        ForeignWord,
-        NativeWord;
-
-        private Type another;
-
-        static {
-            ForeignWord.another = NativeWord;
-            NativeWord.another = ForeignWord;
-        }
-
-        public Type getAnother() {
-            return another;
-        }
-    }
-
-    private static final Random rng = new Random(System.currentTimeMillis());
-    private List<Translation> translationList;
-
     private List<String> guesses;
     // should optimize it later. now is irrelevant.
     private List<Translation> translationGuesses;
 
     private String word;
     private int correctPosition;
-    Type gameType = Type.NativeWord;
-    private int guessCount;
+    GuessWordGameType gameType = GuessWordGameType.NativeWord;
 
-
-
-    GuessWordGame(List<Translation> translationList, int guessCount) {
-        this.translationList = translationList;
-        this.guessCount = guessCount;
-    }
-
-    void NewGame() {
-        guesses = new ArrayList<>(guessCount);
-        translationGuesses = new ArrayList<>(guessCount);
-
-        correctPosition = rng.nextInt(guessCount);
-        for (int i = 0; i < guessCount; i++) {
-            Collections.swap(translationList, i, rng.nextInt(translationList.size()-i) + i);
-            Translation t = translationList.get(i);
-            if (correctPosition == i) {
-                word = gameType == Type.NativeWord ? t.nativeWord : t.foreignWord;
+    GuessWordGame(List<Translation> guesses, int correctPosition, GuessWordGameType type) {
+        // initialize guesses and correct word
+        this.correctPosition = correctPosition;
+        translationGuesses = guesses;
+        gameType = type;
+        this.guesses = new ArrayList<>(guesses.size());
+        for (int i = 0; i < guesses.size(); ++i) {
+            if (type == GuessWordGameType.NativeWord) {
+                this.guesses.add(guesses.get(i).foreignWord);
+            } else {
+                this.guesses.add(guesses.get(i).nativeWord);
             }
-            guesses.add(gameType == Type.NativeWord ? t.foreignWord : t.nativeWord);
-            translationGuesses.add(t);
         }
+        Translation t = guesses.get(correctPosition);
+        word = type == GuessWordGameType.NativeWord ? t.nativeWord : t.foreignWord;
     }
-
-
 
     boolean IsCorrect(int position) {
         return correctPosition == position;
@@ -81,15 +53,13 @@ public class GuessWordGame {
         return word;
     }
 
-    public void setGameType(Type gameType) {
+    public void setGameType(GuessWordGameType gameType) {
         this.gameType = gameType;
     }
 
-    public Type getGameType() {
+    public GuessWordGameType getGameType() {
         return gameType;
     }
-
-    public void switchGameType() { this.gameType = this.gameType.getAnother(); }
 
     String getForeignWord(int position) {
         return translationGuesses.get(position).foreignWord;

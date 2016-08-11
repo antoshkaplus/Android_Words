@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -41,17 +42,21 @@ public class GuessWordFragment extends Fragment implements
     private ListView guesses;
     private TextView word;
 
+    private GuessWordGameFactory factory;
     private GuessWordGame game;
+
     private TextToSpeech textToSpeech;
 
     private boolean gameOver = true;
 
     private Handler handler = new Handler();
-
     private Runnable nextGameEvent = null;
-
-
     private TranslationRepository repo;
+
+
+    // should show message when done going through history... no more elements there
+    private List<Play> history;
+
 
     public static GuessWordFragment newInstance() {
         GuessWordFragment fragment = new GuessWordFragment();
@@ -82,7 +87,6 @@ public class GuessWordFragment extends Fragment implements
     public void onAttach(Context activity) {
         super.onAttach(activity);
         repo = new TranslationRepository(activity);
-
         textToSpeech = new TextToSpeech(activity, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -90,10 +94,14 @@ public class GuessWordFragment extends Fragment implements
             }
         });
         try {
+            factory = new GuessWordGameFactory(repo.getAllTranslations());
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -116,8 +124,8 @@ public class GuessWordFragment extends Fragment implements
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_switch_game_type) {
-            game.switchGameType();
-            OnNext(this);
+            factory.switchGameType();
+            OnNext();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -135,10 +143,11 @@ public class GuessWordFragment extends Fragment implements
         word.setText(game.getWord());
     }
 
+
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (gameOver) {
-            OnNext(this);
+            OnNext();
             return;
         }
         gameOver = true;
@@ -168,10 +177,8 @@ public class GuessWordFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        OnNext(this);
+        OnNext();
     }
-
-
 
     public void OnCorrectGuess(GuessWordGame game) {
         try {
@@ -184,7 +191,7 @@ public class GuessWordFragment extends Fragment implements
         nextGameEvent = new Runnable() {
             @Override
             public void run() {
-                OnNext(GuessWordFragment.this);
+                OnNext();
             }
         };
         handler.postDelayed(nextGameEvent, 2000);
@@ -202,21 +209,32 @@ public class GuessWordFragment extends Fragment implements
         nextGameEvent = new Runnable() {
             @Override
             public void run() {
-                OnNext(GuessWordFragment.this);
+                OnNext();
             }
         };
         handler.postDelayed(nextGameEvent, 2000);
     }
 
-    public void OnNext(GuessWordFragment fragment) {
+    public void OnNext() {
+        history.add(new Play(game, ))
         handler.removeCallbacks(nextGameEvent);
-        game.NewGame();
-        fragment.setGame(game);
+        game = factory.createNew();
+        setGame(game);
     }
 
 
 
     public interface OnFragmentInteractionListener {
+    }
+
+    class Play {
+        GuessWordGame game;
+        int chosenPosition;
+
+        Play(GuessWordGame game, int chosenPosition) {
+            this.game = game;
+            this.chosenPosition = chosenPosition;
+        }
     }
 
 }

@@ -59,15 +59,13 @@ public class MainActivity extends Activity implements
 
     private boolean syncing = false;
 
-    private GuessWordGame game;
-
     private GuessWordFragment guessWordFragment;
     private TranslationListFragment translationListFragment;
     private StatsListFragment statsListFragment;
 
     private AddWordDialog addWordDialog;
 
-    private List<Translation> translationList;
+
 
     SharedPreferences settings;
 
@@ -108,7 +106,6 @@ public class MainActivity extends Activity implements
                 store.setFirstLaunch();
             }
 //            ListView lv = (ListView)findViewById(R.id.translations);
-            translationList = translationRepository.getAllTranslations();
 //            lv.setAdapter(new TranslationAdapter(this, trs));
 
             FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -117,10 +114,6 @@ public class MainActivity extends Activity implements
 
             translationListFragment.setListAdapter(new TranslationAdapter(this, translationRepository));
 
-            game = new GuessWordGame(translationList, GUESS_WORD_GAME_CHOICE_COUNT);
-            game.NewGame();
-
-            guessWordFragment.setGame(game);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
