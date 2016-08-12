@@ -308,43 +308,61 @@ public class GuessWordFragment extends Fragment implements
         }
     }
 
+    
     static class Plays {
-        private CursorableLinkedList<Play> history = new CursorableLinkedList<>();
-        CursorableLinkedList.Cursor<Play> iterator = history.cursor();
-        Play current = null;
-        int capacity;
+	LinkedList<Play> prev = new LinkedList();
+	LinkedList<Play> next = new LinkedList();
+	Play current;
+	
+	int capacity;
 
-        Plays(int capacity) {
-            this.capacity = capacity;
-        }
+	Plays(int capacity) {
+		this.capacity = capacity;
+	}
 
-        Play getCurrent() {
-            return current;
-        }
+	Play getCurrent() {
+		return current;
+	}
 
-        void add(Play play) {
-            if (capacity == history.size()) {
-                history.removeFirst();
-            }
-            history.add(play);
-        }
+	int size() {
+		if (current == null) return 0;
+		return 1 + prev.size() + next.size();
+	}
+	
+	// addLast
+	// addFirst 
+	// addNext
+	// addPrev
+	void add(Play play) {
+		if (capacity >= size() && !prev.empty()) {
+			prev.removeFirst();
+		}
+		next.addLast(play);
+	}
 
-        Play moveNext() {
-            return current = iterator.next();
-        }
+	Play moveNext() {
+		if (current != null) {
+			prev.addLast(current);
+		}
+		return current = next.removeFirst();
+	}
 
-        Play movePrev() {
-            return current = iterator.previous();
-        }
+	Play movePrev() {
+		if (current != null) {
+			next.addFirst(current);
+		}
+		return current = prev.removeLast();
+	}
 
-        boolean hasNext() {
-            return iterator.hasNext();
-        }
+	boolean hasNext() {
+		return !next.empty();
+	}
 
-        boolean hasPrev() {
-            return iterator.hasPrevious();
-        }
+	boolean hasPrev() {
+		return !prev.empty();
+	}
     }
+
 
 
 }
