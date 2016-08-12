@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -64,7 +65,6 @@ public class MainActivity extends Activity implements
     private StatsListFragment statsListFragment;
 
     private AddWordDialog addWordDialog;
-
 
 
     SharedPreferences settings;
@@ -386,5 +386,8 @@ public class MainActivity extends Activity implements
         addWordDialog.setTranslation(foreignWord, nativeWord);
     }
 
-
+    @Override
+    public void onBackPressed() {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BackPressedReceiver.ACTION_BACK_PRESSED));
+    }
 }

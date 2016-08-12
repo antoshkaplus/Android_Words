@@ -8,6 +8,8 @@
     <string name="default_word">default word</string>
     <string name="default_score">0</string>
 
+    <string name="toast__no_previous_games">No more previous games</string>
+    <string name="toast__play_current">Play this game</string>
 
     <string name="action__add_translation">Add Translation</string>
     <string name="action__settings">Settings</string>

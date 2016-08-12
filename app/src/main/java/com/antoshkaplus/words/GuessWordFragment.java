@@ -1,13 +1,15 @@
 package com.antoshkaplus.words;
 
-import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,10 +19,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.util.List;
+import org.apache.commons.collections4.list.CursorableLinkedList;
+
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Locale;
 
 
@@ -31,11 +36,19 @@ import java.util.Locale;
  * to handle interaction events.
  * Use the {@link GuessWordFragment#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * functionality:
+ * show history of played games
+ *
+ * testing:
+ * try to play with play capacity equal to 1
  */
 public class GuessWordFragment extends Fragment implements
         AdapterView.OnItemClickListener,
         AdapterView.OnItemLongClickListener,
         View.OnClickListener {
+
+    private static final int PLAYS_CAPACITY = 20;
 
     private OnFragmentInteractionListener mListener;
 
@@ -43,19 +56,22 @@ public class GuessWordFragment extends Fragment implements
     private TextView word;
 
     private GuessWordGameFactory factory;
-    private GuessWordGame game;
 
     private TextToSpeech textToSpeech;
-
-    private boolean gameOver = true;
 
     private Handler handler = new Handler();
     private Runnable nextGameEvent = null;
     private TranslationRepository repo;
 
 
-    // should show message when done going through history... no more elements there
-    private List<Play> history;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            onBackPressed();
+        }
+    };
+
+    Plays plays = new Plays(PLAYS_CAPACITY);
 
 
     public static GuessWordFragment newInstance() {
@@ -76,9 +92,6 @@ public class GuessWordFragment extends Fragment implements
         guesses.setOnItemClickListener(this);
         guesses.setOnItemLongClickListener(this);
         word = (TextView)v.findViewById(R.id.word);
-        if (game != null) {
-            fillViews();
-        }
         word.setOnClickListener(this);
         return v;
     }
@@ -130,44 +143,56 @@ public class GuessWordFragment extends Fragment implements
         return super.onOptionsItemSelected(item);
     }
 
-    void setGame(GuessWordGame game) {
-        gameOver = false;
-        this.game = game;
-        if (guesses != null) {
-            fillViews();
-        }
-    }
-
-    void fillViews() {
+    void fillViews(GuessWordGame game) {
         guesses.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, game.getGuesses()));
         word.setText(game.getWord());
     }
 
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (gameOver) {
-            OnNext();
-            return;
-        }
-        gameOver = true;
-        int correctPosition = game.getCorrectPosition();
+    void fillOutcomes(Play play) {
+        int correctPosition = play.game.getCorrectPosition();
         View correctView = guesses.getChildAt(correctPosition);
         correctView.setBackgroundColor(Color.GREEN);
 
+        if (!play.game.IsCorrect(play.chosenPosition)) {
+            guesses.getChildAt(play.chosenPosition).setBackgroundColor(Color.RED);
+        }
+    }
+
+    void fillCurrent() {
+        Play play = plays.getCurrent();
+        fillViews(play.game);
+        fillOutcomes(play);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        if (plays.hasNext()) {
+            plays.moveNext();
+            fillCurrent();
+            return;
+        }
+        // latest
+        Play play = plays.getCurrent();
+        if (play.isFinished()) {
+            OnNext();
+            return;
+        }
+        GuessWordGame game = play.game;
+        play.chosenPosition = position;
+        fillOutcomes(play);
         // should just call callback with position.
         // but two of them separate a lot more
         if (game.IsCorrect(position)) {
             OnCorrectGuess(game);
         } else {
-            view.setBackgroundColor(Color.RED);
             OnIncorrectGuess(game, position);
         }
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        speak(game.getGuesses().get(position));
+        String s = plays.getCurrent().game.getGuesses().get(position);
+        speak(s);
         return true;
     }
 
@@ -177,7 +202,16 @@ public class GuessWordFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        OnNext();
+        if (!plays.hasNext()) {
+            if (plays.getCurrent().isFinished()) {
+                OnNext();
+            } else {
+                Toast.makeText(getContext(), R.string.toast__play_current, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            plays.moveNext();
+            fillCurrent();
+        }
     }
 
     public void OnCorrectGuess(GuessWordGame game) {
@@ -216,10 +250,39 @@ public class GuessWordFragment extends Fragment implements
     }
 
     public void OnNext() {
-        history.add(new Play(game, ))
         handler.removeCallbacks(nextGameEvent);
-        game = factory.createNew();
-        setGame(game);
+        GuessWordGame game = factory.createNew();
+        plays.add(new Play(game));
+        plays.moveNext();
+        fillViews(game);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        OnNext();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getContext()).registerReceiver(receiver,
+                new IntentFilter(BackPressedReceiver.ACTION_BACK_PRESSED));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+    }
+
+    public void onBackPressed() {
+        if (!plays.hasPrev()) {
+            Toast.makeText(getContext(), R.string.toast__no_previous_games, Toast.LENGTH_SHORT).show();
+        } else {
+            plays.movePrev();
+            fillCurrent();
+        }
     }
 
 
@@ -229,12 +292,59 @@ public class GuessWordFragment extends Fragment implements
 
     class Play {
         GuessWordGame game;
-        int chosenPosition;
+        int chosenPosition = -1;
+
+        Play(GuessWordGame game) {
+            this.game = game;
+        }
 
         Play(GuessWordGame game, int chosenPosition) {
             this.game = game;
             this.chosenPosition = chosenPosition;
         }
+
+        boolean isFinished() {
+            return chosenPosition >= 0;
+        }
     }
+
+    static class Plays {
+        private CursorableLinkedList<Play> history = new CursorableLinkedList<>();
+        CursorableLinkedList.Cursor<Play> iterator = history.cursor();
+        Play current = null;
+        int capacity;
+
+        Plays(int capacity) {
+            this.capacity = capacity;
+        }
+
+        Play getCurrent() {
+            return current;
+        }
+
+        void add(Play play) {
+            if (capacity == history.size()) {
+                history.removeFirst();
+            }
+            history.add(play);
+        }
+
+        Play moveNext() {
+            return current = iterator.next();
+        }
+
+        Play movePrev() {
+            return current = iterator.previous();
+        }
+
+        boolean hasNext() {
+            return iterator.hasNext();
+        }
+
+        boolean hasPrev() {
+            return iterator.hasPrevious();
+        }
+    }
+
 
 }
