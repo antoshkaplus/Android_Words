@@ -12,10 +12,7 @@ Want to learn more English words. Hope this application is going to help me.
 * add more games
 * by hand testing notes
 * unit tests everywhere
-
-* move to UUID
-
-* fix web for words. show error.
+* move translation to UUID (this should help with problems that erase on synchonization)
 
 ## guess word:
 * **add date to score**
@@ -23,9 +20,8 @@ Want to learn more English words. Hope this application is going to help me.
 * for translation list need ability to search for words, also some sorting, edit button to remove some.
 * maybe some graph with statistics how user progresses. should be multiple parameters. maybe keep it through slider somehow.
 * add setting for how long should reset game, maybe in the near future would need to create controller
-* time period between words settings
-* **ability to go back (pressing back button, should be able to point out result)**
-
+* time period between words setting
+* how many games to keep in history setting
 
 ## app
 * pass
@@ -33,7 +29,7 @@ Want to learn more English words. Hope this application is going to help me.
 ## web
 * show more error messages
 * show authorization errors if exists
-
+* before trying each web transaction look if user is signed in
 
 
 

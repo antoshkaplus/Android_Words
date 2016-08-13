@@ -18,13 +18,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.commons.collections4.list.CursorableLinkedList;
+import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
@@ -44,15 +48,14 @@ import java.util.Locale;
  * try to play with play capacity equal to 1
  */
 public class GuessWordFragment extends Fragment implements
-        AdapterView.OnItemClickListener,
-        AdapterView.OnItemLongClickListener,
         View.OnClickListener {
 
     private static final int PLAYS_CAPACITY = 20;
+    private static final int GUESS_COUNT = 4;
 
     private OnFragmentInteractionListener mListener;
 
-    private ListView guesses;
+    private List<TextView> guesses;
     private TextView word;
 
     private GuessWordGameFactory factory;
@@ -87,10 +90,18 @@ public class GuessWordFragment extends Fragment implements
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View v = inflater.inflate(R.layout.fragment_guess_word, container, false);
-        v.setOnClickListener(this);
-        guesses = (ListView)v.findViewById(R.id.guesses);
-        guesses.setOnItemClickListener(this);
-        guesses.setOnItemLongClickListener(this);
+        //v.setOnClickListener(this);
+        LinearLayout layout = (LinearLayout) v.findViewById(R.id.guesses);
+        layout.setOnClickListener(this);
+        guesses = new ArrayList<>();
+        for (int i = 0; i < GUESS_COUNT; ++i) {
+            TextView tv = (TextView) inflater.inflate(android.R.layout.simple_list_item_1, layout, false);
+            GuessListener lis = new GuessListener(i);
+            tv.setOnClickListener(lis);
+            tv.setOnLongClickListener(lis);
+            layout.addView(tv);
+            guesses.add(tv);
+        }
         word = (TextView)v.findViewById(R.id.word);
         word.setOnClickListener(this);
         return v;
@@ -108,6 +119,8 @@ public class GuessWordFragment extends Fragment implements
         });
         try {
             factory = new GuessWordGameFactory(repo.getAllTranslations());
+            factory.setGuessCount(GUESS_COUNT);
+
             mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
@@ -144,56 +157,29 @@ public class GuessWordFragment extends Fragment implements
     }
 
     void fillViews(GuessWordGame game) {
-        guesses.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, game.getGuesses()));
+        List<String> textGuesses = game.getGuesses();
+        for (int i = 0; i < GUESS_COUNT; ++i) {
+            guesses.get(i).setBackgroundColor(Color.WHITE);
+            guesses.get(i).setText(textGuesses.get(i));
+        }
         word.setText(game.getWord());
     }
 
     void fillOutcomes(Play play) {
         int correctPosition = play.game.getCorrectPosition();
-        View correctView = guesses.getChildAt(correctPosition);
-        correctView.setBackgroundColor(Color.GREEN);
+        guesses.get(correctPosition).setBackgroundColor(Color.GREEN);
 
         if (!play.game.IsCorrect(play.chosenPosition)) {
-            guesses.getChildAt(play.chosenPosition).setBackgroundColor(Color.RED);
+            guesses.get(play.chosenPosition).setBackgroundColor(Color.RED);
         }
     }
 
     void fillCurrent() {
         Play play = plays.getCurrent();
         fillViews(play.game);
-        fillOutcomes(play);
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (plays.hasNext()) {
-            plays.moveNext();
-            fillCurrent();
-            return;
-        }
-        // latest
-        Play play = plays.getCurrent();
         if (play.isFinished()) {
-            OnNext();
-            return;
+            fillOutcomes(play);
         }
-        GuessWordGame game = play.game;
-        play.chosenPosition = position;
-        fillOutcomes(play);
-        // should just call callback with position.
-        // but two of them separate a lot more
-        if (game.IsCorrect(position)) {
-            OnCorrectGuess(game);
-        } else {
-            OnIncorrectGuess(game, position);
-        }
-    }
-
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        String s = plays.getCurrent().game.getGuesses().get(position);
-        speak(s);
-        return true;
     }
 
     private void speak(String word) {
@@ -310,59 +296,96 @@ public class GuessWordFragment extends Fragment implements
 
     
     static class Plays {
-	LinkedList<Play> prev = new LinkedList();
-	LinkedList<Play> next = new LinkedList();
-	Play current;
-	
-	int capacity;
 
-	Plays(int capacity) {
-		this.capacity = capacity;
-	}
+        LinkedList<Play> prev = new LinkedList<>();
+        LinkedList<Play> next = new LinkedList<>();
+        Play current;
 
-	Play getCurrent() {
-		return current;
-	}
+        int capacity;
 
-	int size() {
-		if (current == null) return 0;
-		return 1 + prev.size() + next.size();
-	}
-	
-	// addLast
-	// addFirst 
-	// addNext
-	// addPrev
-	void add(Play play) {
-		if (capacity >= size() && !prev.empty()) {
-			prev.removeFirst();
-		}
-		next.addLast(play);
-	}
+        Plays(int capacity) {
+            this.capacity = capacity;
+        }
 
-	Play moveNext() {
-		if (current != null) {
-			prev.addLast(current);
-		}
-		return current = next.removeFirst();
-	}
+        Play getCurrent() {
+            return current;
+        }
 
-	Play movePrev() {
-		if (current != null) {
-			next.addFirst(current);
-		}
-		return current = prev.removeLast();
-	}
+        int size() {
+            if (current == null) return 0;
+            return 1 + prev.size() + next.size();
+        }
 
-	boolean hasNext() {
-		return !next.empty();
-	}
+        void add(Play play) {
+            if (capacity <= size() && !prev.isEmpty()) {
+                prev.removeFirst();
+            }
+            next.addLast(play);
+        }
 
-	boolean hasPrev() {
-		return !prev.empty();
-	}
+        Play moveNext() {
+            if (current != null) {
+                prev.addLast(current);
+            }
+            return current = next.removeFirst();
+        }
+
+        Play movePrev() {
+            if (current != null) {
+                next.addFirst(current);
+            }
+            return current = prev.removeLast();
+        }
+
+        boolean hasNext() {
+            return !next.isEmpty();
+        }
+
+        boolean hasPrev() {
+            return !prev.isEmpty();
+        }
     }
 
+    class GuessListener implements View.OnClickListener, View.OnLongClickListener {
+
+        int guessIndex;
+
+        GuessListener(int guessIndex) {
+            this.guessIndex = guessIndex;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (plays.hasNext()) {
+                plays.moveNext();
+                fillCurrent();
+                return;
+            }
+            // latest
+            Play play = plays.getCurrent();
+            if (play.isFinished()) {
+                OnNext();
+                return;
+            }
+            GuessWordGame game = play.game;
+            play.chosenPosition = guessIndex;
+            fillOutcomes(play);
+            // should just call callback with position.
+            // but two of them separate a lot more
+            if (game.IsCorrect(guessIndex)) {
+                OnCorrectGuess(game);
+            } else {
+                OnIncorrectGuess(game, guessIndex);
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            String s = plays.getCurrent().game.getGuesses().get(guessIndex);
+            speak(s);
+            return true;
+        }
+    }
 
 
 }

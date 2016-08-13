@@ -26,6 +26,10 @@ public class GuessWordGameFactory {
         this.translations = translations;
     }
 
+    public void setGuessCount(int guessCount) {
+        this.guessCount = guessCount;
+    }
+
     public void switchGameType() { this.gameType = this.gameType.getAnother(); }
 
     GuessWordGame createNew() {
