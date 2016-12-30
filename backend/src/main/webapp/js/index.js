@@ -17,7 +17,8 @@ function Translation(foreignWord, nativeWord) {
 $(function() {
     viewModel = {
         translationList: ko.observable([]),
-        statsList: ko.observable([])
+        statsList: ko.observable([]),
+        wordTranslation: ko.observable([])
     }
     ko.applyBindings(viewModel)
 })
@@ -231,11 +232,29 @@ function addFileTranslationList() {
 function autoTranslate() {
     var apiKey = 'AIzaSyCpNJPGA_zTpriCby8-z4XyAwEllC9wRlM'
     var source = 'https://www.googleapis.com/language/translate/v2';
-    $.get( source, { key: apiKey, source: "en", target: "ru", q: $('#foreignWord').val() } )
+    var foreignWord = $('#foreignWord').val()
+
+    $.get( source, { key: apiKey, source: "en", target: "ru", q: foreignWord } )
         .done(function( data ) {
            var text = data.data.translations[0].translatedText
                console.log(text)
                $('#nativeWord').val(text);
         });
+
+    viewModel.wordTranslation([ new Translation("", "In Progress") ])
+
+    gapi.client.dictionaryApi.getTranslationOnline({foreignWord : foreignWord}).execute(function(resp) {
+        if (resp.error != null) {
+            // need to show some kind of sign to reload browser window
+            // later on may try to reload by myself
+            $("#alertErrorGetTranslationList").show()
+            return
+        }
+        if (resp.list === undefined) {
+            resp.list = [ new Translation("", "Not Found") ]
+        }
+        viewModel.wordTranslation(resp.list)
+        console.log(resp)
+    })
 }
 

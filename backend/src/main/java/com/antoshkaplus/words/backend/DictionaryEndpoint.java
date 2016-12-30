@@ -21,6 +21,7 @@ import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +149,7 @@ public class DictionaryEndpoint {
     // testing:
     //  put one translation inside
     //  put same translation inside : may need to check update/creation times later
+    // TODO increase db version
     @ApiMethod(name = "addTranslationOnline", path = "add_translation_online")
     public void addTranslationOnline(final Translation shallowTranslation, final User user)
             throws OAuthRequestException, InvalidParameterException
@@ -167,6 +169,20 @@ public class DictionaryEndpoint {
                 ofy().save().entity(tNew).now();
             }
         });
+    }
+
+    @ApiMethod(name="getTranslationOnline", path="get_translation_online")
+    public TranslationList getTranslationOnline(@Named("foreignWord") final String foreignWord, final User user)
+        throws OAuthRequestException, InvalidParameterException {
+
+        TranslationList list = ofy().transact(new Work<TranslationList>() {
+            @Override
+            public TranslationList run() {
+                BackendUser u = retrieveBackendUser(user);
+                return new TranslationList(new ArrayList<Translation>(ofy().load().type(Translation.class).ancestor(u).filter("foreignWord ==", foreignWord).list()));
+            }
+        });
+        return list;
     }
 
 
