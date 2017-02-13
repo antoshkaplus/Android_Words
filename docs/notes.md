@@ -62,6 +62,8 @@ Divided in two parts
 * request from server updates with db version higher than what we have
 * update everything locally
 
+### Notes:
+* we do this complicated sync on device because we don't want to lock db while sync process is going on because it also includes communication with the server
 
 # Testing Ideas
 * Current device application has to be removed
