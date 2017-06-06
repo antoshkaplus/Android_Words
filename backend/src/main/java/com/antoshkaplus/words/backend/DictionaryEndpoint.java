@@ -13,6 +13,7 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
+import com.google.api.server.spi.config.Nullable;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
@@ -90,7 +91,7 @@ public class DictionaryEndpoint {
 
     @ApiMethod(name = "getTranslationList_Cursor", path = "get_translaiton_list_cursor")
     public TranslationList getTranslationList_Cursor(@Named("pageSize")Integer pageSize,
-                                                     @Named("cursor")String cursor, User user) {
+                                                     @Named("cursor") @Nullable String cursor, User user) {
 
         Query<Translation> q = getTranslationQuery(user).order("-updateDate");
         if (cursor != null && !cursor.isEmpty()) {

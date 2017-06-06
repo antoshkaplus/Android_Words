@@ -24,6 +24,10 @@ public class TranslationList {
         this.nextCursor = nextCursor;
     }
 
+    public String getNextCursor() {
+        return nextCursor;
+    }
+
     public List<com.antoshkaplus.words.backend.model.Translation> getList() {
         return list;
     }

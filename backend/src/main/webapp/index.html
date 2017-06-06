@@ -10,7 +10,10 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script src="//knockoutjs.com/downloads/knockout-3.4.0.js"></script>
 </head>
-<body role="document" style="padding-top: 70px;">
+
+<body role="document"  style="padding-top: 70px; padding-left: 3%; padding-right: 3%;">
+
+
 
 <!-- here we place all possible alerts -->
 <!-- worst alerts first -->
@@ -62,56 +65,51 @@
 </form>
 </div>
 
-<div class="panel panel-default">
+<div>
+    <div class="col-md-6">
         <div class="row">
-            <div class="col-md-6">
-                <div class="row">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>Foreign Word</th>
-                            <th>Native Word</th>
-                            <th>Remove</th>
-                        </tr>
-                        </thead>
-                        <tbody data-bind="foreach: translationList">
-                        <!-- ko ifnot: deleted -->
-                        <tr>
-                            <td data-bind="text: foreignWord"></td>
-                            <td data-bind="text: nativeWord"></td>
-                            <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
-                        </tr>
-                        <!-- /ko -->
-                        </tbody>
-                    </table>
-                </div>
-                <div class="row">
-                    <button type="button" class="btn btn-default" id="loadMoreTranslations" onclick="loadMoreTranslations()">Load More Translations</button>
-                    <button type="button" class="btn btn-default" id="resetTranslations" onclick="resetTranslationList()">Reset Translations</button>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Foreign Word</th>
-                        <th>Success Score</th>
-                        <th>Failure Score</th>
-                    </tr>
-                    </thead>
-                    <tbody data-bind="foreach: statsList">
-                    <tr>
-                        <td data-bind="text: foreignWord"></td>
-                        <td data-bind="text: successScore"></td>
-                        <td data-bind="text: failureScore"></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Foreign Word</th>
+                    <th>Native Word</th>
+                    <th>Remove</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: translationList">
+                <!-- ko ifnot: deleted -->
+                <tr>
+                    <td data-bind="text: foreignWord"></td>
+                    <td data-bind="text: nativeWord"></td>
+                    <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
+                </tr>
+                <!-- /ko -->
+                </tbody>
+            </table>
         </div>
-</div>
-
-
+        <div class="row">
+            <button type="button" class="btn btn-default" id="loadMoreTranslations" onclick="loadMoreTranslations()">Load More Translations</button>
+            <button type="button" class="btn btn-default" id="resetTranslations" onclick="resetTranslationList()">Reset Translations</button>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Foreign Word</th>
+                <th>Success Score</th>
+                <th>Failure Score</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: statsList">
+            <tr>
+                <td data-bind="text: foreignWord"></td>
+                <td data-bind="text: successScore"></td>
+                <td data-bind="text: failureScore"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 
