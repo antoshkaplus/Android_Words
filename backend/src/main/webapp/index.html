@@ -65,24 +65,30 @@
 <div class="panel panel-default">
         <div class="row">
             <div class="col-md-6">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Foreign Word</th>
-                        <th>Native Word</th>
-                        <th>Remove</th>
-                    </tr>
-                    </thead>
-                    <tbody data-bind="foreach: translationList">
-                    <!-- ko ifnot: deleted -->
-                    <tr>
-                        <td data-bind="text: foreignWord"></td>
-                        <td data-bind="text: nativeWord"></td>
-                        <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
-                    </tr>
-                    <!-- /ko -->
-                    </tbody>
-                </table>
+                <div class="row">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Foreign Word</th>
+                            <th>Native Word</th>
+                            <th>Remove</th>
+                        </tr>
+                        </thead>
+                        <tbody data-bind="foreach: translationList">
+                        <!-- ko ifnot: deleted -->
+                        <tr>
+                            <td data-bind="text: foreignWord"></td>
+                            <td data-bind="text: nativeWord"></td>
+                            <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
+                        </tr>
+                        <!-- /ko -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <button type="button" class="btn btn-default" id="loadMoreTranslations" onclick="loadMoreTranslations()">Load More Translations</button>
+                    <button type="button" class="btn btn-default" id="resetTranslations" onclick="resetTranslationList()">Reset Translations</button>
+                </div>
             </div>
             <div class="col-md-6">
                 <table class="table">

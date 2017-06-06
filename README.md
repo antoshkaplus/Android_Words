@@ -8,6 +8,7 @@ Want to learn more English words. Hope this application is going to help me.
 # TODO
 
 ## overall
+* add multiple translation types: general, idiom, phrase (expression)
 * later on make some progress graphs
 * add more games
 * by hand testing notes

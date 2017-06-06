@@ -17,37 +17,13 @@ function Translation(foreignWord, nativeWord) {
 $(function() {
     viewModel = {
         translationList: ko.observable([]),
+        translationListCursor: ko.observable(null),
         statsList: ko.observable([]),
         wordTranslation: ko.observable([])
     }
     ko.applyBindings(viewModel)
 })
 
-
-
-
-// A function that attaches a "Say Hello" button click handler
-function enableClick() {
-  document.getElementById('helloButton').onclick = function() {
-    var name = document.getElementById('nameInput').value;
-    gapi.client.myApi.sayHi({'name': name}).execute(
-      function(response) {
-        var outputAlertDiv = document.getElementById('outputAlert');
-        outputAlertDiv.style.visibility = 'visible';
-
-        if (!response.error) {
-          outputAlertDiv.className = 'alert alert-success';
-          outputAlertDiv.innerHTML = '<h2>' + response.result.data + '</h2>';
-        }
-        else if (response.error) {
-          outputAlertDiv.className = 'alert alert-danger';
-          outputAlertDiv.innerHTML = '<b>Error Code: </b>' + response.error.code + ' [' + response.error.message + ']';
-        }
-      }
-    );
-    return false;
-  }
-}
 
 // This is called initially
 function init() {
@@ -100,7 +76,7 @@ function userAuthed() {
         if (!resp.code) {
             // user is signed in, call my endpoint
             console.log("user is signed in, continue with your bullshit")
-            fillTranslationList()
+            loadMoreTranslations()
             fillStatsList()
             //gapi.client.dictionaryApi.getDictionary().execute(function(resp) {
             //    console.log(resp)
@@ -144,6 +120,7 @@ function addTranslation() {
         }
         console.log("translation saved", resp)
         $('#foreignWord').focus().select()
+        resetTranslationList()
     })
 
 }
@@ -169,6 +146,7 @@ function removeTranslation() {
             return
         }
         console.log("translation removed", resp)
+        resetTranslationList()
     })
 }
 
@@ -184,6 +162,35 @@ function fillTranslationList() {
         viewModel.translationList(resp.list)
         console.log(resp)
     })
+}
+
+function loadMoreTranslations() {
+    $("#loadMoreTranslations").prop('disabled', true);
+
+    gapi.client.dictionaryApi
+        .getTranslationList_Cursor({pageSize: 10, cursor: viewModel.translationListCursor()})
+        .execute(function(resp) {
+            if (resp.error != null) {
+                // need to show some kind of sign to reload browser window
+                // later on may try to reload by myself
+                $("#alertErrorGetTranslationList").show()
+                return
+            }
+            if (resp) {
+                if (resp.list) {
+                    viewModel.translationList(viewModel.translationList().concat(resp.list))
+                }
+                viewModel.translationListCursor(resp.nextCursor)
+            }
+            console.log(resp)
+            $("#loadMoreTranslations").prop('disabled', false);
+        })
+}
+
+function resetTranslationList() {
+    viewModel.translationList([])
+    viewModel.translationListCursor(null)
+    loadMoreTranslations()
 }
 
 function fillStatsList() {
@@ -219,6 +226,7 @@ function addFileTranslationList() {
             }
             gapi.client.dictionaryApi.addTranslationList(translationList).execute(function(resp) {
                 console.log(resp)
+                resetTranslationList()
             })
         }
         r.readAsText(f)

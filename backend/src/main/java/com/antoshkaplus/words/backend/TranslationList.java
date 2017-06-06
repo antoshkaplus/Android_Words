@@ -9,6 +9,7 @@ import java.util.List;
 public class TranslationList {
 
     private List<com.antoshkaplus.words.backend.model.Translation> list;
+    private String nextCursor;
 
     public TranslationList() {
         this.list = new ArrayList<>();
@@ -16,6 +17,11 @@ public class TranslationList {
 
     public TranslationList(List<com.antoshkaplus.words.backend.model.Translation> list) {
         this.list = list;
+    }
+
+    public TranslationList(List<com.antoshkaplus.words.backend.model.Translation> list, String nextCursor) {
+        this.list = list;
+        this.nextCursor = nextCursor;
     }
 
     public List<com.antoshkaplus.words.backend.model.Translation> getList() {

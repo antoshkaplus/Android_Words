@@ -13,6 +13,8 @@ import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.datastore.Cursor;
+import com.google.appengine.api.datastore.QueryResultIterator;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.ObjectifyService;
@@ -85,6 +87,24 @@ public class DictionaryEndpoint {
         Query<Translation> query = getTranslationQuery(user);
         return new TranslationList(query.filter("version >", version).list());
     }
+
+    @ApiMethod(name = "getTranslationList_Cursor", path = "get_translaiton_list_cursor")
+    public TranslationList getTranslationList_Cursor(@Named("pageSize")Integer pageSize,
+                                                     @Named("cursor")String cursor, User user) {
+
+        Query<Translation> q = getTranslationQuery(user).order("-updateDate");
+        if (cursor != null && !cursor.isEmpty()) {
+            q = q.startAt(Cursor.fromWebSafeString(cursor));
+        }
+        QueryResultIterator<Translation> it = q.iterator();
+        List<Translation> list = new ArrayList<>();
+        while (it.hasNext() && list.size() < pageSize) {
+            list.add(it.next());
+        }
+        String nextCursor = it.getCursor().toWebSafeString();
+        return new TranslationList(list, nextCursor);
+    }
+
 
     @ApiMethod(name = "updateTranslationList", path = "update_translation_list")
     @SuppressWarnings("UnnecessaryLocalVariable")
