@@ -4,9 +4,10 @@ var deletedTranslations
 
 // class definitions
 
-function Translation(foreignWord, nativeWord) {
+function Translation(foreignWord, nativeWord, kind) {
     this.foreignWord = foreignWord;
     this.nativeWord = nativeWord;
+    this.kind = kind;
 }
 
 
@@ -16,39 +17,30 @@ function Translation(foreignWord, nativeWord) {
 // may meed to create viewModel object in the future.
 $(function() {
     viewModel = {
+        dictionaryApiLoaded: ko.observable(false),
         translationList: ko.observable([]),
         translationListCursor: ko.observable(null),
         statsList: ko.observable([]),
-        wordTranslation: ko.observable([])
-    }
-    ko.applyBindings(viewModel)
-})
-
-
-// This is called initially
-function init() {
-    deletedTranslations = Array()
-
-    var apiName = 'dictionaryApi';
-    var apiVersion = 'v2';
-    var apiRoot = 'https://' + window.location.host + '/_ah/api';
-    if (window.location.hostname == 'localhost'
-      || window.location.hostname == '127.0.0.1'
-      || ((window.location.port != "") && (window.location.port > 1023))) {
-        // We're probably running against the DevAppServer
-      apiRoot = 'http://' + window.location.host + '/_ah/api';
-    }
-    //apiRoot = "https://antoshkaplus-words.appspot.com/_ah/api"
-
-    var apisToLoad = 2
-    var callback = function() {
-      if (--apisToLoad == 0) {
-          signin(true, userAuthed);
-      }
+        wordTranslation: ko.observable([]),
+        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun"]),
+        translationKindSelected: ko.observable()
     }
 
-    gapi.client.load(apiName, apiVersion, callback, apiRoot);
-    gapi.client.load('oauth2', 'v2', callback)
+    viewModel.dictionaryApiLoaded.subscribe(function(val) {
+        if (!val) return;
+        deletedTranslations = Array()
+        loadMoreTranslations()
+        fillStatsList()
+    });
+
+    viewModel.translationKindSelected.subscribe(function(newKind) {
+        form = $("#addTranslationForm")
+        if (newKind == "Word" || newKind == "Pronun") {
+            form.addClass("form-inline")
+        } else {
+            form.removeClass("form-inline")
+        }
+    })
 
     var ENTER_KEY_CODE = 13
     $('#foreignWord').keyup(function(e){
@@ -58,37 +50,9 @@ function init() {
         }
     });
 
-}
-//server:client_id:
-var CLIENT_ID = "251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleusercontent.com"
-var SCOPES = "https://www.googleapis.com/auth/userinfo.email"
+    ko.applyBindings(viewModel)
+})
 
-function signin(mode, authorizeCallback) {
-    gapi.auth.authorize({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        immediate: mode},
-        authorizeCallback);
-}
-
-function userAuthed() {
-    var request = gapi.client.oauth2.userinfo.get().execute(function(resp) {
-        if (!resp.code) {
-            // user is signed in, call my endpoint
-            console.log("user is signed in, continue with your bullshit")
-            loadMoreTranslations()
-            fillStatsList()
-            //gapi.client.dictionaryApi.getDictionary().execute(function(resp) {
-            //    console.log(resp)
-            //})
-        } else {
-            console.log("user sucks dick")
-            signin(false, userAuthed)
-
-
-        }
-    });
-}
 
 // we call this function this way because of google api example naming.
 function signOut() {
@@ -101,12 +65,13 @@ function addTranslation() {
 
     w_0 = $('#foreignWord').val()
     w_1 = $('#nativeWord').val()
+    kind = $('#translationKind').val()
     if (!w_0 || !w_1) {
         console.log("one of the words is empty")
         // make red one of the cells
         return
     }
-    var translation = new Translation(w_0, w_1);
+    var translation = new Translation(w_0, w_1, kind);
     // it's now done a lot different
     // have to code very different
     // better go through whole synchronization process

@@ -38,11 +38,15 @@ public class Translation {
     @Parent
     Key<BackendUser> owner;
 
+    private TranslationKind kind = TranslationKind.Word;
+
+
     public Translation() {}
 
-    public Translation(String foreignWord, String nativeWord) {
+    public Translation(String foreignWord, String nativeWord, TranslationKind kind) {
         this.foreignWord = foreignWord;
         this.nativeWord = nativeWord;
+        this.kind = kind;
         resetId();
         deleted = false;
         Date date = new Date();
@@ -50,13 +54,14 @@ public class Translation {
         setUpdateDate(date);
     }
 
-    public Translation(String foreignWord, String nativeWord, Key<BackendUser> owner) {
-        this(foreignWord, nativeWord);
+    public Translation(String foreignWord, String nativeWord, TranslationKind kind, Key<BackendUser> owner) {
+        this(foreignWord, nativeWord, kind);
         this.owner = owner;
+
     }
 
-    public Translation(String foreignWord, String nativeWord, BackendUser owner) {
-        this(foreignWord, nativeWord);
+    public Translation(String foreignWord, String nativeWord, TranslationKind kind, BackendUser owner) {
+        this(foreignWord, nativeWord, kind);
         this.owner = owner.getKey();
     }
 
@@ -139,6 +144,14 @@ public class Translation {
         if (creationDate == null || (tD != null && creationDate.after(tD))) {
             creationDate = tD;
         }
+    }
+
+    public TranslationKind getKind() {
+        return kind == null ? TranslationKind.Word : kind;
+    }
+
+    public void setKind(TranslationKind kind) {
+        this.kind = kind;
     }
 
     public boolean emptyCreationDate() {

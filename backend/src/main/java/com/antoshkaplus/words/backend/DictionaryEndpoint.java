@@ -152,6 +152,7 @@ public class DictionaryEndpoint {
                 final Translation tRem = new Translation(
                         shallowTranslation.getForeignWord(),
                         shallowTranslation.getNativeWord(),
+                        shallowTranslation.getKind(),
                         backendUser);
                 tRem.setDeleted(true);
 
@@ -183,6 +184,7 @@ public class DictionaryEndpoint {
                 final Translation tNew = new Translation(
                         shallowTranslation.getForeignWord(),
                         shallowTranslation.getNativeWord(),
+                        shallowTranslation.getKind(),
                         backendUser);
 
                 Translation tDb = ofy().load().type(Translation.class).parent(backendUser).id(tNew.getId()).now();

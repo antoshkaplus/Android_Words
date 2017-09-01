@@ -5,10 +5,12 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
     <link rel="stylesheet"
           href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
     <script src="//knockoutjs.com/downloads/knockout-3.4.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
 </head>
 
 <body role="document"  style="padding-top: 70px; padding-left: 3%; padding-right: 3%;">
@@ -29,20 +31,23 @@
 
 
 
-
+<button type="button" class="btn btn-primary" id="login" data-bind="click: auth">Sign in</button>
+<button type="button" class="btn btn-primary" id="rereshAuth" data-bind="click: refreshAuth">Refresh Auth</button>
 
 <a href="storage.html" class="btn btn-info" role="button">Storage playground</a>
 
 <div class="panel panel-default">
-    <form class="form-inline">
+    <form class="form-inline" id="addTranslationForm">
         <div class="form-group">
             <label for="foreignWord">Foreign</label>
             <input type="text" class="form-control" id="foreignWord" placeholder="apple">
         </div>
         <div class="form-group">
             <label for="nativeWord">Native</label>
-            <input type="text" class="form-control" id="nativeWord" placeholder="яблоко">
+            <input type="text" class="form-control" id="nativeWord" placeholder="fruit">
         </div>
+        <select class="selectpicker" id="translationKind" data-bind="options: translationKindOptions, value: translationKindSelected">
+        </select>
         <button type="button" id="addTranslationButton" class="btn btn-default" onclick="addTranslation()">Add</button>
         <button type="button" class="btn btn-default" onclick="autoTranslate()">Auto</button>
         <button type="button" id="logOut" class="btn btn-default pull-right" onclick="signOut()">Log out</button>
@@ -71,8 +76,9 @@
             <table class="table">
                 <thead>
                 <tr>
-                    <th>Foreign Word</th>
-                    <th>Native Word</th>
+                    <th>Foreign</th>
+                    <th>Native</th>
+                    <th>Kind</th>
                     <th>Remove</th>
                 </tr>
                 </thead>
@@ -81,6 +87,7 @@
                 <tr>
                     <td data-bind="text: foreignWord"></td>
                     <td data-bind="text: nativeWord"></td>
+                    <td data-bind="text: kind"></td>
                     <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
                 </tr>
                 <!-- /ko -->
@@ -113,6 +120,7 @@
 </div>
 
 
+<script type="text/javascript" src="js/init.js"></script>
 <script type="text/javascript" src="js/index.js"></script>
 <script src="https://apis.google.com/js/client.js?onload=init"></script>
 
