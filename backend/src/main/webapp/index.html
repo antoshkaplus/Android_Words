@@ -53,7 +53,9 @@
         <button type="button" id="logOut" class="btn btn-default pull-right" onclick="signOut()">Log out</button>
     </form>
     <ul class="list-group" data-bind="foreach: wordTranslation">
+        <!-- ko ifnot: deleted -->
         <li class="list-group-item" data-bind="text: nativeWord"></li>
+        <!-- /ko -->
     </ul>
 </div>
 
