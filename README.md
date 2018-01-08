@@ -28,6 +28,7 @@ Want to learn more English words. Hope this application is going to help me.
 * pass
 
 ## web
+* ability to change translation picking one in the list
 * show more error messages
 * show authorization errors if exists
 * before trying each web transaction look if user is signed in
