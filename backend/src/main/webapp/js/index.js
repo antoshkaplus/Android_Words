@@ -8,6 +8,7 @@ function Translation(foreignWord, nativeWord, kind) {
     this.foreignWord = foreignWord;
     this.nativeWord = nativeWord;
     this.kind = kind;
+    this.deleted = false;
 }
 
 
