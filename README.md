@@ -8,12 +8,12 @@ Want to learn more English words. Hope this application is going to help me.
 # TODO
 
 ## overall
-* add multiple translation types: general, idiom, phrase (expression)
 * later on make some progress graphs
 * add more games
 * by hand testing notes
 * unit tests everywhere
 * move translation to UUID (this should help with problems that erase on synchonization)
+* add abbreviation type: FYI - for your information, CYA - cover your ass
 
 ## guess word:
 * **add date to score**
