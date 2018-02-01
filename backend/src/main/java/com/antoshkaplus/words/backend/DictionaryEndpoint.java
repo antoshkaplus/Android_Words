@@ -166,15 +166,9 @@ public class DictionaryEndpoint {
         });
     }
 
-    // use:
-    //  update date and create date as now
-    //  deleted = false
-    //  have to check if already exists first
-
     // testing:
     //  put one translation inside
     //  put same translation inside : may need to check update/creation times later
-    // TODO increase db version
     @ApiMethod(name = "addTranslationOnline", path = "add_translation_online")
     public Translation addTranslationOnline(final Translation shallowTranslation, final User user)
             throws OAuthRequestException, InvalidParameterException
@@ -194,7 +188,7 @@ public class DictionaryEndpoint {
                 Translation tDb = ofy().load().type(Translation.class).parent(backendUser).id(tNew.getId()).now();
                 tNew.setCreationDateToEarliest(tDb);
                 tNew.setVersion(backendUser.increaseVersion());
-                ofy().save().entity(tNew).now();
+                ofy().save().entities(tNew, backendUser).now();
                 val.setVal(tNew);
             }
         });

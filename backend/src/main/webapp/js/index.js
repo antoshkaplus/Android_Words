@@ -83,6 +83,7 @@ function addTranslation() {
         function(resp) {
             console.log("translation saved", resp)
             $('#foreignWord').focus().select()
+            if (!resp.result) return;
             viewModel.translationList.unshift(resp.result)
         },
         function(reason){
@@ -91,14 +92,6 @@ function addTranslation() {
 }
 
 function removeTranslation(translation) {
-    // later on can throw some alert about it to user
-    if (typeof translation.foreignWord != 'string') {
-        bF = false
-    }
-    if (typeof translation.nativeWord != 'string') {
-        bN = false
-    }
-    if (!bF || !bN) return
     gapi.client.dictionaryApi.removeTranslationOnline(translation).then(
         function(resp) {
             console.log("translation removed", resp)
