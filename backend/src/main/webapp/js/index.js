@@ -19,11 +19,11 @@ function Translation(foreignWord, nativeWord, kind) {
 $(function() {
     viewModel = {
         dictionaryApiLoaded: ko.observable(false),
-        translationList: ko.observable([]),
+        translationList: ko.observableArray(),
         translationListCursor: ko.observable(null),
         statsList: ko.observable([]),
         wordTranslation: ko.observable([]),
-        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun"]),
+        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun", "Abbr"]),
         translationKindSelected: ko.observable()
     }
 
@@ -79,41 +79,34 @@ function addTranslation() {
     // but with javascript
     // and only with one element
     // easy to test
-    gapi.client.dictionaryApi.addTranslationOnline(translation).execute(function(resp) {
-        if (resp.error) {
+    gapi.client.dictionaryApi.addTranslationOnline(translation).then(
+        function(resp) {
+            console.log("translation saved", resp)
+            $('#foreignWord').focus().select()
+            viewModel.translationList.unshift(resp.result)
+        },
+        function(reason){
             $("#alertErrorAddTranslation").show()
-            return
-        }
-        console.log("translation saved", resp)
-        $('#foreignWord').focus().select()
-        resetTranslationList()
-    })
-
+        });
 }
 
-function removeTranslation() {
-    chs = $(this).closest("tr").children()
-    foreignWord = chs.eq(0).text()
-    nativeWord = chs.eq(1).text()
-    bF = true
-    bN = true
+function removeTranslation(translation) {
     // later on can throw some alert about it to user
-    if (typeof foreignWord != 'string') {
+    if (typeof translation.foreignWord != 'string') {
         bF = false
     }
-    if (typeof nativeWord != 'string') {
+    if (typeof translation.nativeWord != 'string') {
         bN = false
     }
     if (!bF || !bN) return
-    var translation = new Translation(foreignWord, nativeWord);
-    gapi.client.dictionaryApi.removeTranslationOnline(translation).execute(function(resp) {
-        if (resp.error) {
+    gapi.client.dictionaryApi.removeTranslationOnline(translation).then(
+        function(resp) {
+            console.log("translation removed", resp)
+            viewModel.translationList.remove(translation)
+        },
+        function(reason) {
             $('#alertErrorRemoveTranslation').show()
-            return
-        }
-        console.log("translation removed", resp)
-        resetTranslationList()
-    })
+        })
 }
 
 function fillTranslationList() {
@@ -135,22 +128,20 @@ function loadMoreTranslations() {
 
     gapi.client.dictionaryApi
         .getTranslationList_Cursor({pageSize: 10, cursor: viewModel.translationListCursor()})
-        .execute(function(resp) {
-            if (resp.error != null) {
-                // need to show some kind of sign to reload browser window
-                // later on may try to reload by myself
-                $("#alertErrorGetTranslationList").show()
-                return
-            }
-            if (resp) {
-                if (resp.list) {
-                    viewModel.translationList(viewModel.translationList().concat(resp.list))
+        .then(
+            function(resp) {
+                if (resp) {
+                    if (resp.result.list) {
+                        ko.utils.arrayPushAll(viewModel.translationList, resp.result.list)
+                    }
+                    viewModel.translationListCursor(resp.result.nextCursor)
                 }
-                viewModel.translationListCursor(resp.nextCursor)
-            }
-            console.log(resp)
-            $("#loadMoreTranslations").prop('disabled', false);
-        })
+                console.log(resp)
+                $("#loadMoreTranslations").prop('disabled', false);
+            },
+            function(reason) {
+                $("#alertErrorGetTranslationList").show()
+            })
 }
 
 function resetTranslationList() {
@@ -217,18 +208,16 @@ function autoTranslate() {
 
     viewModel.wordTranslation([ new Translation("", "In Progress") ])
 
-    gapi.client.dictionaryApi.getTranslationOnline({foreignWord : foreignWord}).execute(function(resp) {
-        if (resp.error != null) {
-            // need to show some kind of sign to reload browser window
-            // later on may try to reload by myself
+    gapi.client.dictionaryApi.getTranslationOnline({foreignWord : foreignWord}).then(
+        function(resp) {
+            if (resp.result.list === undefined) {
+                resp.result.list = [ new Translation("", "Not Found") ]
+            }
+            viewModel.wordTranslation(resp.result.list)
+            console.log(resp)
+        },
+        function(reason) {
             $("#alertErrorGetTranslationList").show()
-            return
-        }
-        if (resp.list === undefined) {
-            resp.list = [ new Translation("", "Not Found") ]
-        }
-        viewModel.wordTranslation(resp.list)
-        console.log(resp)
-    })
+        })
 }
 

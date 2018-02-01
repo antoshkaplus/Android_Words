@@ -5,7 +5,7 @@
     <item
         android:title="@string/menu__switch_game_type"
         android:id="@+id/action_switch_game_type"
-        app:showAsAction="never"
+        android:showAsAction="never"
         />
 
 </menu>

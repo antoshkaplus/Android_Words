@@ -90,7 +90,7 @@
                     <td data-bind="text: foreignWord"></td>
                     <td data-bind="text: nativeWord"></td>
                     <td data-bind="text: kind"></td>
-                    <td><a href="javascript:void(0)" onclick="removeTranslation.call(this)"><i class="glyphicon glyphicon-remove"></i></a></td>
+                    <td><a data-bind="click: removeTranslation()"><i class="glyphicon glyphicon-remove"></i></a></td>
                 </tr>
                 <!-- /ko -->
                 </tbody>

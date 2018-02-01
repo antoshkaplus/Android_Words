@@ -1,36 +1,56 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.cloud.tools.endpoints-framework-client'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.google.cloud.tools:endpoints-framework-gradle-plugin:1.0.2'
+    }
+}
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "com.antoshkaplus.words"
-        minSdkVersion 23
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion 26
+        targetSdkVersion 26
+        versionCode 2
+        versionName "2.0"
 //      when there are multiple libraries with one name
         multiDexEnabled true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         debug {
             debuggable true
         }
-
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    flavorDimensions "mode"
+
     productFlavors {
         local {
+            dimension 'mode'
             // buildConfigField 'String', 'HOST', '"http://10.48.98.43:8080/_ah/api"'
+            // buildConfigField 'String', 'HOST', '"http://25.254.207.189:8080/_ah/api"'
             // big mac
-            buildConfigField 'String', 'HOST', '"http://25.254.207.189:8080/_ah/api"'
+            buildConfigField 'String', 'HOST', '"http://25.230.57.193:8080/_ah/api"'
         }
 
         remote {
+            dimension 'mode'
             buildConfigField 'String', 'HOST', '"https://antoshkaplus-words.appspot.com/_ah/api"'
         }
     }
@@ -38,17 +58,16 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(path: ':backend', configuration: 'android-endpoints')
-    compile project(path: ':fly')
-    // new version is not ready
-    compile 'com.google.android.gms:play-services-auth:9.0.1'
-    //compile 'com.google.http-client:google-http-client-android:1.12.0-beta'
-    compile 'com.j256.ormlite:ormlite-core:4.48'
-    compile 'com.j256.ormlite:ormlite-android:4.48'
-    compile 'com.google.apis:google-api-services-translate:v2-rev41-1.20.0'
-    compile 'com.google.guava:guava:19.0'
-    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
-}
+    implementation project(path: ':fly')
 
-//apply plugin: 'com.google.gms.google-services-auth'
+    endpointsServer project(path: ':backend', configuration: 'endpoints')
+    // new version is not ready
+    implementation 'com.google.android.gms:play-services-auth:9.0.1'
+    implementation 'com.j256.ormlite:ormlite-core:4.48'
+    implementation 'com.j256.ormlite:ormlite-android:4.48'
+    implementation 'com.google.apis:google-api-services-translate:v2-rev41-1.20.0'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+    implementation group: 'com.google.http-client', name: 'google-http-client-android', version: '1.23.0'
+
+    implementation 'com.google.api-client:google-api-client-android:1.23.0'
+}

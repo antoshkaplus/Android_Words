@@ -8,5 +8,6 @@ public enum TranslationKind {
     Word,
     Idiom,
     Phrase,
-    Pronun // Pronunciation
+    Pronun, // Pronunciation
+    Abbr // Abbreviation
 }

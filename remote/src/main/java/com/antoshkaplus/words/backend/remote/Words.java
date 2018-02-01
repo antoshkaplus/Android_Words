@@ -99,21 +99,21 @@ public class Words {
                 fillMissingValues();
             }
             if (command.equals("add")) {
-                Translation t = new Translation("foreign", "native");
-                ofy().save().entity(t).now();
+//                Translation t = new Translation("foreign", "native");
+//                ofy().save().entity(t).now();
             }
             if (command.equals("size")) {
                 int size = ofy().load().type(Translation.class).count();
                 System.out.println(size);
             }
             if (command.equals("test")) {
-                Translation t = new Translation("foreign", "native");
-                ofy().save().entity(t).now();
-
-                ArrayList<String> ids = new ArrayList<>();
-                ids.add("foreign_native");
-                Map<String, Translation> ts = ofy().load().type(Translation.class).ids(ids);
-                System.out.println("test end");
+//                Translation t = new Translation("foreign", "native");
+//                ofy().save().entity(t).now();
+//
+//                ArrayList<String> ids = new ArrayList<>();
+//                ids.add("foreign_native");
+//                Map<String, Translation> ts = ofy().load().type(Translation.class).ids(ids);
+//                System.out.println("test end");
             }
         }
         installer.uninstall();
@@ -134,12 +134,12 @@ public class Words {
             password = scanner.nextLine();
         }
 
-        RemoteApiOptions options = new RemoteApiOptions()
-                .server("localhost", 8080).useDevelopmentServerCredential();
-
 //        RemoteApiOptions options = new RemoteApiOptions()
-//                .server("antoshkaplus-words.appspot.com", 443)
-//                .useApplicationDefaultCredential();
+//                .server("localhost", 8080).useDevelopmentServerCredential();
+
+        RemoteApiOptions options = new RemoteApiOptions()
+                .server("antoshkaplus-words.appspot.com", 443)
+                .useApplicationDefaultCredential();
         // still may try to go to localhost
         //        .credentials("example@example.com", "haha")
         //        .server("localhost", 8080);

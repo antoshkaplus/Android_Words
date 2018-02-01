@@ -35,8 +35,8 @@ public class BackendUser {
         return version;
     }
 
-    public void increaseVersion() {
-        ++version;
+    public int increaseVersion() {
+        return ++version;
     }
 
 

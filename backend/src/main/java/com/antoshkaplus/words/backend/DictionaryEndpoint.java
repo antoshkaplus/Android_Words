@@ -9,6 +9,9 @@ package com.antoshkaplus.words.backend;
 import com.antoshkaplus.words.backend.model.*;
 import com.antoshkaplus.words.backend.model.BackendUser;
 import com.antoshkaplus.words.backend.model.Translation;
+
+import com.antoshkaplus.bee.ValContainer;
+
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.ApiNamespace;
@@ -42,7 +45,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * Translation id, owner
  */
 @Api(name = "dictionaryApi",
-        version = "v2",
+        version = "v3",
         resource = "dictionary",
         namespace = @ApiNamespace(
                 ownerDomain = "backend.words.antoshkaplus.com",
@@ -173,9 +176,10 @@ public class DictionaryEndpoint {
     //  put same translation inside : may need to check update/creation times later
     // TODO increase db version
     @ApiMethod(name = "addTranslationOnline", path = "add_translation_online")
-    public void addTranslationOnline(final Translation shallowTranslation, final User user)
+    public Translation addTranslationOnline(final Translation shallowTranslation, final User user)
             throws OAuthRequestException, InvalidParameterException
     {
+        ValContainer<Translation> val = new ValContainer();
         ofy().transact(new VoidWork() {
             @Override
             public void vrun() {
@@ -189,9 +193,12 @@ public class DictionaryEndpoint {
 
                 Translation tDb = ofy().load().type(Translation.class).parent(backendUser).id(tNew.getId()).now();
                 tNew.setCreationDateToEarliest(tDb);
+                tNew.setVersion(backendUser.increaseVersion());
                 ofy().save().entity(tNew).now();
+                val.setVal(tNew);
             }
         });
+        return val.getVal();
     }
 
     @ApiMethod(name="getTranslationOnline", path="get_translation_online")

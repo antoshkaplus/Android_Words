@@ -25,15 +25,9 @@ import com.antoshkaplus.words.backend.dictionaryApi.DictionaryApi;
 import com.antoshkaplus.words.backend.dictionaryApi.model.TranslationList;
 import com.antoshkaplus.words.dialog.AddWordDialog;
 import com.antoshkaplus.words.model.Translation;
+
 import com.google.android.gms.common.AccountPicker;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.extensions.android.json.AndroidJsonFactory;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.DateTime;
-import com.google.api.services.translate.Translate;
-import com.google.api.services.translate.TranslateRequestInitializer;
-import com.google.api.services.translate.model.TranslationsListResponse;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

@@ -54,7 +54,7 @@ function refreshAuth() {
 
 function loadApi() {
     var apiName = 'dictionaryApi';
-    var apiVersion = 'v2';
+    var apiVersion = 'v3';
     var apiRoot = 'https://' + window.location.host + '/_ah/api';
     if (window.location.hostname == 'localhost'
       || window.location.hostname == '127.0.0.1'
