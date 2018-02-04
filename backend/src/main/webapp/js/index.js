@@ -3,5 +3,3 @@
 function signOut() {
     gapi.auth.setToken(null)
 }
-
-
