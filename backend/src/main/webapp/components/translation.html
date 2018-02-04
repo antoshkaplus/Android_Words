@@ -1,0 +1,71 @@
+<template>
+
+    <div class="panel panel-default">
+        <form class="form-inline" id="addTranslationForm">
+            <div class="form-group">
+                <label for="foreignWord">Foreign</label>
+                <input type="text" class="form-control" id="foreignWord" placeholder="apple" data-bind="event: { keyup: onKeyUp }">
+            </div>
+            <div class="form-group">
+                <label for="nativeWord">Native</label>
+                <input type="text" class="form-control" id="nativeWord" placeholder="fruit">
+            </div>
+            <select class="form-control" id="translationKind" data-bind="options: translationKindOptions, value: translationKindSelected">
+            </select>
+            <button type="button" id="addTranslationButton" class="btn btn-primary" data-bind="click: addTranslation">Add</button>
+            <button type="button" class="btn btn-secondary" data-bind="click: autoTranslate">Auto</button>
+            <button type="button" id="logOut" class="btn btn-secondary pull-right" onclick="signOut()">Log out</button>
+        </form>
+        <ul class="list-group" data-bind="foreach: wordTranslation">
+            <!-- ko ifnot: deleted -->
+            <li class="list-group-item" data-bind="text: nativeWord"></li>
+            <!-- /ko -->
+        </ul>
+    </div>
+
+
+    <!-- try to upload file -->
+    <div class="panel panel-default">
+        <form>
+            <div class="fileinput fileinput-new" data-provides="fileinput">
+                <input id="translationListFile" type="file"/>
+            </div>
+            <button type="button" class="btn btn-primary" data-bind="click: addFileTranslationList">Upload</button>
+        </form>
+    </div>
+
+    <div>
+        <div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Foreign</th>
+                    <th>Native</th>
+                    <th>Kind</th>
+                    <th>Remove</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: translationList">
+                <!-- ko ifnot: deleted -->
+                <tr>
+                    <td data-bind="text: foreignWord"></td>
+                    <td data-bind="text: nativeWord"></td>
+                    <td data-bind="text: kind"></td>
+                    <td>
+                        <button type="button" class="btn btn-primary" data-bind="click: $root.removeTranslation">
+                            <span class="octicon octicon-x"></span>
+                        </button>
+                    </td>
+                </tr>
+                <!-- /ko -->
+                </tbody>
+            </table>
+        </div>
+        <div class="row">
+            <button type="button" class="btn btn-primary" id="loadMoreTranslations" data-bind="click: loadMoreTranslations">Load More Translations</button>
+            <button type="button" class="btn btn-secondary" id="resetTranslations" data-bind="click: resetTranslationList">Reset Translations</button>
+        </div>
+    </div>
+
+</template>
+<script type="text/javascript" src="translation.js"></script>

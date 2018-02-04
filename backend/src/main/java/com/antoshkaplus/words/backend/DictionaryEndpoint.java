@@ -26,6 +26,8 @@ import com.googlecode.objectify.VoidWork;
 import com.googlecode.objectify.Work;
 import com.googlecode.objectify.cmd.Query;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -205,16 +207,33 @@ public class DictionaryEndpoint {
     public TranslationList getTranslationOnline(@Named("foreignWord") final String foreignWord, final User user)
         throws OAuthRequestException, InvalidParameterException {
 
-        TranslationList list = ofy().transact(new Work<TranslationList>() {
-            @Override
-            public TranslationList run() {
-                BackendUser u = retrieveBackendUser(user);
-                return new TranslationList(new ArrayList<Translation>(ofy().load().type(Translation.class).ancestor(u).filter("foreignWord ==", foreignWord).list()));
+        return ofy().transact(() -> {
+            BackendUser u = retrieveBackendUser(user);
+            TranslationList list = new TranslationList(new ArrayList<Translation>(ofy().load().type(Translation.class).ancestor(u).filter("foreignWord ==", foreignWord).list()));
+
+            if (list.size() > 0) {
+                increaseLookupCount(foreignWord, u);
             }
+            return list;
         });
-        return list;
     }
 
+    void increaseLookupCount(String foreignWord, BackendUser u) {
+        Date now = new Date();
+        ForeignWordStats stats = ofy().load().type(ForeignWordStats.class).parent(u).id(foreignWord).now();
+        if (stats != null) {
+            if (DateUtils.addMinutes(stats.getLastLookup(), 1).after(now)) {
+                return;
+            }
+        } else {
+            stats = new ForeignWordStats(foreignWord);
+            stats.setOwner(u);
+        }
+        stats.increaseLookupCount();
+        stats.setVersion(u.increaseVersion());
+
+        ofy().save().entities(stats, u).now();
+    }
 
     // with lambda those two methods would be awesome.
     // right now would have to use inheritance to code reuse.

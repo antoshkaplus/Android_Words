@@ -1,0 +1,17 @@
+<template>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Foreign Word</th>
+            <th>Lookups</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: statsList">
+        <tr>
+            <td data-bind="text: foreignWord"></td>
+            <td data-bind="text: lookupCount"></td>
+        </tr>
+        </tbody>
+    </table>
+</template>
+<script type="text/javascript" src="lookup.js"></script>

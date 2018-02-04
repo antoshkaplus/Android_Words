@@ -10,6 +10,8 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.Parent;
 
+import java.util.Date;
+
 @Entity
 public class ForeignWordStats {
 
@@ -27,6 +29,9 @@ public class ForeignWordStats {
     @Parent
     private Key<BackendUser> owner;
 
+    @Index
+    private int lookupCount;
+    private Date lastLookup;
 
     public ForeignWordStats() {}
 
@@ -34,11 +39,14 @@ public class ForeignWordStats {
         this.foreignWord = foreignWord;
         successScore = 0;
         failureScore = 0;
+        lookupCount = 0;
+        lastLookup = new Date();
     }
 
     public void updateFrom(ForeignWordStats s) {
         successScore += s.successScore;
         failureScore += s.failureScore;
+        lookupCount += s.lookupCount;
     }
 
     public void setFailureScore(int failureScore) {
@@ -75,5 +83,22 @@ public class ForeignWordStats {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public int getLookupCount() {
+        return lookupCount;
+    }
+
+    public void setLookupCount(int lookupCount) {
+        this.lookupCount = lookupCount;
+    }
+
+    public void increaseLookupCount() {
+        ++this.lookupCount;
+        this.lastLookup = new Date();
+    }
+
+    public Date getLastLookup() {
+        return lastLookup;
     }
 }

@@ -1,130 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello, Endpoints!</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link rel="stylesheet"
-          href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
-
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-    <script src="//knockoutjs.com/downloads/knockout-3.4.0.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+    <title>Words</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css">
 </head>
 
-<body role="document"  style="padding-top: 70px; padding-left: 3%; padding-right: 3%;">
+<body class="container-fluid" style="padding-top: 70px; padding-left: 3%; padding-right: 3%;">
 
+    <!-- here we place all possible alerts -->
+    <!-- worst alerts first -->
+    <div id="alertErrorAddTranslation" class="alert alert-danger collapse" role="alert">
+        <strong>Error!</strong> Translation was not added!
+    </div>
+    <div id="alertErrorGetTranslationList" class="alert alert-danger collapse" role="alert">
+        <strong>Error!</strong> Unable to get translation list!
+    </div>
+    <div id="alertErrorGetStatsList" class="alert alert-danger collapse" role="alert">
+        <strong>Error!</strong> Unable to get translation list!
+    </div>
 
+    <button type="button" class="btn btn-primary" id="login" data-bind="click: auth">Sign in</button>
+    <button type="button" class="btn btn-primary" id="rereshAuth" data-bind="click: refreshAuth">Refresh Auth</button>
 
-<!-- here we place all possible alerts -->
-<!-- worst alerts first -->
-<div id="alertErrorAddTranslation" class="alert alert-danger collapse" role="alert">
-    <strong>Error!</strong> Translation was not added!
-</div>
-<div id="alertErrorGetTranslationList" class="alert alert-danger collapse" role="alert">
-    <strong>Error!</strong> Unable to get translation list!
-</div>
-<div id="alertErrorGetStatsList" class="alert alert-danger collapse" role="alert">
-    <strong>Error!</strong> Unable to get translation list!
-</div>
+    <a href="storage.html" class="btn btn-info" role="button">Storage playground</a>
 
-
-
-<button type="button" class="btn btn-primary" id="login" data-bind="click: auth">Sign in</button>
-<button type="button" class="btn btn-primary" id="rereshAuth" data-bind="click: refreshAuth">Refresh Auth</button>
-
-<a href="storage.html" class="btn btn-info" role="button">Storage playground</a>
-
-<div class="panel panel-default">
-    <form class="form-inline" id="addTranslationForm">
-        <div class="form-group">
-            <label for="foreignWord">Foreign</label>
-            <input type="text" class="form-control" id="foreignWord" placeholder="apple">
-        </div>
-        <div class="form-group">
-            <label for="nativeWord">Native</label>
-            <input type="text" class="form-control" id="nativeWord" placeholder="fruit">
-        </div>
-        <select class="selectpicker" id="translationKind" data-bind="options: translationKindOptions, value: translationKindSelected">
-        </select>
-        <button type="button" id="addTranslationButton" class="btn btn-default" onclick="addTranslation()">Add</button>
-        <button type="button" class="btn btn-default" onclick="autoTranslate()">Auto</button>
-        <button type="button" id="logOut" class="btn btn-default pull-right" onclick="signOut()">Log out</button>
-    </form>
-    <ul class="list-group" data-bind="foreach: wordTranslation">
-        <!-- ko ifnot: deleted -->
-        <li class="list-group-item" data-bind="text: nativeWord"></li>
-        <!-- /ko -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="translation-tab" data-toggle="tab" href="#translation" role="tab" aria-controls="translation-tab" aria-selected="true">Translation</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="score-tab" data-toggle="tab" href="#score" role="tab" aria-controls="score-tab" aria-selected="false">Scores</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="lookup-tab" data-toggle="tab" href="#lookup" role="tab" aria-controls="lookup-tab" aria-selected="false">Lookup</a>
+        </li>
     </ul>
-</div>
-
-
-
-
-<!-- try to upload file -->
-<div class="panel panel-default">
-<form>
-    <div class="fileinput fileinput-new" data-provides="fileinput">
-        <input id="translationListFile" type="file"/>
-    </div>
-    <button type="button" class="btn btn-default" onclick="addFileTranslationList()">Upload</button>
-</form>
-</div>
-
-<div>
-    <div class="col-md-6">
-        <div class="row">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Foreign</th>
-                    <th>Native</th>
-                    <th>Kind</th>
-                    <th>Remove</th>
-                </tr>
-                </thead>
-                <tbody data-bind="foreach: translationList">
-                <!-- ko ifnot: deleted -->
-                <tr>
-                    <td data-bind="text: foreignWord"></td>
-                    <td data-bind="text: nativeWord"></td>
-                    <td data-bind="text: kind"></td>
-                    <td><a data-bind="click: removeTranslation()"><i class="glyphicon glyphicon-remove"></i></a></td>
-                </tr>
-                <!-- /ko -->
-                </tbody>
-            </table>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="translation" role="tabpanel" aria-labelledby="translation-tab">
+            <components-translation/>
         </div>
-        <div class="row">
-            <button type="button" class="btn btn-default" id="loadMoreTranslations" onclick="loadMoreTranslations()">Load More Translations</button>
-            <button type="button" class="btn btn-default" id="resetTranslations" onclick="resetTranslationList()">Reset Translations</button>
+        <div class="tab-pane fade" id="score" role="tabpanel" aria-labelledby="score-tab">
+            <components-score/>
+        </div>
+        <div class="tab-pane fade" id="lookup" role="tabpanel" aria-labelledby="lookup-tab">
+            <components-lookup/>
         </div>
     </div>
-    <div class="col-md-6">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Foreign Word</th>
-                <th>Success Score</th>
-                <th>Failure Score</th>
-            </tr>
-            </thead>
-            <tbody data-bind="foreach: statsList">
-            <tr>
-                <td data-bind="text: foreignWord"></td>
-                <td data-bind="text: successScore"></td>
-                <td data-bind="text: failureScore"></td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//knockoutjs.com/downloads/knockout-3.4.0.js"></script>
 
-<script type="text/javascript" src="js/init.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
-<script src="https://apis.google.com/js/client.js?onload=init"></script>
+    <script type="text/javascript" src="js/init.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+    <!-- the problem arises when component start nesting each other in some weird way??? - no -->
+    <link rel="import" href="components/translation.html">
+    <link rel="import" href="components/score.html">
+    <link rel="import" href="components/lookup.html">
 
 </body>
 </html>

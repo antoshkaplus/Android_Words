@@ -4,6 +4,15 @@ var CLIENT_ID = "251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleuserco
 var SCOPES = "https://www.googleapis.com/auth/userinfo.email"
 
 
+$(function() {
+
+    externalApis = {
+        dictionaryLoaded: ko.observable(false),
+    }
+
+})
+
+
 function init() {
     gapi.load('client:auth2', initAuth);
 }
@@ -66,7 +75,7 @@ function loadApi() {
 
     gapi.client.load(apiName, apiVersion, undefined, apiRoot).then(
         function(response) {
-            viewModel.dictionaryApiLoaded(true)
+            externalApis.dictionaryLoaded(true)
             console.log("dictionary api loaded")
         },
         function(reason) {
