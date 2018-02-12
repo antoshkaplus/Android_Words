@@ -28,11 +28,8 @@ Want to learn more English words. Hope this application is going to help me.
 * pass
 
 ## web
-* ability to change translation picking one in the list
-* show more error messages
-* show authorization errors if exists
-* before trying each web transaction look if user is signed in
-
+* don't let to send multiple queries with the same text to translate. quota becomes big because of too many enter presses.
+somehow do the same for user translations
 
 
 

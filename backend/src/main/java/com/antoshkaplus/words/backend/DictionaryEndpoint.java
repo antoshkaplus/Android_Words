@@ -199,7 +199,7 @@ public class DictionaryEndpoint {
 
     @ApiMethod(name="getTranslationOnline", path="get_translation_online")
     public TranslationList getTranslationOnline(@Named("foreignWord") final String foreignWord, final User user)
-        throws OAuthRequestException, InvalidParameterException {
+        throws OAuthRequestException {
 
         return ofy().transact(() -> {
             BackendUser u = retrieveBackendUser(user);
@@ -216,7 +216,7 @@ public class DictionaryEndpoint {
         Date now = new Date();
         ForeignWordStats stats = ofy().load().type(ForeignWordStats.class).parent(u).id(foreignWord).now();
         if (stats != null) {
-            if (DateUtils.addMinutes(stats.getLastLookup(), 1).after(now)) {
+            if (stats.getLastLookup() == null || DateUtils.addMinutes(stats.getLastLookup(), 1).after(now)) {
                 return;
             }
         } else {

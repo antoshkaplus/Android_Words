@@ -10,6 +10,7 @@
                     $("#alertErrorGetStatsList").show()
                     return
                 }
+                if (!resp.list) resp.list = [];
                 resp.list = resp.list.filter(stat => stat.lookupCount > 0)
                 resp.list.sort((left, right) => left.lookupCount - right.lookupCount)
 

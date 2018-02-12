@@ -15,6 +15,8 @@ function Translation(foreignWord, nativeWord, kind) {
         translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun", "Abbr"]),
         translationKindSelected: ko.observable(),
 
+        gapiTranslations: {},
+
         loadMoreTranslations: function() {
             $("#loadMoreTranslations").prop('disabled', true);
 
@@ -72,12 +74,22 @@ function Translation(foreignWord, nativeWord, kind) {
             var source = 'https://www.googleapis.com/language/translate/v2';
             var foreignWord = $('#foreignWord').val()
 
-            $.get( source, { key: apiKey, source: "en", target: "ru", q: foreignWord } )
-                .done(function( data ) {
-                   var text = data.data.translations[0].translatedText
-                       console.log(text)
-                       $('#nativeWord').val(text);
-                });
+            translatedText = vm.gapiTranslations[foreignWord];
+            if (translatedText === undefined) {
+                vm.gapiTranslations[foreignWord] = null;
+                $.get( source, { key: apiKey, source: "en", target: "ru", q: foreignWord } )
+                    .done(function( data ) {
+                        text = vm.gapiTranslations[foreignWord] = data.data.translations[0].translatedText
+
+                        console.log(text)
+                        $('#nativeWord').val(text);
+                    });
+            } else if (translatedText === null) {
+                // nothing to do wait for it
+            } else {
+                $('#nativeWord').val(translatedText);
+            }
+
 
             vm.wordTranslation([ new Translation("", "In Progress") ])
 
@@ -157,7 +169,11 @@ function Translation(foreignWord, nativeWord, kind) {
             const ENTER_KEY_CODE = 13
             if(e.keyCode == ENTER_KEY_CODE)
             {
-                vm.autoTranslate()
+                vm.autoTranslate();
+                var foreignWord = $('#foreignWord').val();
+                utterThis = new SpeechSynthesisUtterance(foreignWord);
+                utterThis.voice = window.speechSynthesis.getVoices().find(voice => voice.lang == "en-US");
+                window.speechSynthesis.speak(utterThis);
             }
         }
     }
