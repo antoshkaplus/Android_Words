@@ -30,6 +30,7 @@ Want to learn more English words. Hope this application is going to help me.
 ## web
 * don't let to send multiple queries with the same text to translate. quota becomes big because of too many enter presses.
 somehow do the same for user translations
-
+* check if someone abuses Translator API shut down perpetrators
+* make sure to increase db version every time new translation is inserted
 
 
