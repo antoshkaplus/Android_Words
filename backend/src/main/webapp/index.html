@@ -4,6 +4,7 @@
     <title>Words</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/3.5.0/octicons.min.css">
+    <link rel="stylesheet" href="css/base.css">
 </head>
 
 <body class="container-fluid" style="padding-top: 70px; padding-left: 3%; padding-right: 3%;">
@@ -54,10 +55,12 @@
     <script src="//knockoutjs.com/downloads/knockout-3.4.0.js"></script>
 
     <script type="text/javascript" src="js/init.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
     <script type="text/javascript" src="js/index.js"></script>
     <script src="https://apis.google.com/js/client.js?onload=init"></script>
 
     <!-- the problem arises when component start nesting each other in some weird way??? - no -->
+    <link rel="import" href="components/add-usage.html">
     <link rel="import" href="components/translation.html">
     <link rel="import" href="components/score.html">
     <link rel="import" href="components/lookup.html">

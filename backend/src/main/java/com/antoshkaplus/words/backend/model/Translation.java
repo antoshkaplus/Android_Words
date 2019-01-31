@@ -6,7 +6,9 @@ import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Parent;
 import com.googlecode.objectify.annotation.Index;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by antoshkaplus on 8/5/15.
@@ -34,6 +36,8 @@ public class Translation {
 
     @Index
     private int version;
+
+    private List<Usage> usages = new ArrayList<>();
 
     @Parent
     Key<BackendUser> owner;
@@ -160,5 +164,18 @@ public class Translation {
 
     public boolean emptyUpdateDate() {
         return updateDate == null;
+    }
+
+    public List<Usage> getUsages() {
+        return usages;
+    }
+
+    public void updateUsages(List<Usage> usages) {
+        for (Usage u : usages) {
+            if (this.usages.stream().anyMatch(x -> x.usage.equals(u.usage))) {
+                continue;
+            }
+            this.usages.add(u);
+        }
     }
 }

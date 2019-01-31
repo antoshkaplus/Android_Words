@@ -1,19 +1,13 @@
 
-function Translation(foreignWord, nativeWord, kind) {
-    this.foreignWord = foreignWord;
-    this.nativeWord = nativeWord;
-    this.kind = kind;
-    this.deleted = false;
-}
-
 (function () {
 
     var vm = {
         translationList: ko.observableArray(),
         translationListCursor: ko.observable(null),
         wordTranslation: ko.observable([]),
-        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun", "Abbr"]),
+        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun", "Name", "Abbr"]),
         translationKindSelected: ko.observable(),
+        addUsageTranslation: ko.observable(),
 
         gapiTranslations: {},
 
@@ -98,7 +92,7 @@ function Translation(foreignWord, nativeWord, kind) {
                     if (resp.result.list === undefined) {
                         resp.result.list = [ new Translation("", "Not Found") ]
                     }
-                    vm.wordTranslation(resp.result.list)
+                    vm.wordTranslation( resp.result.list.map(ConvertWebTranslation) )
                     console.log(resp)
                 },
                 function(reason) {
@@ -135,7 +129,10 @@ function Translation(foreignWord, nativeWord, kind) {
                 });
         },
         removeTranslation: function(translation) {
+            var bF = true;
+            var bN = true;
             // later on can throw some alert about it to user
+
             if (typeof translation.foreignWord != 'string') {
                 bF = false
             }
@@ -151,6 +148,9 @@ function Translation(foreignWord, nativeWord, kind) {
                 function(reason) {
                     $('#alertErrorRemoveTranslation').show()
                 })
+        },
+        addUsage: function(translation) {
+            vm.addUsageTranslation(translation);
         },
         fillTranslationList: function() {
             gapi.client.dictionaryApi.getTranslationListWhole().execute(function(resp) {

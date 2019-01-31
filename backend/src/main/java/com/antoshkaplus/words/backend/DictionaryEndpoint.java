@@ -30,6 +30,8 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -229,6 +231,20 @@ public class DictionaryEndpoint {
         ofy().save().entities(stats, u).now();
     }
 
+    @ApiMethod(name = "addTranslationUsage", path = "add_translation_usage")
+    public void addTranslationUsage(@Named("translationId") final String translationId, final Usage usage, final User user) {
+        ofy().transact(new VoidWork() {
+            @Override
+            public void vrun() {
+                final BackendUser backendUser = retrieveBackendUser(user);
+                Translation tr = ofy().load().type(Translation.class).parent(backendUser).id(translationId).now();
+                if (tr == null) throw new RuntimeException("translation does not exist");
+                tr.updateUsages(Collections.singletonList(usage));
+                ofy().save().entity(tr);
+            }
+        });
+    }
+
     // with lambda those two methods would be awesome.
     // right now would have to use inheritance to code reuse.
 
@@ -267,7 +283,6 @@ public class DictionaryEndpoint {
                 ofy().save().entity(backendUser).now();
             }
         });
-
     }
 
     // returns all items with version high than given

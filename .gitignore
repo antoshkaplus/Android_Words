@@ -2,13 +2,7 @@
 *.iml
 /local.properties
 
-# user specific configuration
-/.idea/libraries
-/.idea/workspace.xml
-/.idea/encodings.xml
-/.idea/vcs.xml
-/.idea/modules.xml
-/.idea/misc.xml
+.idea/
 
 /test
 
