@@ -28,3 +28,8 @@ function Usage(usage) {
     this.usage = usage;
     this.creationDate = new Date();
 }
+
+// cyrillic characters
+function HasRussianLetters(text) {
+    return /[\u0400-\u04FF]/.test(text)
+}

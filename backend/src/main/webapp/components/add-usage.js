@@ -28,16 +28,18 @@
             var translation = vm.translation();
             vm.translation(null)
 
+            var usage = vm.usage()
             gapi.client.dictionaryApi
-                .addTranslationUsage({"translationId": translation.id}, new Usage(vm.usage()))
+                .addTranslationUsage({"translationId": translation.id}, new Usage(usage))
                 .then(
                     function(resp) {
-                        translation.usages.push(vm.usage());
+                        translation.usages.push(usage);
                         console.log("add usage success")
                     },
                     function(reason) {
                         console.log("add usage failure", reason)
                     })
+            vm.usage("")
         }
     }
 

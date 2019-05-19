@@ -11,4 +11,5 @@ public enum TranslationKind {
     Pronun, // Pronunciation
     Name,
     Abbr, // Abbreviation
+    Compliment
 }

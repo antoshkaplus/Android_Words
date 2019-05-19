@@ -5,7 +5,7 @@
         translationList: ko.observableArray(),
         translationListCursor: ko.observable(null),
         wordTranslation: ko.observable([]),
-        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun", "Name", "Abbr"]),
+        translationKindOptions: ko.observable(["Word", "Idiom", "Phrase", "Pronun", "Name", "Abbr", "Compliment"]),
         translationKindSelected: ko.observable(),
         addUsageTranslation: ko.observable(),
 
@@ -67,6 +67,8 @@
             var apiKey = 'AIzaSyCpNJPGA_zTpriCby8-z4XyAwEllC9wRlM'
             var source = 'https://www.googleapis.com/language/translate/v2';
             var foreignWord = $('#foreignWord').val()
+
+            if (HasRussianLetters(foreignWord)) return;
 
             translatedText = vm.gapiTranslations[foreignWord];
             if (translatedText === undefined) {
@@ -171,6 +173,8 @@
             {
                 vm.autoTranslate();
                 var foreignWord = $('#foreignWord').val();
+                if (HasRussianLetters(foreignWord)) return;
+
                 utterThis = new SpeechSynthesisUtterance(foreignWord);
                 utterThis.voice = window.speechSynthesis.getVoices().find(voice => voice.lang == "en-US");
                 window.speechSynthesis.speak(utterThis);

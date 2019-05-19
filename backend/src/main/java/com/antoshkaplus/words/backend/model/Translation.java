@@ -26,6 +26,7 @@ public class Translation {
     private String id;
     @Index
     private String foreignWord;
+    // if nativeWord is empty string, consider to be straightforward
     private String nativeWord;
 
     private Date creationDate;
@@ -71,6 +72,7 @@ public class Translation {
 
 
     public String getNativeWord() {
+        if (nativeWord == null) return "";
         return nativeWord;
     }
 
@@ -99,7 +101,7 @@ public class Translation {
     }
 
     public void resetId() {
-        this.id = foreignWord + "_" + nativeWord;
+        this.id = foreignWord + "_" + getNativeWord();
     }
 
     public void resetCreationDate() {
