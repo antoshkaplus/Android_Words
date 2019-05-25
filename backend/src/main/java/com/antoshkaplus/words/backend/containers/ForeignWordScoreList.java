@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.containers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,7 @@ public class ForeignWordScoreList {
         return list.size();
     }
 
-    List<String> getForeignWords() {
+    public List<String> getForeignWords() {
         List<String> words = new ArrayList<>(list.size());
         for (ForeignWordScore fws : list) {
             words.add(fws.foreignWord);

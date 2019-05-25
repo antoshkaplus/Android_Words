@@ -1,40 +1,33 @@
 
-(function () {
+define(['knockout', 'require-text!components/score.html'], function(ko, htmlString) {
 
-    var vm = {
-        statsList: ko.observable([]),
+    function ScoreViewModel(params, componentInfo) {
 
-        fillStatsList: function() {
-            gapi.client.dictionaryApi.getStatsListWhole().execute(function(resp) {
-                if (resp.error != null) {
-                    $("#alertErrorGetStatsList").show()
-                    return
+        this.statsList = ko.observable([]),
+        this.fillStatsList = function() {
+                gapi.client.dictionaryApi.getStatsListWhole().execute(function(resp) {
+                    if (resp.error != null) {
+                        $("#alertErrorGetStatsList").show()
+                        return
+                    }
+                    vm.statsList(resp.list)
+                    console.log(resp)
+                })
+            }
+
+        var vm = this
+        externalApis.dictionaryLoaded.subscribe(function(val) {
+            if (!val) return;
+            vm.fillStatsList()
+        })
+    }
+
+    return {
+        viewModel: {
+                createViewModel: function(params, componentInfo) {
+                    return new ScoreViewModel(params, componentInfo)
                 }
-                vm.statsList(resp.list)
-                console.log(resp)
-            })
-        }
-    }
-
-    externalApis.dictionaryLoaded.subscribe(function(val) {
-        if (!val) return;
-        vm.fillStatsList()
-    })
-
-    var thatDoc = document;
-    var thisDoc = document.currentScript.ownerDocument
-
-    var tmpl = thisDoc.querySelector('template')
-    var Element = Object.create(HTMLElement.prototype)
-
-    var shadowRoot;
-
-    Element.createdCallback = function () {
-        var clone = thatDoc.importNode(tmpl.content, true);
-        this.appendChild(clone);
-
-        ko.applyBindings(vm, this)
-    }
-
-    thatDoc.registerElement('components-score', {prototype: Element});
-})()
+        },
+        template: htmlString
+    };
+})

@@ -1,5 +1,6 @@
 package com.antoshkaplus.words.backend.model;
 
+import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
@@ -23,7 +24,7 @@ public class BackendUser {
         this.email = email;
     }
 
-    Key<BackendUser> getKey() {
+    public Key<BackendUser> getKey() {
         return Key.create(BackendUser.class, email);
     }
 
@@ -40,5 +41,7 @@ public class BackendUser {
     }
 
 
-
+    public static Key<BackendUser> getKey(User user) {
+        return Key.create(BackendUser.class, user.getEmail());
+    }
 }

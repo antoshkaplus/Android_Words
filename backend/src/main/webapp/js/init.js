@@ -4,10 +4,10 @@ var CLIENT_ID = "251166830439-2noub1jvf90q79oc87sgbho3up8iurej.apps.googleuserco
 var SCOPES = "https://www.googleapis.com/auth/userinfo.email"
 
 
-$(function() {
+define(["knockout"], (ko) => {
 
     externalApis = {
-        dictionaryLoaded: ko.observable(false),
+            dictionaryLoaded: ko.observable(false),
     }
 
 })

@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.containers;
 
 import java.util.ArrayList;
 import java.util.List;

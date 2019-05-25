@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.containers;
 
 /**
  * Created by antoshkaplus on 5/26/16.

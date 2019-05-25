@@ -1,4 +1,4 @@
-package com.antoshkaplus.words.backend;
+package com.antoshkaplus.words.backend.containers;
 
 import com.antoshkaplus.words.backend.model.ForeignWordStats;
 
@@ -15,7 +15,7 @@ public class ForeignWordStatsList {
 
     ForeignWordStatsList() {}
 
-    ForeignWordStatsList(List<ForeignWordStats> list) {
+    public ForeignWordStatsList(List<ForeignWordStats> list) {
         this.list = list;
     }
 
@@ -31,7 +31,7 @@ public class ForeignWordStatsList {
         return list.size();
     }
 
-    List<String> getForeignWords() {
+    public List<String> getForeignWords() {
         List<String> words = new ArrayList<>(list.size());
         for (ForeignWordStats fws : list) {
             words.add(fws.getForeignWord());

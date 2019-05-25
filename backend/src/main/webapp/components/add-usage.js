@@ -1,11 +1,7 @@
 
-(function () {
 
-    var thatDoc = document;
-    var thisDoc = document.currentScript.ownerDocument
-
-    var tmpl = thisDoc.querySelector('template')
-
+define(['knockout', 'require-text!components/add-usage.html'], function(ko, htmlString) {
+    
     function AddUsageViewModel(params, componentInfo) {
         var vm = this
 
@@ -42,14 +38,14 @@
             vm.usage("")
         }
     }
-
-    ko.components.register('ko-component-add-usage', {
+ 
+    // Return component definition
+    return {
         viewModel: {
-            createViewModel: function(params, componentInfo){
-                return new AddUsageViewModel(params, componentInfo)
-            }
+                createViewModel: function(params, componentInfo) {
+                    return new AddUsageViewModel(params, componentInfo)
+                }
         },
-        template: tmpl.innerHTML
-    })
-
-})()
+        template: htmlString
+    };
+});

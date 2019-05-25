@@ -6,15 +6,19 @@
 
 package com.antoshkaplus.words.backend;
 
-import com.antoshkaplus.words.backend.model.*;
-import com.antoshkaplus.words.backend.model.BackendUser;
-import com.antoshkaplus.words.backend.model.Translation;
-
 import com.antoshkaplus.bee.ValContainer;
-
-import com.google.api.server.spi.config.Api;
+import com.antoshkaplus.words.backend.containers.ForeignWordScore;
+import com.antoshkaplus.words.backend.containers.ForeignWordScoreList;
+import com.antoshkaplus.words.backend.containers.ForeignWordStatsList;
+import com.antoshkaplus.words.backend.containers.ResourceBoolean;
+import com.antoshkaplus.words.backend.containers.TranslationList;
+import com.antoshkaplus.words.backend.containers.Version;
+import com.antoshkaplus.words.backend.model.BackendUser;
+import com.antoshkaplus.words.backend.model.ForeignWordStats;
+import com.antoshkaplus.words.backend.model.Translation;
+import com.antoshkaplus.words.backend.model.Update;
+import com.antoshkaplus.words.backend.model.Usage;
 import com.google.api.server.spi.config.ApiMethod;
-import com.google.api.server.spi.config.ApiNamespace;
 import com.google.api.server.spi.config.Named;
 import com.google.api.server.spi.config.Nullable;
 import com.google.appengine.api.datastore.Cursor;
@@ -30,7 +34,6 @@ import org.apache.commons.lang3.time.DateUtils;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -48,16 +51,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * Some properties have to be set in backend:
  * Translation id, owner
  */
-@Api(name = "dictionaryApi",
-        version = "v3",
-        resource = "dictionary",
-        namespace = @ApiNamespace(
-                ownerDomain = "backend.words.antoshkaplus.com",
-                ownerName = "backend.words.antoshkaplus.com"),
-        scopes = {Constants.EMAIL_SCOPE},
-        clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID_HORSE, Constants.ANDROID_CLIENT_ID_PONY, Constants.API_EXPLORER_CLIENT_ID},
-        audiences = {Constants.ANDROID_AUDIENCE})
-public class DictionaryEndpoint {
+public class DictionaryEndpoint extends BaseEndpoint {
 
     static {
         ObjectifyService.register(ForeignWordStats.class);
@@ -351,23 +345,6 @@ public class DictionaryEndpoint {
                 ofy().save().entities(m.values()).now();
             }
         });
-    }
-
-
-
-    private BackendUser retrieveBackendUser(User user) {
-        BackendUser newUser = new BackendUser(user.getEmail());
-        BackendUser res = ofy().load().entity(newUser).now();
-        if (res == null) {
-            ofy().save().entity(newUser).now();
-            res = newUser;
-        }
-        return res;
-    }
-
-    private Query<Translation> getTranslationQuery(User user) {
-        BackendUser backendUser = retrieveBackendUser(user);
-        return ofy().load().type(Translation.class).ancestor(backendUser);
     }
 
 
