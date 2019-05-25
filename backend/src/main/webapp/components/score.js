@@ -1,5 +1,5 @@
 
-define(['knockout', 'require-text!components/score.html'], function(ko, htmlString) {
+define(['jquery', 'knockout', 'require-text!components/score.html'], function($, ko, htmlString) {
 
     function ScoreViewModel(params, componentInfo) {
 
@@ -20,6 +20,7 @@ define(['knockout', 'require-text!components/score.html'], function(ko, htmlStri
             if (!val) return;
             vm.fillStatsList()
         })
+        if (externalApis.dictionaryLoaded()) vm.fillStatsList()
     }
 
     return {

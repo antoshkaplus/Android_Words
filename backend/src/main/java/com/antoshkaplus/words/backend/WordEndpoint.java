@@ -3,12 +3,17 @@ package com.antoshkaplus.words.backend;
 
 import com.antoshkaplus.words.backend.containers.WordVersusList;
 import com.antoshkaplus.words.backend.model.BackendUser;
+import com.antoshkaplus.words.backend.model.ForeignWordStats;
+import com.antoshkaplus.words.backend.model.Translation;
+import com.antoshkaplus.words.backend.model.Update;
 import com.antoshkaplus.words.backend.model.Word;
 import com.antoshkaplus.words.backend.model.WordVersus;
+import com.google.api.server.spi.config.ApiClass;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.users.User;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.Result;
 
@@ -21,7 +26,13 @@ import java.util.stream.Collectors;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 
+@ApiClass(resource = "word")
 public class WordEndpoint extends BaseEndpoint {
+
+    static {
+        ObjectifyService.register(WordVersus.class);
+        ObjectifyService.register(Word.class);
+    }
 
     @ApiMethod
     public WordVersus addWordVersus(WordVersus wordVersus, User user) {
@@ -57,7 +68,7 @@ public class WordEndpoint extends BaseEndpoint {
         wordVersusSave.now();
 
         words.forEach(w -> w.wordVersusList.add(Ref.create(wordVersus)));
-        ofy().save().entities(wordVersus.words).now();
+        ofy().save().entities(words).now();
 
         return wordVersus;
     }

@@ -56,8 +56,6 @@ public class DictionaryEndpoint extends BaseEndpoint {
     static {
         ObjectifyService.register(ForeignWordStats.class);
         ObjectifyService.register(Translation.class);
-        ObjectifyService.register(BackendUser.class);
-        ObjectifyService.register(Update.class);
     }
 
     public DictionaryEndpoint() {}

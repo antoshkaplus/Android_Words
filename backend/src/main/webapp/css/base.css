@@ -2,3 +2,11 @@
 ul div li.list-group-item {
     background-color: #efff89
 }
+
+.list-group .list-group .list-group-item {
+    background-color: #f6ffc1
+}
+
+.list-group .list-group + .list-group-item {
+    background-color: #bbd8a9
+}

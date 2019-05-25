@@ -1,10 +1,13 @@
 package com.antoshkaplus.words.backend;
 
 import com.antoshkaplus.words.backend.model.BackendUser;
+import com.antoshkaplus.words.backend.model.ForeignWordStats;
 import com.antoshkaplus.words.backend.model.Translation;
+import com.antoshkaplus.words.backend.model.Update;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiNamespace;
 import com.google.appengine.api.users.User;
+import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.cmd.Query;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -19,6 +22,11 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
         clientIds = {Constants.WEB_CLIENT_ID, Constants.ANDROID_CLIENT_ID_HORSE, Constants.ANDROID_CLIENT_ID_PONY, Constants.API_EXPLORER_CLIENT_ID},
         audiences = {Constants.ANDROID_AUDIENCE})
 public class BaseEndpoint {
+
+    static {
+        ObjectifyService.register(BackendUser.class);
+        ObjectifyService.register(Update.class);
+    }
 
     BackendUser retrieveBackendUser(User user) {
         BackendUser newUser = new BackendUser(user.getEmail());

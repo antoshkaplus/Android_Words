@@ -1,5 +1,5 @@
 
-define(['knockout', 'require-text!components/lookup.html'], function(ko, htmlString) {
+define(['jquery', 'knockout', 'require-text!components/lookup.html'], function($, ko, htmlString) {
 
     function LookupViewModel(params, componentInfo) {
 
@@ -24,6 +24,7 @@ define(['knockout', 'require-text!components/lookup.html'], function(ko, htmlStr
             if (!val) return;
             vm.fillStatsList()
         })
+        if (externalApis.dictionaryLoaded()) vm.fillStatsList()
     }
 
     return {

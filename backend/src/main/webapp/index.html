@@ -36,6 +36,9 @@
         <li class="nav-item">
             <a class="nav-link" id="lookup-tab" data-toggle="tab" href="#lookup" role="tab" aria-controls="lookup-tab" aria-selected="false">Lookup</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" id="word-versus-tab" data-toggle="tab" href="#word-versus" role="tab" aria-controls="word-versus-tab" aria-selected="false">Word VS</a>
+        </li>
     </ul>
 
     <div class="tab-content">
@@ -43,10 +46,13 @@
             <ko-component-translation/>
         </div>
         <div class="tab-pane fade" id="score" role="tabpanel" aria-labelledby="score-tab">
-            <ko-components-score/>
+            <ko-component-score/>
         </div>
         <div class="tab-pane fade" id="lookup" role="tabpanel" aria-labelledby="lookup-tab">
-            <ko-components-lookup/>
+            <ko-component-lookup/>
+        </div>
+        <div class="tab-pane fade" id="word-versus" role="tabpanel" aria-labelledby="word-versus-tab">
+            <ko-component-word-versus/>
         </div>
     </div>
 

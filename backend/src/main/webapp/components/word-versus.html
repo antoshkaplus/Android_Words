@@ -1,0 +1,34 @@
+
+<div class="panel panel-default">
+    <form>
+
+        <div class="form-group">
+            <label>Words:</label>
+            <div data-bind="foreach: words">
+                <input type="text" data-bind="value: $rawData" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Difference:</label>
+            <textarea data-bind="value: description" class="form-control" required>
+            </textarea>
+        </div>
+        <div class="form-group">
+            <button type="button" class="btn btn-primary" data-bind="click: $component.addWordVersus">Add</button>
+        </div>
+    </form>
+
+    <div class="list-group" data-bind="foreach: wordVersusList">
+        <div class="list-group" data-bind="foreach: words">
+            <div class="list-group-item" data-bind="text: $data"></div>
+        </div>
+
+        <div class="list-group-item d-flex justify-content-between">
+            <div style="white-space: pre-wrap;" data-bind="text: description"></div>
+            <div data-bind="text: creationDate"></div>
+        </div>
+
+        <div class="list-group-item"></div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 
 
-define(['knockout', 'require-text!components/add-usage.html'], function(ko, htmlString) {
+define(['jquery', 'knockout', 'require-text!components/add-usage.html'], function($, ko, htmlString) {
     
     function AddUsageViewModel(params, componentInfo) {
         var vm = this

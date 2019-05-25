@@ -1,5 +1,5 @@
 
-define(['knockout', 'require-text!components/translation.html'], function(ko, htmlString) {
+define(['jquery', 'knockout', 'require-text!components/translation.html'], function($, ko, htmlString) {
 
     function TranslationViewModel(params, componentInfo) {
 
@@ -191,6 +191,7 @@ define(['knockout', 'require-text!components/translation.html'], function(ko, ht
             if (!val) return;
             vm.loadMoreTranslations()
         })
+        if (externalApis.dictionaryLoaded()) vm.loadMoreTranslations()
 
         vm.translationKindSelected.subscribe(function(newKind) {
             form = $("#addTranslationForm")
