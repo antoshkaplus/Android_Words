@@ -30,9 +30,19 @@ define(['jquery', 'knockout', 'require-text!components/add-usage.html'], functio
                 .then(
                     function(resp) {
                         translation.usages.push(usage);
+                        $.notify({
+                            message: "usage added"
+                        },{
+                            type: 'success'
+                        });
                         console.log("add usage success")
                     },
                     function(reason) {
+                        $.notify({
+                            message: "add usage failure"
+                        },{
+                            type: 'danger'
+                        });
                         console.log("add usage failure", reason)
                     })
             vm.usage("")

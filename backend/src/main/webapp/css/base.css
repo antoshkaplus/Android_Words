@@ -1,12 +1,8 @@
 
-ul div li.list-group-item {
-    background-color: #efff89
-}
-
-.list-group .list-group .list-group-item {
+.list-item-light {
     background-color: #f6ffc1
 }
 
-.list-group .list-group + .list-group-item {
+.list-item-dark {
     background-color: #bbd8a9
 }

@@ -17,7 +17,7 @@
     </form>
     <ul class="list-group" data-bind="foreach: wordTranslation">
         <!-- ko ifnot: deleted -->
-        <li class="list-group-item d-flex justify-content-between">
+        <li class="list-item-light list-group-item d-flex justify-content-between">
             <div data-bind="text: nativeWord"></div>
             <button type="button" class=" btn btn-primary" data-bind="click: $component.addUsage">
                 <span title="Add Usage" class="octicon octicon-plus"></span>
@@ -25,7 +25,7 @@
         </li>
 
         <div class="list-group" data-bind="foreach: usages">
-            <li class="list-group-item" data-bind="text: usage"></li>
+            <li class="list-item-dark list-group-item" data-bind="text: usage"></li>
         </div>
 
         <!-- /ko -->

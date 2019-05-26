@@ -21,10 +21,10 @@
 
     <div class="list-group" data-bind="foreach: wordVersusList">
         <div class="list-group" data-bind="foreach: words">
-            <div class="list-group-item" data-bind="text: $data"></div>
+            <div class="list-item-light list-group-item" data-bind="text: $data"></div>
         </div>
 
-        <div class="list-group-item d-flex justify-content-between">
+        <div class="list-item-dark list-group-item d-flex justify-content-between">
             <div style="white-space: pre-wrap;" data-bind="text: description"></div>
             <div data-bind="text: creationDate"></div>
         </div>
