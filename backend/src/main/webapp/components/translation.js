@@ -70,24 +70,23 @@ define(['jquery', 'knockout', 'require-text!components/translation.html'], funct
                 var source = 'https://www.googleapis.com/language/translate/v2';
                 var foreignWord = $('#foreignWord').val()
 
-                if (HasRussianLetters(foreignWord)) return;
-
                 translatedText = vm.gapiTranslations[foreignWord];
                 if (translatedText === undefined) {
                     vm.gapiTranslations[foreignWord] = null;
-                    $.get( source, { key: apiKey, source: "en", target: "ru", q: foreignWord } )
-                        .done(function( data ) {
-                            text = vm.gapiTranslations[foreignWord] = data.data.translations[0].translatedText
+                    if (!HasRussianLetters(foreignWord)) {
+                        $.get( source, { key: apiKey, source: "en", target: "ru", q: foreignWord } )
+                            .done(function( data ) {
+                                text = vm.gapiTranslations[foreignWord] = data.data.translations[0].translatedText
 
-                            console.log(text)
-                            $('#nativeWord').val(text);
-                        });
+                                console.log(text)
+                                $('#nativeWord').val(text);
+                            });
+                    }
                 } else if (translatedText === null) {
                     // nothing to do wait for it
                 } else {
                     $('#nativeWord').val(translatedText);
                 }
-
 
                 vm.wordTranslation([ new Translation("", "In Progress") ])
 
