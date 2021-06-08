@@ -2,6 +2,8 @@ package com.antoshkaplus.words.backend;
 
 import com.antoshkaplus.words.backend.model.BackendUser;
 import com.antoshkaplus.words.backend.model.Translation;
+import com.antoshkaplus.words.backend.model.WordVersus;
+import com.antoshkaplus.words.backend.model.ForeignWordStats;
 import com.google.appengine.api.oauth.OAuthRequestException;
 
 import java.security.InvalidParameterException;
@@ -24,6 +26,15 @@ public class Dictionary {
         return translations;
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    public List<WordVersus> getWordVersusListWhole(BackendUser user) {
+        List<WordVersus> list = ofy().load().type(WordVersus.class).ancestor(user).list();
+        return list;
+    }
 
-
+    @SuppressWarnings("UnnecessaryLocalVariable")
+    public List<ForeignWordStats> getForeignWordStats(BackendUser user) {
+        List<ForeignWordStats> list = ofy().load().type(ForeignWordStats.class).ancestor(user).list();
+        return list;
+    }
 }

@@ -4,6 +4,10 @@ package com.antoshkaplus.words.backend.remote;
 import com.antoshkaplus.words.backend.model.BackendUser;
 import com.antoshkaplus.words.backend.Dictionary;
 import com.antoshkaplus.words.backend.model.Translation;
+import com.antoshkaplus.words.backend.model.TranslationKind;
+import com.antoshkaplus.words.backend.model.WordVersus;
+import com.antoshkaplus.words.backend.model.ForeignWordStats;
+import com.antoshkaplus.words.backend.model.Usage;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.FetchOptions;
@@ -38,6 +42,8 @@ import java.util.Scanner;
 public class Words {
 
     static {
+        ObjectifyService.register(ForeignWordStats.class);
+        ObjectifyService.register(WordVersus.class);
         ObjectifyService.register(Translation.class);
         ObjectifyService.register(BackendUser.class);
     }
@@ -168,8 +174,52 @@ public class Words {
 
     public JSONObject translationToJsonObject(Translation t) {
         JSONObject obj = new JSONObject();
+        obj.put("id", t.getId());
         obj.put("foreignWord", t.getForeignWord());
         obj.put("nativeWord", t.getNativeWord());
+        Map<TranslationKind, String> map = Map.of(
+                TranslationKind.Word, "Word",
+                TranslationKind.Idiom, "Idiom",
+                TranslationKind.Phrase, "Phrase",
+                TranslationKind.Name, "Name",
+                TranslationKind.Abbr, "Abbr",
+                TranslationKind.Compliment, "Compliment",
+                TranslationKind.Pronun, "Pronun");
+        obj.put("kind", map.get(t.getKind()));
+        obj.put("deleted", t.isDeleted());
+        obj.put("createDate", t.getCreationDate().toString());
+        obj.put("updateDate", t.getUpdateDate().toString());
+
+        JSONArray usages = new JSONArray();
+        for (Usage u : t.getUsages()) {
+            JSONObject uObj = new JSONObject();
+            uObj.put("usage", u.usage);
+            uObj.put("createDate", u.creationDate.toString());
+
+            usages.add(uObj);
+        }
+        obj.put("usages", usages);
+        return obj;
+    }
+
+    public JSONObject wordVersusToJsonObject(WordVersus t) {
+        JSONObject obj = new JSONObject();
+        obj.put("id", t.id);
+        JSONArray words = new JSONArray();
+        for (String s : t.words) {
+            words.add(s);
+        }
+        obj.put("words", words);
+        obj.put("description", t.description);
+        obj.put("createDate", t.creationDate.toString());
+        return obj;
+    }
+
+    public JSONObject statsToJsonObject(ForeignWordStats t) {
+        JSONObject obj = new JSONObject();
+        obj.put("foreignWord", t.getForeignWord());
+        obj.put("lookupCount", t.getLookupCount());
+        obj.put("lastLookup", t.getLastLookup() != null ? t.getLastLookup().toString() : (new Date()).toString());
         return obj;
     }
 
@@ -187,6 +237,16 @@ public class Words {
                     translations.add(translationToJsonObject(t));
                 }
                 userObj.put("translations", translations);
+                JSONArray wordVersus = new JSONArray();
+                for (WordVersus t : dict.getWordVersusListWhole(bu)) {
+                    wordVersus.add(wordVersusToJsonObject(t));
+                }
+                userObj.put("wordVersus", wordVersus);
+                JSONArray stats = new JSONArray();
+                for (ForeignWordStats t : dict.getForeignWordStats(bu)) {
+                    stats.add(statsToJsonObject(t));
+                }
+                userObj.put("stats", stats);
             }
             catch (Exception ex) {
                 ex.printStackTrace();
